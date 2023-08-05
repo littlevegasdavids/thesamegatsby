@@ -19,7 +19,7 @@ import Image from "next/image";
 const Home: NextPage = () => {
   return (
     <Flex height="100vh" alignItems="center" justifyContent="center" m={[3, 0]}>
-      <Box p={2} rounded="lg" className="CardBorder" shadow="2xl" textColor="white">
+      <Box p={2} rounded="lg" className="CardBorder" shadow="2xl" textColor="white" textAlign="center">
         <Box
           bg="black"
           px={["3", "10"]}
@@ -39,7 +39,7 @@ const Home: NextPage = () => {
               height={60}
             />
             <Text as="b">Déjà Gatsby | thesamegatsby | littlevegasdavids</Text>
-            <Flex flexDirection="column" gap={0} placeItems="center">
+            <Flex flexDirection="column" gap={0}>
               <Text>Music | Alter Ego | Software</Text>
               <Text>Cape Town, South Africa</Text>
               <Text as="b">Coming Soon</Text>
