@@ -9,6 +9,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import {
+  GithubLogo,
   InstagramLogo,
   SoundcloudLogo,
   YoutubeLogo,
@@ -38,11 +39,11 @@ const Home: NextPage = () => {
               width={400}
               height={60}
             />
-            <Text as="b">Déjà Gatsby | thesamegatsby | littlevegasdavids</Text>
+            <Text as="b" fontSize={["xl","3xl"]} mt="-10">THE SAME GATSBY</Text>
             <Flex flexDirection="column" gap={0}>
               <Text>Music | Alter Ego | Software</Text>
               <Text>Cape Town, South Africa</Text>
-              <Text as="b">Coming Soon</Text>
+              <Text as="b">Under Construction: Coming Soon</Text>
             </Flex>
             <Flex gap={3}>
               <a href="https://www.instagram.com/thesamegatsby" target="_blank">
@@ -66,6 +67,15 @@ const Home: NextPage = () => {
               <a href="https://soundcloud.com/dejagatsby" target="_blank">
                 <Icon
                   as={SoundcloudLogo}
+                  boxSize={10}
+                  bg="white"
+                  textColor="black"
+                  rounded="lg"
+                />
+              </a>
+              <a href="https://github.com/littlevegasdavids/littlevegasdavids" target="_blank">
+                <Icon
+                  as={GithubLogo}
                   boxSize={10}
                   bg="white"
                   textColor="black"
