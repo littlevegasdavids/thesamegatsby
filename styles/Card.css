@@ -1,0 +1,17 @@
+.CardBorder{
+    background: linear-gradient(-45deg, #5BC0BE, #6FFFE9, white);
+	animation: gradient 3s ease infinite;
+    background-size: 600% 600%;
+}
+
+@keyframes gradient {
+	0% {
+		background-position: 0% 50%;
+	}
+	50% {
+		background-position: 100% 50%;
+	}
+	100% {
+		background-position: 0% 50%;
+	}
+}
