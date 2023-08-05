@@ -45,7 +45,7 @@ const Home: NextPage = () => {
               <Text as="b">Coming Soon</Text>
             </Flex>
             <Flex gap={3}>
-              <a href="https://www.instagram.com" target="_blank">
+              <a href="https://www.instagram.com/thesamegatsby" target="_blank">
                 <Icon
                   as={InstagramLogo}
                   boxSize={10}

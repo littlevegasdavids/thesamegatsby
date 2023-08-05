@@ -2,18 +2,19 @@ import { ChakraProvider, CSSReset, extendTheme } from "@chakra-ui/react";
 import '../styles/global.css'
 import '../styles/Card.css'
 import Head from "next/head";
+import type { AppProps } from "next/app";
 
 const theme = extendTheme({
   styles: {
     global: {
       body: {
-        bg: '', // Example background color (you can use any valid color value)
+        b: '', // Example background color (you can use any valid color value)
       },
     },
   },
 });
 
-function MyApp({ Component, pageProps }) {
+function MyApp({ Component, pageProps }: AppProps) {
   return (
     <ChakraProvider theme={theme}>
       <Head>
