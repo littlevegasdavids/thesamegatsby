@@ -1,11 +1,6 @@
 import {
-  Avatar,
   Box,
   Flex,
-  Heading,
-  Icon,
-  SimpleGrid,
-  Spinner,
   Tab,
   TabList,
   TabPanel,
@@ -13,12 +8,6 @@ import {
   Tabs,
   Text,
 } from "@chakra-ui/react";
-import {
-  GithubLogo,
-  InstagramLogo,
-  SoundcloudLogo,
-  YoutubeLogo,
-} from "@phosphor-icons/react";
 import type { NextPage } from "next";
 import Image from "next/image";
 
@@ -56,7 +45,20 @@ const Home: NextPage = () => {
               </TabList>
               <TabPanels>
                 <TabPanel>
-                  <p>Music Tab</p>
+                  <Tabs isFitted align="center" variant="unstyled">
+                    <TabList>
+                      <Tab _selected={{ color: "black", bg: "white" }}>Songs</Tab>
+                      <Tab _selected={{ color: "black", bg: "white" }}>Mixes</Tab>
+                    </TabList>
+                    <TabPanels>
+                      <TabPanel>
+                        <p>Here are my songs</p>
+                      </TabPanel>
+                      <TabPanel>
+                        <p>Here are my mixes</p>
+                      </TabPanel>
+                    </TabPanels>
+                  </Tabs>
                 </TabPanel>
                 <TabPanel>
                   <p>Software Tab</p>
