@@ -29,12 +29,14 @@ const MusicTab = () => {
           alignItems="center"
           gap={3}
         >
-          <Image
-            src="/music/bring_that_change.svg"
-            alt="bring that change image"
-            width={200}
-            height={60}
-          />
+          <Box width="100%" maxW="400px" aspectRatio={1 / 1} position="relative">
+            <Image
+              src="/music/bring_that_change.svg"
+              alt="bring that change image"
+              layout="fill"
+            />
+          </Box>
+
           <Flex
             gap={3}
             direction="column"
@@ -59,7 +61,10 @@ const MusicTab = () => {
               </Tooltip>
 
               <Tooltip placement="top" hasArrow label="Apple Music">
-                <a href="https://music.apple.com/za/album/bring-that-change/1708120323?i=1708120324" target="_blank">
+                <a
+                  href="https://music.apple.com/za/album/bring-that-change/1708120323?i=1708120324"
+                  target="_blank"
+                >
                   <Icon
                     as={AppleLogo}
                     boxSize={8}
@@ -86,7 +91,10 @@ const MusicTab = () => {
               </Tooltip>
 
               <Tooltip placement="top" hasArrow label="Soundcloud">
-                <a href="https://soundcloud.com/dejagatsby/bring-that-change" target="_blank">
+                <a
+                  href="https://soundcloud.com/dejagatsby/bring-that-change"
+                  target="_blank"
+                >
                   <Icon
                     as={SoundcloudLogo}
                     boxSize={8}
