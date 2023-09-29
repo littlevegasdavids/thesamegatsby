@@ -18,7 +18,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <ChakraProvider theme={theme}>
       <Head>
-        <title>Gatbsy</title>
+        <title>thesamegatsby</title>
         <link rel="icon" href="Profile.jpeg"/>
       </Head>
       <CSSReset />
