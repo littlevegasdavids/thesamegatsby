@@ -41,7 +41,7 @@ const SoftwareTab = () => {
               alignItems="center"
             >
               <Text as="b" fontSize="md">
-                League Of Legends Champions
+                League Of Legends Champions (2023)
               </Text>
             </Flex>
           </Flex>
@@ -87,7 +87,7 @@ const SoftwareTab = () => {
               alignItems="center"
             >
               <Text as="b" fontSize="md">
-                RIC BGO Tool
+                RIC BGO Tool (2022)
               </Text>
             </Flex>
           </Flex>
@@ -108,6 +108,41 @@ const SoftwareTab = () => {
                   Demo Video
                 </Button>
               </a>
+              <a
+                href="https://github.com/littlevegasdavids/RIC-BGO-Tool"
+                target="_blank"
+              >
+                <Button bg="black" textColor="white">
+                  <Icon as={GithubLogo} textColor="white" mr={2} />
+                  Github
+                </Button>
+              </a>
+            </Flex>
+          </Flex>
+        </Box>
+        <Box bg="white" rounded="xl" textColor="black" p={3} w="100%">
+          <Flex
+            direction="row"
+            justifyContent="center"
+            alignItems="center"
+            gap={3}
+          >
+            <Flex
+              gap={3}
+              direction="column"
+              justifyContent="center"
+              alignItems="center"
+            >
+              <Text as="b" fontSize="md">
+                Shop Emporium (2022)
+              </Text>
+            </Flex>
+          </Flex>
+          <Flex justifyContent="center" mt={3} gap={5} direction="column">
+            <Text fontSize="sm" fontStyle="italic">
+              An ecommerce framework that I built from scratch during my gap year.
+            </Text>
+            <Flex justifyContent="center" gap={3}>
               <a
                 href="https://github.com/littlevegasdavids/RIC-BGO-Tool"
                 target="_blank"
