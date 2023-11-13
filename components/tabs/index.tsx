@@ -8,12 +8,12 @@ const TabsContent = () => {
     <Tabs isFitted variant="unstyled" w="100%">
       <TabList>
         <Tab _selected={{ color: "black", bg: "white" }}>Music</Tab>
-        <Tab _selected={{ color: "black", bg: "white" }}>Videos</Tab>
+        {/* <Tab _selected={{ color: "black", bg: "white" }}>Videos</Tab> */}
         <Tab _selected={{ color: "black", bg: "white" }}>Software</Tab>
       </TabList>
       <TabPanels>
         <MusicTab />
-        <VideoTab />
+        {/* <VideoTab /> */}
         <SoftwareTab />
       </TabPanels>
     </Tabs>

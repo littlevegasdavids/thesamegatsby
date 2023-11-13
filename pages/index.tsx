@@ -11,7 +11,7 @@ import TabsContent from "../components/tabs";
 
 const Home: NextPage = () => {
   return (
-    <Flex height="100vh" alignItems="center" justifyContent="center" m={[3, 0]}>
+    <Flex minH="100vh" alignItems="center" justifyContent="center" m={[3, 0]} py="5">
       <Box
         p={2}
         rounded="lg"
@@ -19,6 +19,7 @@ const Home: NextPage = () => {
         shadow="2xl"
         textColor="white"
         textAlign="center"
+        maxW="500px"
       >
         <Box bg="black" px={["3", "10"]} py="3" rounded="lg">
           <Flex
