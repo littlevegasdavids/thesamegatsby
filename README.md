@@ -2,4 +2,4 @@
 
 My personal portfolio website
 
-<a href="thesamegatsby.com" target="_blank">thesamegatsby.com</a>
+<a href="www.thesamegatsby.com" target="_blank">thesamegatsby.com</a>
