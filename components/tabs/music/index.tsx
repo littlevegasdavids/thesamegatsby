@@ -8,11 +8,8 @@ import {
   Tooltip,
 } from "@chakra-ui/react";
 import {
-  InstagramLogo,
   YoutubeLogo,
   SoundcloudLogo,
-  TiktokLogo,
-  GithubLogo,
   SpotifyLogo,
   AppleLogo,
   Play,

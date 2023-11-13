@@ -13,7 +13,7 @@ const TabsContent = () => {
       </TabList>
       <TabPanels>
         <MusicTab />
-        <VideoTab />
+        {/* <VideoTab /> */}
         <SoftwareTab />
       </TabPanels>
     </Tabs>
