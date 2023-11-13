@@ -19,6 +19,7 @@ const Home: NextPage = () => {
         shadow="2xl"
         textColor="white"
         textAlign="center"
+        maxW="500px"
       >
         <Box bg="black" px={["3", "10"]} py="3" rounded="lg">
           <Flex

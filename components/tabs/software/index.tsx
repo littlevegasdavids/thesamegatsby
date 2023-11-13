@@ -5,7 +5,6 @@ import {
   Text,
   Icon,
   Button,
-  Tooltip,
 } from "@chakra-ui/react";
 import { GithubLogo, Link } from "@phosphor-icons/react";
 import Image from "next/image";
