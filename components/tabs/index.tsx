@@ -9,12 +9,12 @@ const TabsContent = () => {
       <TabList>
         <Tab _selected={{ color: "black", bg: "white" }}>Music</Tab>
         {/* <Tab _selected={{ color: "black", bg: "white" }}>Videos</Tab> */}
-        <Tab _selected={{ color: "black", bg: "white" }}>Software</Tab>
+        {/* <Tab _selected={{ color: "black", bg: "white" }}>Software</Tab> */}
       </TabList>
       <TabPanels>
         <MusicTab />
         {/* <VideoTab /> */}
-        <SoftwareTab />
+        {/* <SoftwareTab /> */}
       </TabPanels>
     </Tabs>
   );

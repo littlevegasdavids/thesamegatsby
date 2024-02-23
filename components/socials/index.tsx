@@ -58,7 +58,7 @@ const Socials = () => {
         </a>
       </Tooltip>
 
-      <Tooltip placement="top" hasArrow label="Github">
+      {/* <Tooltip placement="top" hasArrow label="Github">
         <a
           href="https://github.com/littlevegasdavids/littlevegasdavids"
           target="_blank"
@@ -71,7 +71,7 @@ const Socials = () => {
             rounded="lg"
           />
         </a>
-      </Tooltip>
+      </Tooltip> */}
     </Flex>
   );
 };

@@ -1,5 +1,5 @@
 .CardBorder{
-    background: linear-gradient(-45deg, #5BC0BE, #6FFFE9, white);
+    background: linear-gradient(-45deg, white, #6FFFE9, #EA70FF);
 	animation: gradient 3s ease infinite;
     background-size: 600% 600%;
 }
