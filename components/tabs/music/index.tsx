@@ -1,121 +1,42 @@
-import {
-  Box,
-  Button,
-  Flex,
-  Icon,
-  TabPanel,
-  Text,
-  Tooltip,
-} from "@chakra-ui/react";
-import {
-  YoutubeLogo,
-  SoundcloudLogo,
-  SpotifyLogo,
-  AppleLogo,
-  Play,
-} from "@phosphor-icons/react";
-import Image from "next/image";
+import { Flex } from "@chakra-ui/react";
+import MusicBox from "./MusicBox";
+import { useState } from "react";
 
-const MusicTab = () => {
+const MusicContent = () => {
   return (
-    <TabPanel>
-      <Box bg="white" rounded="xl" textColor="black" p={3} w="100%">
-        <Flex
-          direction="row"
-          justifyContent="center"
-          alignItems="center"
-          gap={3}
-        >
-          <Box width="100%" maxW="400px" aspectRatio={1 / 1} position="relative">
-            <Image
-              src="/music/bring_that_change.svg"
-              alt="bring that change image"
-              layout="fill"
-            />
-          </Box>
-
-          <Flex
-            gap={3}
-            direction="column"
-            justifyContent="center"
-            alignItems="center"
-          >
-            <Text as="b">Bring that change</Text>
-            <Flex gap={3}>
-              <Tooltip placement="top" hasArrow label="Spotify">
-                <a
-                  href="https://open.spotify.com/track/09QlqIRHu7X9DmGK0vdDvQ?si=2ca9d27a5ef949a5"
-                  target="_blank"
-                >
-                  <Icon
-                    as={SpotifyLogo}
-                    boxSize={8}
-                    bg="white"
-                    textColor="black"
-                    rounded="lg"
-                  />
-                </a>
-              </Tooltip>
-
-              <Tooltip placement="top" hasArrow label="Apple Music">
-                <a
-                  href="https://music.apple.com/za/album/bring-that-change/1708120323?i=1708120324"
-                  target="_blank"
-                >
-                  <Icon
-                    as={AppleLogo}
-                    boxSize={8}
-                    bg="white"
-                    textColor="black"
-                    rounded="lg"
-                  />
-                </a>
-              </Tooltip>
-
-              <Tooltip placement="top" hasArrow label="Youtube Music">
-                <a
-                  href="https://www.youtube.com/watch?v=aZ5cKAAMU2U"
-                  target="_blank"
-                >
-                  <Icon
-                    as={YoutubeLogo}
-                    boxSize={8}
-                    bg="white"
-                    textColor="black"
-                    rounded="lg"
-                  />
-                </a>
-              </Tooltip>
-
-              <Tooltip placement="top" hasArrow label="Soundcloud">
-                <a
-                  href="https://soundcloud.com/dejagatsby/bring-that-change"
-                  target="_blank"
-                >
-                  <Icon
-                    as={SoundcloudLogo}
-                    boxSize={8}
-                    bg="white"
-                    textColor="black"
-                    rounded="lg"
-                  />
-                </a>
-              </Tooltip>
-            </Flex>
-            <a
-              href="https://www.youtube.com/watch?v=aZ5cKAAMU2U"
-              target="_blank"
-            >
-              <Button bg="black" textColor="white">
-                <Icon as={Play} mr={2} />
-                Play
-              </Button>
-            </a>
-          </Flex>
-        </Flex>
-      </Box>
-    </TabPanel>
+    <Flex direction={"column"} gap={3} justifyContent="center" w="100%">
+      <MusicBox
+        title={"Can't You See EP"}
+        spotifyLink={
+          "https://open.spotify.com/album/4WiQgdIocMx6qgYSmxnTPG?si=vomvD2eSSb-3t1jN45mGIA"
+        }
+        appleMusicLink={
+          "https://music.apple.com/za/album/cant-you-see-ep/1732276175"
+        }
+        youtubeLink={
+          "https://www.youtube.com/watch?v=fVlgwC0v_rQ&list=OLAK5uy_mdFFNJyKEaN9sPwJeztKKdCZlV_8188k8&index=1"
+        }
+        soundcloudLink={
+          "https://soundcloud.com/dejagatsby/sets/cant-you-see-ep/"
+        }
+        imgSrc={"/music/can't_you_see.png"}
+        bg={"white"}
+      />
+      <MusicBox
+        title={"Bring That Change"}
+        spotifyLink={
+          "https://open.spotify.com/track/09QlqIRHu7X9DmGK0vdDvQ?si=2ca9d27a5ef949a5"
+        }
+        appleMusicLink={
+          "https://music.apple.com/za/album/bring-that-change/1708120323?i=1708120324"
+        }
+        youtubeLink={"https://www.youtube.com/watch?v=aZ5cKAAMU2U"}
+        soundcloudLink={"https://soundcloud.com/dejagatsby/bring-that-change"}
+        imgSrc={"/music/bring_that_change.svg"}
+        bg={"white"}
+      />
+    </Flex>
   );
 };
 
-export default MusicTab;
+export default MusicContent;

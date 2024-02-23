@@ -1,17 +1,14 @@
-import {
-  Box,
-  Flex,
-  Text,
-} from "@chakra-ui/react";
+import { Box, Flex, Text } from "@chakra-ui/react";
 
 import type { NextPage } from "next";
 import Image from "next/image";
 import Socials from "../components/socials";
 import TabsContent from "../components/tabs";
+import MusicContent from "../components/tabs/music";
 
 const Home: NextPage = () => {
   return (
-    <Flex minH="100vh" alignItems="center" justifyContent="center" m={[3, 0]} py="5">
+    <Flex minH="100vh" alignItems="center" justifyContent="center" m={[3, 0]}>
       <Box
         p={2}
         rounded="lg"
@@ -19,7 +16,8 @@ const Home: NextPage = () => {
         shadow="2xl"
         textColor="white"
         textAlign="center"
-        maxW="500px"
+        minW={["95%", "35%"]}
+        my={5}
       >
         <Box bg="black" px={["3", "10"]} py="3" rounded="lg">
           <Flex
@@ -29,17 +27,20 @@ const Home: NextPage = () => {
             fontSize={["sm", "xl"]}
           >
             <Image
-              src="/Profile.jpeg"
+              src="/profile_pic.jpg"
               alt="profile picture"
-              width={400}
-              height={60}
+              width={"200"}
+              height={200}
             />
-            <Text as="b" fontSize={["xl", "3xl"]} mt="-10">
-              THE SAME GATSBY
-            </Text>
-            <Text>Cape Town, South Africa</Text>  
+            <Box>
+              <Text as="b" fontStyle="" fontSize={["xl", "3xl"]}>
+                Déjà Gatsby
+              </Text>
+              <Text fontSize="lg" fontWeight="light">Cape Town, South Africa</Text>
+            </Box>
+
             <Socials />
-            <TabsContent />
+            <MusicContent />
           </Flex>
         </Box>
       </Box>
