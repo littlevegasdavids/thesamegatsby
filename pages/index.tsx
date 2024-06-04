@@ -36,7 +36,7 @@ const Home: NextPage = () => {
               <Text as="b" fontStyle="" fontSize={["xl", "3xl"]}>
                 Déjà Gatsby
               </Text>
-              <Text fontSize="lg" fontWeight="light">Cape Town, South Africa</Text>
+              <Text fontSize="lg" fontWeight="light">South Africa</Text>
             </Box>
 
             <Socials />
