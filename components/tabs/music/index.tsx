@@ -6,7 +6,7 @@ const MusicContent = () => {
   return (
     <Flex direction={"column"} gap={3} justifyContent="center" w="100%">
       <MusicBox
-        title={"You who can be Forever"}
+        title={"You who could be Forever"}
         spotifyLink={
           "https://open.spotify.com/album/6KnDL1oCSeCVK7hpor4T3s?si=dLRxoji6QNSPbYS5zAEWoQ"
         }
