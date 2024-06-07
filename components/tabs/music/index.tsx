@@ -6,6 +6,23 @@ const MusicContent = () => {
   return (
     <Flex direction={"column"} gap={3} justifyContent="center" w="100%">
       <MusicBox
+        title={"You who can be Forever"}
+        spotifyLink={
+          "https://open.spotify.com/album/6KnDL1oCSeCVK7hpor4T3s?si=dLRxoji6QNSPbYS5zAEWoQ"
+        }
+        appleMusicLink={
+          "https://music.apple.com/us/album/you-who-could-be-forever-single/1750669404"
+        }
+        youtubeLink={
+          "https://www.youtube.com/watch?v=mqdVuGzM-1s"
+        }
+        soundcloudLink={
+          "https://soundcloud.com/dejagatsby/you-who-could-be-forever"
+        }
+        imgSrc={"/music/you_who_could_be_forever.png"}
+        bg={"white"}
+      />
+      <MusicBox
         title={"Can't You See EP"}
         spotifyLink={
           "https://open.spotify.com/album/4WiQgdIocMx6qgYSmxnTPG?si=vomvD2eSSb-3t1jN45mGIA"
