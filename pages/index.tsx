@@ -37,6 +37,7 @@ const Home: NextPage = () => {
                 Déjà Gatsby
               </Text>
               <Text fontSize="lg" fontWeight="light">South Africa</Text>
+              <Text fontSize="md" fontWeight="light">thesamegatsby@gmail.com</Text>
             </Box>
 
             <Socials />
