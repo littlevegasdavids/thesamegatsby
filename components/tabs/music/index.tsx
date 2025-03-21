@@ -6,6 +6,23 @@ const MusicContent = () => {
   return (
     <Flex direction={"column"} gap={3} justifyContent="center" w="100%">
       <MusicBox
+        title={"Give me that KaiZen"}
+        spotifyLink={
+          ""
+        }
+        appleMusicLink={
+          "https://music.apple.com/us/album/give-me-that-kaizen-single/1803499620"
+        }
+        youtubeLink={
+          "https://www.youtube.com/watch?v=3NtCoWZeQFU&list=OLAK5uy_nxHhcOcMrBW07x7hwYzQkMBlJcqLLirHM&index=2"
+        }
+        soundcloudLink={
+          "https://soundcloud.com/dejagatsby/sets/give-me-that-kaizen"
+        }
+        imgSrc={"/music/kaizen.png"}
+        bg={"white"}
+      />
+      <MusicBox
         title={"You who could be Forever"}
         spotifyLink={
           "https://open.spotify.com/album/6KnDL1oCSeCVK7hpor4T3s?si=dLRxoji6QNSPbYS5zAEWoQ"
