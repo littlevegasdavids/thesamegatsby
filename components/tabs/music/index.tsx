@@ -8,7 +8,7 @@ const MusicContent = () => {
       <MusicBox
         title={"Give me that KaiZen"}
         spotifyLink={
-          ""
+          "https://open.spotify.com/album/0ATTxFkDlXZgVnoXe5zQiB?si=wFosTC3rSgOVupKkE4b_FQ"
         }
         appleMusicLink={
           "https://music.apple.com/us/album/give-me-that-kaizen-single/1803499620"
