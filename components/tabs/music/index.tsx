@@ -6,6 +6,40 @@ const MusicContent = () => {
   return (
     <Flex direction={"column"} gap={3} justifyContent="center" w="100%">
       <MusicBox
+        title={"Welcome to Vapor_City"}
+        spotifyLink={
+          "https://open.spotify.com/track/5Shwkb85VSY33QZqMDQaqo?si=488bbdd9ee434b68"
+        }
+        appleMusicLink={
+          "https://music.apple.com/us/album/welcome-to-vapor-city-single/1845517676"
+        }
+        youtubeLink={
+          "https://www.youtube.com/watch?v=e-12woa2MTU"
+        }
+        soundcloudLink={
+          "https://soundcloud.com/dejagatsby/welcome-to-vapor_city"
+        }
+        imgSrc={"/music/vapor_city.png"}
+        bg={"white"}
+      />
+      <MusicBox
+        title={"Give me that KaiZen"}
+        spotifyLink={
+          "https://open.spotify.com/album/0ATTxFkDlXZgVnoXe5zQiB?si=wFosTC3rSgOVupKkE4b_FQ"
+        }
+        appleMusicLink={
+          "https://music.apple.com/us/album/give-me-that-kaizen-single/1803499620"
+        }
+        youtubeLink={
+          "https://www.youtube.com/watch?v=3NtCoWZeQFU&list=OLAK5uy_nxHhcOcMrBW07x7hwYzQkMBlJcqLLirHM&index=2"
+        }
+        soundcloudLink={
+          "https://soundcloud.com/dejagatsby/sets/give-me-that-kaizen"
+        }
+        imgSrc={"/music/kaizen.png"}
+        bg={"white"}
+      />
+      <MusicBox
         title={"Give me that KaiZen"}
         spotifyLink={
           "https://open.spotify.com/album/0ATTxFkDlXZgVnoXe5zQiB?si=wFosTC3rSgOVupKkE4b_FQ"

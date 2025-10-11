@@ -26,7 +26,7 @@ const MusicBox: FC<MusicBoxProps> = ({
   youtubeLink,
   soundcloudLink,
   imgSrc,
-  bg
+  bg,
 }) => {
   return (
     <Box bg={bg} rounded="xl" textColor="black" p={3} w="100%">
@@ -34,7 +34,6 @@ const MusicBox: FC<MusicBoxProps> = ({
         <Box width="100%" maxW="400px" aspectRatio={1 / 1} position="relative">
           <Image src={imgSrc} alt={`${title}-image`} layout="fill" />
         </Box>
-
         <Flex
           gap={3}
           direction="column"
@@ -43,6 +42,7 @@ const MusicBox: FC<MusicBoxProps> = ({
         >
           <Text as="b">{title}</Text>
           <Flex gap={3}>
+            {}
             <Tooltip placement="top" hasArrow label="Spotify">
               <a href={spotifyLink} target="_blank">
                 <Icon
@@ -54,18 +54,19 @@ const MusicBox: FC<MusicBoxProps> = ({
                 />
               </a>
             </Tooltip>
-
-            <Tooltip placement="top" hasArrow label="Apple Music">
-              <a href={appleMusicLink} target="_blank">
-                <Icon
-                  as={AppleLogo}
-                  boxSize={8}
-                  bg={bg}
-                  textColor="black"
-                  rounded="lg"
-                />
-              </a>
-            </Tooltip>
+            {appleMusicLink !== "" && (
+              <Tooltip placement="top" hasArrow label="Apple Music">
+                <a href={appleMusicLink} target="_blank">
+                  <Icon
+                    as={AppleLogo}
+                    boxSize={8}
+                    bg={bg}
+                    textColor="black"
+                    rounded="lg"
+                  />
+                </a>
+              </Tooltip>
+            )}
 
             <Tooltip placement="top" hasArrow label="Youtube Music">
               <a href={youtubeLink} target="_blank">
