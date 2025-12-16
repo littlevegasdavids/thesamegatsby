@@ -1,10 +1,8 @@
 import { Box, Flex, Text } from "@chakra-ui/react";
-
 import type { NextPage } from "next";
 import Image from "next/image";
 import Socials from "../components/socials";
-import TabsContent from "../components/tabs";
-import MusicContent from "../components/tabs/music";
+import MusicContent from "../components/music";
 
 const Home: NextPage = () => {
   return (
