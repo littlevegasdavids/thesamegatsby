@@ -16,7 +16,7 @@ export const songs: Song[] = [
       "https://music.apple.com/us/album/welcome-to-vapor-city-single/1845517676",
     youtubeLink: "https://www.youtube.com/watch?v=e-12woa2MTU",
     soundcloudLink: "https://soundcloud.com/dejagatsby/welcome-to-vapor_city",
-    imgSrc: "/music/vapor_city.png",
+    imgSrc: "/music/vapor_city/cover.png",
   },
   {
     title: "Give me that KaiZen",
@@ -28,7 +28,7 @@ export const songs: Song[] = [
       "https://www.youtube.com/watch?v=3NtCoWZeQFU&list=OLAK5uy_nxHhcOcMrBW07x7hwYzQkMBlJcqLLirHM&index=2",
     soundcloudLink:
       "https://soundcloud.com/dejagatsby/sets/give-me-that-kaizen",
-    imgSrc: "/music/kaizen.png",
+    imgSrc: "/music/kaizen/cover.png",
   },
   {
     title: "You who could be Forever",
@@ -39,7 +39,7 @@ export const songs: Song[] = [
     youtubeLink: "https://www.youtube.com/watch?v=mqdVuGzM-1s",
     soundcloudLink:
       "https://soundcloud.com/dejagatsby/you-who-could-be-forever",
-    imgSrc: "/music/you_who_could_be_forever.png",
+    imgSrc: "/music/you_who_could_be_forever/cover.png",
   },
   {
     title: "Can't You See EP",
@@ -50,7 +50,7 @@ export const songs: Song[] = [
     youtubeLink:
       "https://www.youtube.com/watch?v=fVlgwC0v_rQ&list=OLAK5uy_mdFFNJyKEaN9sPwJeztKKdCZlV_8188k8&index=1",
     soundcloudLink: "https://soundcloud.com/dejagatsby/sets/cant-you-see-ep/",
-    imgSrc: "/music/can't_you_see.png",
+    imgSrc: "/music/cant_you_see/cover.png",
   },
   {
     title: "Bring That Change",
@@ -60,6 +60,6 @@ export const songs: Song[] = [
       "https://music.apple.com/za/album/bring-that-change/1708120323?i=1708120324",
     youtubeLink: "https://www.youtube.com/watch?v=aZ5cKAAMU2U",
     soundcloudLink: "https://soundcloud.com/dejagatsby/bring-that-change",
-    imgSrc: "/music/bring_that_change.svg",
+    imgSrc: "/music/bring_that_change/cover.svg",
   },
 ];
