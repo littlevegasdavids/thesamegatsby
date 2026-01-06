@@ -5,19 +5,11 @@ import {
   YoutubeLogo,
   SoundcloudLogo,
   Play,
+  Stop,
 } from "@phosphor-icons/react";
-import { FC } from "react";
+import { FC, useRef, useState } from "react";
 import Image from "next/image";
 import { Song } from "../../songs";
-
-interface MusicBoxProps {
-  title: string;
-  spotifyLink: string;
-  appleMusicLink: string;
-  youtubeLink: string;
-  soundcloudLink: string;
-  imgSrc: string;
-}
 
 const MusicBox: FC<Song> = ({
   title,
@@ -26,7 +18,25 @@ const MusicBox: FC<Song> = ({
   youtubeLink,
   soundcloudLink,
   imgSrc,
+  audioSrc,
 }) => {
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [isPlayingAudio, setIsPlayingAudio] = useState<boolean>(false);
+
+  const playAudio = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    if (isPlayingAudio) {
+      audio.pause();
+      setIsPlayingAudio(false);
+    } else {
+      audio.currentTime = 0;
+      audioRef.current?.play();
+      setIsPlayingAudio(true);
+    }
+  };
+
   return (
     <Box bg={"white"} rounded="xl" textColor="black" p={3} w="100%">
       <Flex direction="row" justifyContent="center" alignItems="center" gap={3}>
@@ -95,12 +105,20 @@ const MusicBox: FC<Song> = ({
               </Tooltip>
             )}
           </Flex>
-          <a href={youtubeLink} target="_blank">
-            <Button bg="black" textColor="white">
-              <Icon as={Play} mr={2} />
-              Play
-            </Button>
-          </a>
+          {audioSrc !== "" && (
+            <>
+              <audio
+                ref={audioRef}
+                src={audioSrc}
+                preload="none"
+                onEnded={() => setIsPlayingAudio(false)}
+              />
+              <Button bg="black" textColor="white" onClick={playAudio}>
+                <Icon as={isPlayingAudio ? Stop : Play} mr={2} />
+                {isPlayingAudio ? "Stop" : "Play"}
+              </Button>
+            </>
+          )}
         </Flex>
       </Flex>
     </Box>

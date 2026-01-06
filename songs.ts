@@ -5,6 +5,7 @@ export interface Song {
   youtubeLink: string;
   soundcloudLink: string;
   imgSrc: string;
+  audioSrc: string;
 }
 
 export const songs: Song[] = [
@@ -17,6 +18,7 @@ export const songs: Song[] = [
     youtubeLink: "https://www.youtube.com/watch?v=e-12woa2MTU",
     soundcloudLink: "https://soundcloud.com/dejagatsby/welcome-to-vapor_city",
     imgSrc: "/music/vapor_city/cover.png",
+    audioSrc: "/music/vapor_city/audio.m4a",
   },
   {
     title: "Give me that KaiZen",
@@ -29,6 +31,7 @@ export const songs: Song[] = [
     soundcloudLink:
       "https://soundcloud.com/dejagatsby/sets/give-me-that-kaizen",
     imgSrc: "/music/kaizen/cover.png",
+    audioSrc: "/music/kaizen/audio.m4a",
   },
   {
     title: "You who could be Forever",
@@ -40,17 +43,31 @@ export const songs: Song[] = [
     soundcloudLink:
       "https://soundcloud.com/dejagatsby/you-who-could-be-forever",
     imgSrc: "/music/you_who_could_be_forever/cover.png",
+    audioSrc: "/music/you_who_could_be_forever/audio.m4a",
   },
   {
-    title: "Can't You See EP",
+    title: "Can't You See",
     spotifyLink:
       "https://open.spotify.com/album/4WiQgdIocMx6qgYSmxnTPG?si=vomvD2eSSb-3t1jN45mGIA",
     appleMusicLink:
-      "https://music.apple.com/za/album/cant-you-see-ep/1732276175",
+      "https://music.apple.com/lk/song/cant-you-see/1732276178",
     youtubeLink:
-      "https://www.youtube.com/watch?v=fVlgwC0v_rQ&list=OLAK5uy_mdFFNJyKEaN9sPwJeztKKdCZlV_8188k8&index=1",
+      "https://www.youtube.com/watch?v=qAU3CmPXcRs&list=OLAK5uy_mdFFNJyKEaN9sPwJeztKKdCZlV_8188k8&index=2",
     soundcloudLink: "https://soundcloud.com/dejagatsby/sets/cant-you-see-ep/",
     imgSrc: "/music/cant_you_see/cover.png",
+    audioSrc: "/music/cant_you_see/audio.m4a",
+  },
+  {
+    title: "UKG 333",
+    spotifyLink:
+      "https://open.spotify.com/track/5CeSfj7vpFfcIoHrlVTPfE?si=108d3e01c0934d14",
+    appleMusicLink:
+      "https://music.apple.com/lk/song/ukg-333/1732276177",
+    youtubeLink:
+      "https://www.youtube.com/watch?v=fVlgwC0v_rQ&list=OLAK5uy_mdFFNJyKEaN9sPwJeztKKdCZlV_8188k8",
+    soundcloudLink: "https://soundcloud.com/dejagatsby/ukg-333?in=dejagatsby/sets/cant-you-see-ep",
+    imgSrc: "/music/cant_you_see/cover.png",
+    audioSrc: "/music/ukg_333/audio.m4a",
   },
   {
     title: "Bring That Change",
@@ -61,5 +78,6 @@ export const songs: Song[] = [
     youtubeLink: "https://www.youtube.com/watch?v=aZ5cKAAMU2U",
     soundcloudLink: "https://soundcloud.com/dejagatsby/bring-that-change",
     imgSrc: "/music/bring_that_change/cover.svg",
+    audioSrc: "/music/bring_that_change/audio.m4a",
   },
 ];
