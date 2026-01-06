@@ -8,6 +8,7 @@ import {
 } from "@phosphor-icons/react";
 import { FC } from "react";
 import Image from "next/image";
+import { Song } from "../../songs";
 
 interface MusicBoxProps {
   title: string;
@@ -16,20 +17,18 @@ interface MusicBoxProps {
   youtubeLink: string;
   soundcloudLink: string;
   imgSrc: string;
-  bg: string;
 }
 
-const MusicBox: FC<MusicBoxProps> = ({
+const MusicBox: FC<Song> = ({
   title,
   spotifyLink,
   appleMusicLink,
   youtubeLink,
   soundcloudLink,
   imgSrc,
-  bg,
 }) => {
   return (
-    <Box bg={bg} rounded="xl" textColor="black" p={3} w="100%">
+    <Box bg={"white"} rounded="xl" textColor="black" p={3} w="100%">
       <Flex direction="row" justifyContent="center" alignItems="center" gap={3}>
         <Box width="100%" maxW="400px" aspectRatio={1 / 1} position="relative">
           <Image src={imgSrc} alt={`${title}-image`} layout="fill" />
@@ -42,25 +41,13 @@ const MusicBox: FC<MusicBoxProps> = ({
         >
           <Text as="b">{title}</Text>
           <Flex gap={3}>
-            {}
-            <Tooltip placement="top" hasArrow label="Spotify">
-              <a href={spotifyLink} target="_blank">
-                <Icon
-                  as={SpotifyLogo}
-                  boxSize={8}
-                  bg={bg}
-                  textColor="black"
-                  rounded="lg"
-                />
-              </a>
-            </Tooltip>
-            {appleMusicLink !== "" && (
-              <Tooltip placement="top" hasArrow label="Apple Music">
-                <a href={appleMusicLink} target="_blank">
+            {spotifyLink !== "" && (
+              <Tooltip placement="top" hasArrow label="Spotify">
+                <a href={spotifyLink} target="_blank">
                   <Icon
-                    as={AppleLogo}
+                    as={SpotifyLogo}
                     boxSize={8}
-                    bg={bg}
+                    bg={"white"}
                     textColor="black"
                     rounded="lg"
                   />
@@ -68,29 +55,45 @@ const MusicBox: FC<MusicBoxProps> = ({
               </Tooltip>
             )}
 
-            <Tooltip placement="top" hasArrow label="Youtube Music">
-              <a href={youtubeLink} target="_blank">
-                <Icon
-                  as={YoutubeLogo}
-                  boxSize={8}
-                  bg={bg}
-                  textColor="black"
-                  rounded="lg"
-                />
-              </a>
-            </Tooltip>
-
-            <Tooltip placement="top" hasArrow label="Soundcloud">
-              <a href={soundcloudLink} target="_blank">
-                <Icon
-                  as={SoundcloudLogo}
-                  boxSize={8}
-                  bg={bg}
-                  textColor="black"
-                  rounded="lg"
-                />
-              </a>
-            </Tooltip>
+            {appleMusicLink !== "" && (
+              <Tooltip placement="top" hasArrow label="Apple Music">
+                <a href={appleMusicLink} target="_blank">
+                  <Icon
+                    as={AppleLogo}
+                    boxSize={8}
+                    bg={"white"}
+                    textColor="black"
+                    rounded="lg"
+                  />
+                </a>
+              </Tooltip>
+            )}
+            {youtubeLink !== "" && (
+              <Tooltip placement="top" hasArrow label="Youtube Music">
+                <a href={youtubeLink} target="_blank">
+                  <Icon
+                    as={YoutubeLogo}
+                    boxSize={8}
+                    bg={"white"}
+                    textColor="black"
+                    rounded="lg"
+                  />
+                </a>
+              </Tooltip>
+            )}
+            {soundcloudLink !== "" && (
+              <Tooltip placement="top" hasArrow label="Soundcloud">
+                <a href={soundcloudLink} target="_blank">
+                  <Icon
+                    as={SoundcloudLogo}
+                    boxSize={8}
+                    bg={"white"}
+                    textColor="black"
+                    rounded="lg"
+                  />
+                </a>
+              </Tooltip>
+            )}
           </Flex>
           <a href={youtubeLink} target="_blank">
             <Button bg="black" textColor="white">
