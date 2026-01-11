@@ -1,24 +1,23 @@
 import { Flex, Tooltip, Icon } from "@chakra-ui/react";
 import {
-  GithubLogo,
-  InstagramLogo,
-  SoundcloudLogo,
-  TiktokLogo,
-  YoutubeLogo,
-  Parallelogram
-} from "@phosphor-icons/react";
+  FaGithub,
+  FaInstagram,
+  FaSoundcloud,
+  FaTiktok,
+  FaYoutube,
+  FaBandcamp,
+} from "react-icons/fa";
 
 const Socials = () => {
   return (
-    <Flex gap={4}>
+    <Flex gap={6}>
       <Tooltip placement="top" hasArrow label="Instagram">
         <a href="https://www.instagram.com/thesamegatsby" target="_blank">
           <Icon
-            as={InstagramLogo}
+            as={FaInstagram}
             boxSize={10}
-            bg="white"
-            textColor="black"
-            rounded="lg"
+            bg="black"
+            textColor="white"
           />
         </a>
       </Tooltip>
@@ -26,11 +25,10 @@ const Socials = () => {
       <Tooltip placement="top" hasArrow label="Youtube">
         <a href="https://www.youtube.com/@thesamegatsby" target="_blank">
           <Icon
-            as={YoutubeLogo}
+            as={FaYoutube}
             boxSize={10}
-            bg="white"
-            textColor="black"
-            rounded="lg"
+            bg="black"
+            textColor="white"
           />
         </a>
       </Tooltip>
@@ -38,11 +36,10 @@ const Socials = () => {
       <Tooltip placement="top" hasArrow label="Soundcloud">
         <a href="https://soundcloud.com/dejagatsby" target="_blank">
           <Icon
-            as={SoundcloudLogo}
+            as={FaSoundcloud}
             boxSize={10}
-            bg="white"
-            textColor="black"
-            rounded="lg"
+            bg="black"
+            textColor="white"
           />
         </a>
       </Tooltip>
@@ -50,11 +47,10 @@ const Socials = () => {
       <Tooltip placement="top" hasArrow label="TikTok">
         <a href="https://www.tiktok.com/@thesamegatsby" target="_blank">
           <Icon
-            as={TiktokLogo}
+            as={FaTiktok}
             boxSize={10}
-            bg="white"
-            textColor="black"
-            rounded="lg"
+            bg="black"
+            textColor="white"
           />
         </a>
       </Tooltip>
@@ -62,29 +58,13 @@ const Socials = () => {
       <Tooltip placement="top" hasArrow label="Bandcamp">
         <a href="https://thesamegatsby.bandcamp.com" target="_blank">
           <Icon
-            as={Parallelogram}
+            as={FaBandcamp}
             boxSize={10}
-            bg="white"
-            textColor="black"
-            rounded="lg"
+            bg="black"
+            textColor="white"
           />
         </a>
       </Tooltip>
-
-      {/* <Tooltip placement="top" hasArrow label="Github">
-        <a
-          href="https://github.com/littlevegasdavids/littlevegasdavids"
-          target="_blank"
-        >
-          <Icon
-            as={GithubLogo}
-            boxSize={10}
-            bg="white"
-            textColor="black"
-            rounded="lg"
-          />
-        </a>
-      </Tooltip> */}
     </Flex>
   );
 };

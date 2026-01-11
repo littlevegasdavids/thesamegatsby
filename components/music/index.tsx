@@ -8,7 +8,7 @@ const MusicContent = () => {
     <Flex direction={"column"} gap={3} justifyContent="center" w="100%">
       <AudioProvider>
         {songs.map((song) => (
-          <MusicBox key={song.title} {...song} />
+          <MusicBox key={song.id} {...song} />
         ))}
       </AudioProvider>
     </Flex>

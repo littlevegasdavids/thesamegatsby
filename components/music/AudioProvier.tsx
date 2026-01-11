@@ -37,7 +37,7 @@ export const AudioProvider = ({ children }: { children: React.ReactNode }) => {
 
     howl.on("play", () => {
       var fadeInTime = 2000;
-      var fadeOutTime = 3000;
+      var fadeOutTime = 2000;
       
       howl.fade(0, 1, fadeInTime);
 

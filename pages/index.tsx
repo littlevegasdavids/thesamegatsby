@@ -1,6 +1,5 @@
-import { Box, Flex, Text } from "@chakra-ui/react";
+import { Box, Flex, Text, Image } from "@chakra-ui/react";
 import type { NextPage } from "next";
-import Image from "next/image";
 import Socials from "../components/socials";
 import MusicContent from "../components/music";
 
@@ -29,6 +28,7 @@ const Home: NextPage = () => {
               alt="profile picture"
               width={"200"}
               height={200}
+              borderRadius="full"
             />
             <Box>
               <Text as="b" fontStyle="" fontSize={["xl", "3xl"]}>
