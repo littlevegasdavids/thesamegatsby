@@ -13,32 +13,40 @@ const Home: NextPage = () => {
         shadow="2xl"
         textColor="white"
         textAlign="center"
-        minW={["95%", "35%"]}
+        w={["400px", "600px", "1200px"]}
         my={5}
       >
         <Box bg="black" px={["3", "10"]} py="3" rounded="lg">
           <Flex
-            flexDirection="column"
-            gap={3}
+            flexDirection={["column", "row"]}
+            gap={[3, 5]}
             placeItems="center"
             fontSize={["sm", "xl"]}
           >
-            <Image
-              src="/profile_pic.jpg"
-              alt="profile picture"
-              width={"200"}
-              height={200}
-              borderRadius="full"
-            />
-            <Box>
-              <Text as="b" fontStyle="" fontSize={["xl", "3xl"]}>
-                Déjà Gatsby
-              </Text>
-              <Text fontSize="lg" fontWeight="light">South Africa</Text>
-              <Text fontSize="md" fontWeight="light">thesamegatsby@gmail.com</Text>
-            </Box>
+            <Flex gap={5} flexDirection={"column"} alignItems="center">
+              <Image
+                src="/profile_pic.jpg"
+                alt="profile picture"
+                width={"200"}
+                height={200}
+                borderRadius="full"
+                border={"4px"}
+              />
+              <Box>
+                <Text as="b" fontStyle="" fontSize={["3xl", "3xl"]}>
+                  Déjà Gatsby
+                </Text>
+                <Text fontSize="lg" fontWeight="light">
+                  South Africa
+                </Text>
+                <Text fontSize="md" fontWeight="light">
+                  thesamegatsby@gmail.com
+                </Text>
+              </Box>
+              <Socials />
+            </Flex>
 
-            <Socials />
+            
             <MusicContent />
           </Flex>
         </Box>

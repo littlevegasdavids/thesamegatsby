@@ -1,6 +1,5 @@
-import { Box, Text, Flex, Tooltip, Icon, Button } from "@chakra-ui/react";
+import { Box, Text, Flex, Tooltip, Icon, Button, Image, AspectRatio } from "@chakra-ui/react";
 import { FC } from "react";
-import Image from "next/image";
 import { Song } from "../../songs";
 import { useAudioPlayer } from "./AudioProvier";
 import {
@@ -29,16 +28,29 @@ const MusicBox: FC<Song> = ({
   return (
     <Box bg={"white"} rounded="xl" textColor="black" p={3} w="100%">
       <Flex direction="row" justifyContent="center" alignItems="center" gap={3}>
-        <Box width="100%" maxW="400px" aspectRatio={1 / 1} position="relative">
-          <Image src={imgSrc} alt={`${title}-image`} layout="fill" />
-        </Box>
+        <AspectRatio
+          ratio={1}
+          width="100%"
+          maxW={{ base: "150px", sm: "220px", md: "320px", lg: "170px" }}
+        >
+          <Image
+            src={imgSrc}
+            alt={`${title}-image`}
+            objectFit="cover"
+            width="100%"
+            height="100%"
+            borderRadius="md"
+            loading="lazy"
+            display="block"
+          />
+        </AspectRatio>
         <Flex
           gap={4}
           direction="column"
           justifyContent="center"
           alignItems="center"
         >
-          <Text as="b">{title}</Text>
+          <Text as="b" fontSize={["md", "lg"]}>{title}</Text>
           <Flex gap={5}>
             {spotifyLink !== "" && (
               <StreamingIcon
@@ -123,7 +135,7 @@ const StreamingIcon = ({
       <a href={link} target="_blank">
         <Icon
           as={icon}
-          boxSize={8}
+          boxSize={[6, 7]}
           bg={"white"}
           textColor="black"
           rounded="full"
