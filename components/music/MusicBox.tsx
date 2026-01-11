@@ -10,6 +10,7 @@ import {
 import { FC, useRef, useState } from "react";
 import Image from "next/image";
 import { Song } from "../../songs";
+import { useAudioPlayer } from "./AudioProvier";
 
 const MusicBox: FC<Song> = ({
   title,
@@ -20,22 +21,9 @@ const MusicBox: FC<Song> = ({
   imgSrc,
   audioSrc,
 }) => {
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [isPlayingAudio, setIsPlayingAudio] = useState<boolean>(false);
+  const { play, stop, isPlaying, currentSrc } = useAudioPlayer();
 
-  const playAudio = () => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    if (isPlayingAudio) {
-      audio.pause();
-      setIsPlayingAudio(false);
-    } else {
-      audio.currentTime = 0;
-      audioRef.current?.play();
-      setIsPlayingAudio(true);
-    }
-  };
+  const isPlayingAudio = isPlaying && currentSrc === audioSrc;
 
   return (
     <Box bg={"white"} rounded="xl" textColor="black" p={3} w="100%">
@@ -105,19 +93,18 @@ const MusicBox: FC<Song> = ({
               </Tooltip>
             )}
           </Flex>
-          {audioSrc !== "" && (
+          {(audioSrc !== "" && isPlayingAudio) ? (
             <>
-              <audio
-                ref={audioRef}
-                src={audioSrc}
-                preload="none"
-                onEnded={() => setIsPlayingAudio(false)}
-              />
-              <Button bg="black" textColor="white" onClick={playAudio}>
-                <Icon as={isPlayingAudio ? Stop : Play} mr={2} />
-                {isPlayingAudio ? "Stop" : "Play"}
+              <Button bg="black" textColor="white" onClick={stop}>
+                <Icon as={Stop} mr={2} />
+                Stop
               </Button>
-            </>
+              </>
+          ) : (
+            <Button bg="black" textColor="white" onClick={() => play(audioSrc)}>
+              <Icon as={Play} mr={2} />
+              Play
+            </Button>
           )}
         </Flex>
       </Flex>
