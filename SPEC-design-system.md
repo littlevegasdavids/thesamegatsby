@@ -151,12 +151,13 @@ Read off the approved screens on 3 Nov 2026.
 |---|---|---|---|
 | `aero.woff2` | Reno's upload (`Aero.ttf`, Nirmal Biswas, v1.000), from dafont.com/aero-2.font | **Donationware: USD 25+ to the author. Reno will pay.** Web use still to be confirmed by the author (SPEC.md open question 1) | Basic Latin + Latin-1 |
 | `chakra-petch-400.woff2`, `chakra-petch-600.woff2` | Google Fonts | SIL OFL 1.1 | Basic Latin + Latin-1 |
-| `vt323-400.woff2` | Google Fonts | SIL OFL 1.1 | Basic Latin + Latin-1 + the readout glyphs `▶■◌` |
+| `vt323-400.woff2` | Google Fonts | SIL OFL 1.1 | Basic Latin + Latin-1. It has no `▶■◌` (open question 1) |
 
 - The fonts total **90 KB or less**, measured after subsetting. Only Aero and Chakra Petch 400 are preloaded. Everything uses `font-display: swap`.
 - Each licence file sits beside its font in `fonts/`.
 - Converting and subsetting needs fonttools (`pyftsubset`). Installing it is an ask-first step.
-- VT323 may not include `▶■◌`. If it doesn't, the glyphs come from the sparkle and icon SVGs instead of a fallback font, so the readout never switches typeface mid-line.
+- VT323 doesn't include `▶■◌`, so the glyphs come from the sparkle and icon SVGs instead of a fallback font, and the readout never switches typeface mid-line.
+- Latin-1 gaps in the fonts themselves: Aero has no `¹²³¼½¾` or soft hyphen, and Chakra Petch has no `µ`. Those characters fall back to the system font.
 
 ## Textures (`textures.css`)
 
@@ -261,4 +262,4 @@ Audio playback logic, real catalogue data, the homepage layout, the release kit,
 
 ## Open questions
 
-1. **VT323 coverage of `▶■◌`.** Checked when the font is subset. The fallback plan is in the Fonts section.
+1. **VT323 coverage of `▶■◌`. Answered 3 Nov 2026 (DS-5): it has none of them.** VT323 v2.000 from `google/fonts` maps none of U+25B6, U+25A0 or U+25CC, so the readout glyphs come from SVGs, as the Fonts section says. (Chakra Petch has `▶■` but not `◌`, and isn't the readout face anyway.)

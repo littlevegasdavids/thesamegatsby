@@ -48,10 +48,11 @@
   --dg-on-panel: var(--dg-bone-100);
 
   /* Type. Aero is display only, never below 24 px: display-l bottoms out
-     at 28 px. */
-  --dg-font-display: "Aero", system-ui, sans-serif;
-  --dg-font-ui: "Chakra Petch", system-ui, sans-serif;
-  --dg-font-readout: "VT323", ui-monospace, monospace;
+     at 28 px. The --font-* variables come from fonts.ts; outside Next, the
+     family name stands in for them. */
+  --dg-font-display: var(--font-aero, "Aero"), system-ui, sans-serif;
+  --dg-font-ui: var(--font-chakra-petch, "Chakra Petch"), system-ui, sans-serif;
+  --dg-font-readout: var(--font-vt323, "VT323"), ui-monospace, monospace;
   --dg-text-display-xl: clamp(1.875rem, 5.4vw, 4.5rem);
   --dg-text-display-l: 1.75rem;
   --dg-text-title: 0.9375rem;

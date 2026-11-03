@@ -140,7 +140,7 @@ Review round 3 (3 Nov 2026):
   - **Files:** `src/design-system/tokens.css`, `src/design-system/contrast.ts`, `src/app/layout.tsx`, `tests/tokens.test.ts`, `tests/no-raw-values.test.ts`
   - **Size:** M
 
-- [ ] **DS-5: Fonts** 🔒 *(fonttools venv, font downloads)*
+- [x] **DS-5: Fonts** 🔒 *(fonttools venv, font downloads)*
   - Subset Aero (from `~/Downloads/Aero.ttf`) to Latin-1 and convert it to WOFF2. Fetch Chakra Petch 400/600 and VT323 from `google/fonts` and subset them the same way. Check VT323 for `▶■◌`. Declare all four with `next/font/local`, preloading only Aero and Chakra Petch 400. Commit the OFL texts. Keep the venv for DS-10.
   - **Acceptance:**
     - the four WOFF2 files total 90 KB or less
@@ -152,8 +152,14 @@ Review round 3 (3 Nov 2026):
     - `ls -l` for the file sizes
     - `npm run build`, then grep the preload links in `out/index.html`
     - **Canvas:** `StyleTile.dc.html` at 1440 px, type block. Aero, Chakra Petch and VT323 render with the same glyphs and accents as on the board (the canvas uses the same Aero file)
+  - **Done 3 Nov 2026.** The four files total 43,260 bytes: Aero 11,240, Chakra Petch 400 7,760 and 600 7,988, VT323 16,272. `out/index.html` has the two preloads, and all four faces are `swap`. VT323 has no `▶■◌`, which is recorded in the spec. Some choices the spec doesn't make:
+    - **Family names.** Under Turbopack, next/font points a font's class and variable at a family named after its constant, so `fonts.ts` relies on that. Chakra Petch 600 is its own declaration with `preload: false`, and joins the `chakraPetch` family through `declarations`. Without that split, both weights would be preloaded.
+    - **`tokens.css` changed**, though it isn't in the file list. The font tokens read next/font's variables, which add its size-adjusted fallback face, and fall back to the plain family name outside Next.
+    - **Hinting is kept**, and so are the licence name records (IDs 13 and 14) in the OFL binaries. Dropping Aero's hinting would take 5.7 KB off the preload path if that's ever wanted.
+    - **The venv** is at `~/.local/share/venvs/dejagatsby-fonttools` (Python 3.14.6, fonttools 4.68.0, brotli 1.2.1), outside the repo and the scratchpad, for DS-10.
+    - **`/system` checks** wait for DS-6, which creates the route. Fonts have no keyboard or motion behaviour. The canvas check was done at 1440 px against a rebuilt type block, with no drift, and every subset glyph matches its source's outline and advance.
   - **Depends on:** DS-4
-  - **Files:** `src/design-system/fonts/*.woff2`, `src/design-system/fonts/OFL-*.txt`, `src/design-system/fonts.ts`, `src/app/layout.tsx`
+  - **Files:** `src/design-system/fonts/*.woff2`, `src/design-system/fonts/OFL-*.txt`, `src/design-system/fonts.ts`, `src/design-system/tokens.css`, `src/app/layout.tsx`, `tests/fonts.test.ts`
   - **Size:** M
 
 - [ ] **DS-6: The `/system` route and its tokens section**
