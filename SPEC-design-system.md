@@ -163,12 +163,12 @@ Read off the approved screens on 3 Nov 2026.
 
 | Utility | Built from | Notes |
 |---|---|---|
-| `.dg-grain` | A 256 × 256 tiled noise image (AVIF, 10 KB or less), on a fixed layer with `mix-blend-mode: overlay` and opacity `--dg-grain-opacity: 0.07` | Optional jitter animated with `steps()`. Static under reduced motion |
+| `.dg-grain` | A 256 × 256 tiled SVG `feTurbulence` noise tile, inline in `textures.css` (under 1 KB, no image file), at opacity `--dg-grain-opacity: 0.07` with normal blending | Static, as on the canvas. Reno chose normal blending on 3 Nov 2026 (DS-7). Measured on tape black, `overlay` left the grain invisible, while normal blending at 0.07 shows about 77% of the canvas's grain (screen, 0.09). It also needs no blend mode over scrolling content, and it can share one layer with the vignette |
 | `.dg-scanlines` | `repeating-linear-gradient` of `--dg-scanline`, zero bytes | The now-playing bar only. Never over cover art, so the bar's thumbnail sits above them |
 | `.dg-halftone` | `radial-gradient` dot mask | Covers and duotone panels |
 | `.dg-tape` | `--dg-tape` as a `text-shadow` (V5 "stacked tape") | The wordmark and every Aero title |
 | `.dg-glass` | `--dg-surface-glass` with `backdrop-filter: var(--dg-glass-filter)`. Solid `--dg-surface` where `backdrop-filter` isn't supported | The header and filter boxes |
-| `.dg-glow` | `--dg-glow-accent` text-shadow and box-shadow | Active readouts and the play state |
+| `.dg-glow` | `--dg-glow-accent` as a text-shadow | Active readouts and the play state. Lit boxes (the progress fill, a lamp dot) take `--dg-glow-accent-box` as their box-shadow, because a box-shadow on a readout would light its whole box |
 | `.dg-sticker` | Stacked `drop-shadow` outline | Cutout images |
 | `.dg-vignette` | `radial-gradient` overlay | The page frame |
 | `.dg-backdrop` | One fixed layer behind all content: the `--dg-grid-*` grid at roughly even strength top to bottom, drifting downward one cell per `--dg-grid-drift` in a seamless loop, with the `--dg-grid-glow` behind the hero | Transform only, so it never triggers layout. Static under reduced motion |
@@ -179,7 +179,6 @@ The page-level layers (grain and vignette) are one fixed element with `pointer-e
 
 - `sparkle-star.svg`: an original four-point star path, drawn for this system. It's the signature mark.
 - `wordmark.svg`: "Déjà Gatsby" set in Aero and outlined, so the logo doesn't depend on the font loading. The `Wordmark` component draws both tones below from tokens, and the file is exported in the screen tone. Bone-white with the V5 "stacked tape" shadows: `0.03em 0.04em 0 #2B3BFF, 0.06em 0.08em 0 rgba(255,75,31,0.55)`. No chrome and no gloss. On artwork it's white with a `0.045em 0.06em` black drop.
-- `grain.avif`: the tile used by `.dg-grain`.
 - Platform icons as inline SVG: the five main platforms (Spotify, Apple Music, YouTube Music, SoundCloud, Bandcamp) and the three under "More" (Amazon Music, Deezer, Tidal). The two social icons (Instagram, TikTok) are inline SVG too. Source: Simple Icons (CC0). Each brand's own trademark guidelines still apply, so keep brand icons monochrome in `--dg-fg`. Downloading them is an ask-first step.
 
 ## Components

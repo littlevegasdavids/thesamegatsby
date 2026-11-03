@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import "./body.css";
+import { TexturesSection } from "./sections/TexturesSection";
 import { TokensSection } from "./sections/TokensSection";
 import styles from "./system.module.css";
 
@@ -21,6 +21,7 @@ export default function System() {
         </p>
       </header>
       <TokensSection />
+      <TexturesSection />
     </main>
   );
 }

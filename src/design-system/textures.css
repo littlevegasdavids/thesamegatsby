@@ -1,0 +1,79 @@
+/* The texture utilities in SPEC-design-system.md › Textures, imported once in
+   the root layout. Like tokens.css, this file may hold raw values, for the
+   noise and gradient recipes; everything else reads tokens. Nothing here
+   animates: the grain is static, as on the canvas. */
+
+/* The ground under every page. Screen frames each page; the root takes the
+   ground too, so overscroll shows tape black rather than white. */
+html {
+  color-scheme: dark;
+  background: var(--dg-bg);
+}
+
+body {
+  margin: 0;
+}
+
+/* Grain: an SVG noise tile at --dg-grain-opacity with normal blending, which
+   on tape black looks like the canvas's screen blend, a little fainter. The
+   filter region is the tile itself, so stitchTiles makes it seamless at 256.
+   The host must be positioned; the grain lies over its content. */
+.dg-grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='n' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='256' height='256' filter='url(%23n)'/%3E%3C/svg%3E") 0 0 / 256px 256px;
+  opacity: var(--dg-grain-opacity);
+  pointer-events: none;
+}
+
+/* Paints over the element's own background colour and under its children,
+   so the bar's cover thumbnail sits above the lines. Give the element its
+   colour with background-color: a background shorthand in a component's
+   CSS, which loads after this file, resets the lines. */
+.dg-scanlines {
+  background-image: var(--dg-scanline);
+}
+
+/* A dot mask: the element shows only through the dots. */
+.dg-halftone {
+  -webkit-mask: radial-gradient(circle, #000 1.3px, transparent 1.7px) 0 0 / 8px 8px;
+  mask: radial-gradient(circle, #000 1.3px, transparent 1.7px) 0 0 / 8px 8px;
+}
+
+.dg-tape {
+  text-shadow: var(--dg-tape);
+}
+
+.dg-glass {
+  background: var(--dg-surface-glass);
+  -webkit-backdrop-filter: var(--dg-glass-filter);
+  backdrop-filter: var(--dg-glass-filter);
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .dg-glass {
+    background: var(--dg-surface);
+  }
+}
+
+/* Text only. A box-shadow here would light the whole box around a readout,
+   so lit boxes (the progress fill, the REC dot) take --dg-glow-accent-box. */
+.dg-glow {
+  text-shadow: var(--dg-glow-accent);
+}
+
+/* A bone die-cut edge with a hazard offset, following the image's alpha. */
+.dg-sticker {
+  filter:
+    drop-shadow(2px 0 0 var(--dg-bone-100))
+    drop-shadow(-2px 0 0 var(--dg-bone-100))
+    drop-shadow(0 2px 0 var(--dg-bone-100))
+    drop-shadow(0 -2px 0 var(--dg-bone-100))
+    drop-shadow(3px 3px 0 var(--dg-hazard-500));
+}
+
+.dg-vignette {
+  background-image: var(--dg-vignette);
+}

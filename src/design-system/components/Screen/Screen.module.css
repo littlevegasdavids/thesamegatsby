@@ -1,0 +1,22 @@
+/* The page frame. overflow-x is clip, not hidden: hidden would make this a
+   scroll container, and the sticky header, filter and release rows would
+   stick to it instead of the viewport. The insets are 0 except where
+   viewport-fit=cover lets the page run under a notch or home bar. */
+.screen {
+  box-sizing: border-box;
+  min-height: 100dvh;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  overflow-x: clip;
+  color: var(--dg-fg);
+  font-family: var(--dg-font-ui);
+  font-size: var(--dg-text-body);
+  line-height: 1.5;
+}
+
+/* Grain and vignette, one fixed layer over everything, the bar included. */
+.texture {
+  position: fixed;
+  inset: 0;
+  z-index: var(--dg-z-texture);
+  pointer-events: none;
+}

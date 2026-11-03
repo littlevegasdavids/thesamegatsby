@@ -274,6 +274,120 @@
   margin: var(--dg-space-4) 0 0;
 }
 
+.section + .section {
+  margin-top: var(--dg-space-8);
+}
+
+/* Textures: each sample is a 64 px tile, as on the style tile. Colours
+   here are background-color: the background shorthand, loaded after
+   textures.css, would reset a utility's lines or vignette. */
+.textureBox {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 64px;
+  overflow: hidden;
+  border-radius: var(--dg-radius-s);
+  background-color: var(--dg-surface);
+}
+
+.raised {
+  background-color: var(--dg-surface-raised);
+}
+
+.panel {
+  background-color: var(--dg-panel);
+}
+
+/* The tile shows its grain at 35% so the texture can be seen. The page
+   itself carries it at the token's 7%. */
+.grainLoud {
+  --dg-grain-opacity: 0.35;
+}
+
+.layer {
+  position: absolute;
+  inset: 0;
+}
+
+.amber {
+  background-color: var(--dg-accent);
+}
+
+.half {
+  display: flex;
+  flex: 1;
+  align-self: stretch;
+  align-items: center;
+  justify-content: center;
+}
+
+.aero {
+  font-family: var(--dg-font-display);
+  font-size: var(--dg-text-display-l);
+  font-weight: 400;
+  line-height: 1;
+}
+
+.artwork {
+  color: var(--dg-white);
+  text-shadow: var(--dg-tape-artwork);
+}
+
+.lit {
+  gap: var(--dg-space-2);
+  color: var(--dg-accent);
+  font-family: var(--dg-font-readout);
+  font-size: var(--dg-text-readout);
+}
+
+.lamp {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--dg-accent);
+  box-shadow: var(--dg-glow-accent-box);
+}
+
+.cutout {
+  position: relative;
+  width: 44px;
+  height: 44px;
+}
+
+.stripes {
+  background: linear-gradient(
+    90deg,
+    var(--dg-accent) 0 25%,
+    var(--dg-panel) 25% 50%,
+    var(--dg-rec) 50% 75%,
+    var(--dg-fg) 75%
+  );
+}
+
+.pane {
+  position: absolute;
+  inset: var(--dg-space-3) var(--dg-space-3) var(--dg-space-3) 35%;
+  border: 1px solid var(--dg-line);
+  border-radius: var(--dg-radius-l);
+}
+
+/* A raised stage, because a black shadow barely shows on tape black. */
+.shadows {
+  gap: var(--dg-space-6);
+  padding: var(--dg-space-5);
+  border-radius: var(--dg-radius-l);
+  background: var(--dg-surface-raised);
+}
+
+.shadowBox {
+  height: 64px;
+  border: 1px solid var(--dg-line);
+  border-radius: var(--dg-radius-l);
+  background: var(--dg-surface);
+}
+
 @media (min-width: 768px) {
   .page {
     padding: var(--dg-space-7) var(--dg-space-8) var(--dg-space-9);

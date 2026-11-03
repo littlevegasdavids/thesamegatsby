@@ -269,7 +269,7 @@ Review round 3 (3 Nov 2026):
 
 ## Phase 4: Surfaces
 
-- [ ] **DS-7: Textures, the glass surface and `Screen`**
+- [x] **DS-7: Textures, the glass surface and `Screen`**
   - The utilities in `textures.css`:
     - `.dg-grain`, `.dg-scanlines`, `.dg-halftone`, `.dg-tape` (the V5 shadows), `.dg-glow`, `.dg-sticker` and `.dg-vignette`
     - `.dg-glass`: the glass colour and blur, with a solid `--dg-surface` fallback under `@supports not (backdrop-filter: …)`, used by the header and filter boxes
@@ -287,8 +287,32 @@ Review round 3 (3 Nov 2026):
     - side-by-side screenshots in Safari and Chrome
     - the spec updated with the grain approach that ships
     - **Canvas:** `StyleTile.dc.html` at 1440 px, the "Motifs · textures" tiles (grain, scanlines, halftone, stacked tape, glow, sticker). `Main.dc.html` at 390 px for the vignette. Grain is expected to look a little fainter (spec 0.07, canvas 0.09)
+  - **Done 3 Nov 2026.** `Screen` wraps every page from the root layout, and `body.css` is gone. `textures.css` holds the eight utilities plus the page ground (`html` background, no body margin). `/system` has a Textures section, and `tests/system-textures.test.ts` fails if a utility or texture token has no sample there. Decisions:
+    - **Grain is normal-blended and static. Reno chose both on 3 Nov 2026, and the spec is updated.** On tape black, the spec's `overlay` at 0.07 measured sd 0 (invisible), normal at 0.07 measured sd 1.61, and the canvas (screen, 0.09) measured sd 2.08. So the jitter criterion doesn't apply, and a test fails if `textures.css` gains any animation.
+    - **The grain tile is the canvas's `feTurbulence` SVG**, inline in `textures.css` (371 bytes), with its filter region pinned to the tile so it repeats seamlessly at 256 px. No AVIF.
+    - **Grain and vignette are one fixed element.** The vignette is its background, and the grain is its `::after` at `--dg-grain-opacity`. That only works because the grain has no blend mode.
+    - **`.dg-glow` is text-shadow only.** Lit boxes use `--dg-glow-accent-box`, and the spec now says so.
+    - **`viewportFit: "cover"`** is set in the root layout, because without it the safe-area insets `Screen` pads by are always 0.
+    - **`Screen` is imported from its own file in the layout, not `index.ts`.** Importing the barrel would put every later component's CSS on every page.
+    - **Gotcha for DS-24 and later:** a `background` shorthand in a component's CSS module loads after `textures.css` and resets `.dg-scanlines` and `.dg-vignette`. Use `background-color` for the colour. The first Textures section build hit this: its scanlines didn't draw.
+  - **Checks.** Chrome isn't installed, so with Reno's OK these ran in headless Brave 1.98 (Chromium 156) over the DevTools protocol, against `npm run build` served locally:
+    - 360, 768, 1280, 390 and 1440 px: no horizontal scroll and no console errors or warnings. The layer is fixed, `inset: 0`, `pointer-events: none`, z-index 300, and doesn't take a click at the centre. `Screen` computes `overflow-x: clip`.
+    - **4× CPU, touch-scrolling the whole of `/system` at 360 px and back,** 8 runs alternating with and without the layer: no long animation frames, and the worst frame gap was 17 ms either way. The trace (`trace-system-360-4x.json`, in the session scratchpad only) has no `Paint` events during the scroll. One cold, traced run had a single 117 ms task. The trace shows nothing of the page's own inside it, and it didn't recur.
+    - **Glass without `backdrop-filter`.** I rewrote the stylesheet over the protocol, flipping the `@supports` condition and dropping the blur, the same edit as disabling it in DevTools. `.dg-glass` then computes `rgb(14, 17, 32)` (`--dg-surface`). Disabling the property alone doesn't trigger `@supports not`, so the acceptance wording undersells the check.
+    - **Reduced motion, emulated:** nothing on the page animates, and the motion samples run 0 transitions, against 3 without emulation.
+    - **CLS: DS-7 adds none.** Cold loads shift by 0.001–0.005, but the same shifts happen at Checkpoint 2's commit. The sources are the VT323 captions, moving when VT323 (not preloaded) swaps in. Left for DS-25.
+    - **Keyboard:** DS-7 adds no focusable element. The motion checkbox is still the only one.
+    - **Safari:** rendered through WKWebView (the WebKit in Safari 27.0.1) with a Swift script, not the Safari app. Every sample matches Chromium. WebKit's grain is about 20% softer (sd 1.3 against 1.65), with the same mean.
+    - **Not checked:** a real phone, and the built-in pane at full size (it stayed hidden).
+  - **Canvas drift, for Checkpoint 4:**
+    - **Vignette:** centred, as the spec reads, where the phone board has it at `50% 35%`. At 390 × 844, the top corners darken 27% (canvas 10%), and the bottom corners 27% on both. It also lies over the header box, where the canvas puts it underneath, so DS-18's header will show darker top corners. Changing `--dg-vignette` to `ellipse at 50% 35%` would match the canvas.
+    - **Scanlines** use the token's 22%. The tile's sample uses 55%.
+    - **The glow sample** is an amber PLAY readout. The tile's is a hazard REC, and the spec has only sodium glow tokens.
+    - **The sticker sample** is a halftone square until DS-14's fixture covers exist. The tile uses a cover.
+    - **The stacked-tape "Aa"** is `--dg-text-display-l` (36 px at 1440), where the tile uses 30 px. An artwork-tone "Aa" sits beside it.
+    - **Layout:** four tiles a row in the 632 px column, where the tile has two a row in 300 px. Glass and vignette are extra tiles.
   - **Depends on:** DS-6
-  - **Files:** `src/design-system/textures.css`, `src/design-system/components/Screen/*`, `src/app/layout.tsx`, `src/app/system/sections/TexturesSection.tsx`
+  - **Files:** `src/design-system/textures.css`, `src/design-system/components/Screen/*`, `src/app/layout.tsx`, `src/app/system/sections/TexturesSection.tsx`. Also `src/design-system/index.ts` (new), `src/app/system/sections/textures.ts`, `src/app/system/system.module.css`, `tests/textures.test.ts` and `tests/system-textures.test.ts`, plus the spec and plan edits above, with `src/app/system/body.css` deleted
   - **Size:** M
 
 - [ ] **DS-8: The drifting grid backdrop**

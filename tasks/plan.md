@@ -45,7 +45,7 @@ The options Reno didn't pick aren't references: Socials B and C, Groupings B and
 ### Where the canvas and the spec disagree, the spec wins
 
 These are the known cases:
-- **Grain.** The canvas uses 9% with a screen blend. The spec caps grain at 8% (`--dg-grain-opacity: 0.07`, overlay), so the built page will look slightly cleaner.
+- **Grain.** The canvas uses 9% with a screen blend. The spec caps grain at 8% (`--dg-grain-opacity: 0.07`, normal blending, chosen in DS-7), so the built page will look slightly cleaner.
 - **Touch targets.** On the canvas the phone hero stream chips are 36 px tall, the desktop filter buttons 40 px, and the bar's "More" toggle 32 px. All are built at 44 px or more.
 - **Scanlines.** The canvas lays them over the bar's cover thumbnail. The spec says never over cover art, so they sit beneath it.
 - **"More" in the hero.** On the canvas it's a plain link, and it's missing from the phone single hero. Per the spec, it's a disclosure button, shown whenever the release has an extra platform.
@@ -82,7 +82,7 @@ No decision is needed for one more thing: the canvas uses values the token table
 - **Disclosure state lives in the component**, with a `defaultOpen` prop, so `/system` can show open states (the filter list, "More", the album's "Show all") without scripting.
 - **`/system` shows fixed and sticky components in frames.** A `SystemFrame` is a full-width, fixed-height box that scrolls on its own and sets `contain: layout paint`, which makes it the containing block for fixed elements. The player bar and the sticky stack then render inside it, one frame per state, instead of piling up at the bottom of the viewport.
 - **One-off font work happens outside the repo.** fonttools runs in a virtual environment outside the repo, at `~/.local/share/venvs/dejagatsby-fonttools`, for subsetting in DS-5 and outlining the wordmark in DS-10. Session scratchpads don't outlive their session, so it isn't kept in one. Only the resulting WOFF2 files, SVG path data and licence texts are committed, so the repo gains no Python dependency.
-- **Grain: an SVG noise tile first, AVIF as the fallback.** The spec says a 10 KB AVIF tile. An SVG `feTurbulence` tile, which is what the canvas uses, is under 1 KB and needs no image tooling. I'll keep it only if it looks the same in Safari and Chrome and costs no scroll performance with CPU throttling on. Either way, I'll update the spec to match what ships.
+- **Grain: an SVG noise tile, inline in `textures.css`.** It's the canvas's own `feTurbulence` tile, under 1 KB, with no image tooling. DS-7 checked it in WebKit and Chromium, and with 4× CPU throttling, so the AVIF fallback wasn't needed. The spec says so.
 - **The wordmark is inline SVG, outlined from Aero's own glyphs.** It's three copies of one path:
   - hazard at 55%, offset 0.06em × 0.08em
   - ultramarine, offset 0.03em × 0.04em
