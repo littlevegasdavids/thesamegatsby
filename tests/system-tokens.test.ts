@@ -40,8 +40,8 @@ describe("/system tokens section", () => {
   });
 
   // The style tile's captions, so a drift in tokens.css shows up here before
-  // it shows up on the canvas check. Ultra light is 7.547:1; the tile and the
-  // spec's contrast table round it to 7.6.
+  // it shows up on the canvas check. Ultra light is 7.547:1; the tile rounds
+  // it to 7.6.
   test("gives the style tile's ratios on tape black", () => {
     const ratios = Object.fromEntries(PRIMITIVES.map((swatch) => [swatch.name, ratioOnBg(tokens, swatch.token)]));
     assert.equal(ratios["Bone"], "16.8:1");

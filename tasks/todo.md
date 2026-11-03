@@ -189,8 +189,12 @@ Review round 3 (3 Nov 2026):
   - **Size:** S
 
 ### Checkpoint 2: `/system` matches the approved style tile
-- [ ] Screenshots of `/system` at 360 and 1440 px shared next to the style tile
-- [ ] Any drift from the mockup fixed or agreed
+- [x] Screenshots of `/system` at 360 and 1440 px shared next to the style tile
+- [x] Any drift from the mockup fixed or agreed. **Reno agreed all four DS-6 items on 3 Nov 2026:**
+  - Ultra light reads 7.5:1. The spec's contrast table now says 7.5 too. The tile's copy is Reno's to update
+  - the type samples stay at the G1 token sizes
+  - the 14 and 18 px small-type floor
+  - the 632 px colour column
 
 ---
 

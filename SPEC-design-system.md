@@ -86,7 +86,7 @@ I checked these on 3 Nov 2026. The test suite re-checks them from `tokens.css`.
 | accent on accent-wash (composited over surface-raised) | 7.5 | 4.5 |
 | on-accent on accent | 11.1 | 4.5 |
 | rec on bg | 6.0 | 4.5 (the REMIX and EDIT tags are small text) |
-| link on bg | 7.6 | 4.5 |
+| link on bg | 7.5 | 4.5 |
 | on-panel on panel | 5.6 | 4.5 |
 | line on bg | 1.6 | decorative only. Never the only boundary of a control |
 
