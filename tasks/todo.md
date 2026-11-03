@@ -408,7 +408,7 @@ Review round 3 (3 Nov 2026):
   - **Files:** `src/design-system/assets/sparkle-star.svg`, `src/design-system/components/SparkleStar/*`, `src/app/system/sections/MarksSection.tsx`. Also `src/app/system/system.module.css`, `tests/sparkle-star.test.ts` and the spec edits above
   - **Size:** S
 
-- [ ] **DS-10: `Wordmark`**
+- [x] **DS-10: `Wordmark`**
   - Outline "Déjà Gatsby" from Aero's glyphs in the DS-5 venv (fonttools' SVG pen), with the path data rounded.
   - The component is inline SVG: three uses of one path, with V5's hazard-at-55% and ultramarine copies under a bone fill, all filled from tokens.
   - Props:
@@ -425,8 +425,26 @@ Review round 3 (3 Nov 2026):
     - block font requests and reload
     - file size
     - **Canvas:** `WordmarkVariants.dc.html` at 1440 px, the V5 cell at both sizes, and V7 for the artwork tone. The header wordmark on `Main.dc.html` at 390 px and `HomeDesktop.dc.html` at 1440 px
+  - **Done 3 Nov 2026.** The DS-5 venv outlined the string from `~/Downloads/Aero.ttf`, the canvas's own file. Aero has no kern, GPOS or GSUB tables, so each glyph sits at its advance. The path is 1,885 bytes, in whole font units on Aero's 1000-unit em. `outline.ts` holds the path, the svg's attributes and each tone's copies, so the tests can import them. `Wordmark.tsx` draws the path once in `<defs>` and fills one `<use>` per copy, with a `useId` id per instance. Screen is hazard at 55%, then ultramarine, then `--dg-fg`. Artwork is `--dg-ink-950` under `--dg-white`. `assets/wordmark.svg` is 2,183 bytes. `/system` › Marks has a Wordmark block beside the star: xl, l, artwork on a `--dg-panel` stage, and the file. `tests/wordmark.test.ts` (13 tests) parses `--dg-tape` and `--dg-tape-artwork` and checks that each copy's offset in font units, divided by the em, and its fill equal the token's shadows. It also checks the size classes, the file's size, title, path, offsets, colours, and that its viewBox clips nothing. Decisions:
+    - **The component's box is the type's own at line-height 1:** 6.099em × 1em, with the baseline 776 units down, where macOS and iOS put it (hhea). The ink is centred in it, at 86 to 914 units. It has `overflow: visible`, so the D's 0.03em slant and the tape draw past the box, as they do on type. In every board container (both V5 cells, V7, and both header boxes), the svg's box lands exactly where the board's span does, to 0.016 px. DS-18 gets the canvas's header layout without adjustment.
+    - **The file's viewBox is the whole mark,** −30 86 6190 910, and its size, 619 × 91, is the mark at a 100 px em. It uses SVG 2 `href` on `<use>`, which Brave and QuickLook (WebKit) both draw. The spec now says this.
+    - **The data file is `outline.ts`, not `wordmark.ts`.** On a case-insensitive disk, TypeScript rejects `wordmark.ts` beside `Wordmark.tsx`.
+    - `tone` defaults to `screen`, and the name "Déjà Gatsby" is fixed.
+  - **Checks.** These ran against `npm run build` served locally: in headless Brave over the protocol (`ds-10/tools/` in the session notes), and in headed Brave through the DevTools MCP.
+    - **Fonts blocked:** `Network.setBlockedURLs` blocked all six font requests, and every face reported `error`. All three wordmarks kept their size and were pixel-identical to the loaded run, at 390 and 1280 px.
+    - **Accessibility tree:** three `image "Déjà Gatsby"` nodes, plus the star. No path or use nodes are exposed, and the file's `alt=""` image doesn't appear.
+    - **Shadow offsets:** 60, 80 and 30, 40 units for screen, and 45, 60 for artwork. Over the 1000-unit em, they equal the tokens' em values exactly (the test).
+    - **360, 768, 1280, 390 and 1440 px:** no horizontal scroll and no console problems. The computed fills are the tokens. The only thing past the column is the D's slant, under 2.2 px, which reaches into the page padding as type does. `/` has no wordmark, and its CSS chunk holds no wordmark or `/system` rule.
+    - **Keyboard and motion:** DS-10 adds no focusable element and no animation. Under reduced motion, nothing on the page animates.
+    - **Canvas:** the board's markup was rebuilt in headless Brave with its own Aero TTF, then compared with ours in the same containers, at 72 px (V5, V7), 28 px (V5 header size and `Main`'s header at 390 px) and 36 px (`HomeDesktop`'s header at 1440 px). Our boxes match exactly. The ink differs only in rasterising. With font smoothing off on the board's type and its baseline snap applied to ours, pixels differing by more than 64 fall from 1,155 to 19 in the phone header. The board was also opened in the built-in pane at Fit scale and checked by eye.
+    - **Not checked:** Safari and a real phone. WebKit was tried on the file only (QuickLook).
+  - **Canvas drift, for Checkpoint 5:**
+    - **On a Mac, the board's type looks a hair heavier** than the outline, because macOS font smoothing thickens text and not paths. On phones, as drawn, there's no such smoothing.
+    - **Brave snaps the type's baseline to a whole pixel.** It sits at 21 px in a 28 px box, where ours stays at 21.73. At 36 and 72 px the gap is under 0.13 px.
+    - **The V5 cell's small sample is 28 px at 1440 px.** By G1, the l size is 36 px from 768 px, so it was compared at 390 px, where l is 28 px.
+    - **The artwork tone sits on a `--dg-panel` stage on `/system`,** not on a cover. Fixture covers come with DS-14.
   - **Depends on:** DS-5, DS-6
-  - **Files:** `src/design-system/assets/wordmark.svg`, `src/design-system/components/Wordmark/*`, `src/app/system/sections/MarksSection.tsx`
+  - **Files:** `src/design-system/assets/wordmark.svg`, `src/design-system/components/Wordmark/*`, `src/app/system/sections/MarksSection.tsx`. Also `src/app/system/system.module.css`, `tests/wordmark.test.ts` and the spec edits above
   - **Size:** M
 
 - [ ] **DS-11: `Button`**

@@ -178,7 +178,7 @@ The page-level layers (grain and vignette) are one fixed element with `pointer-e
 ## Assets (`assets/`)
 
 - `sparkle-star.svg`: an original four-point star path on a 24 × 24 viewBox, drawn for this system. It's the signature mark. The file bakes in `--dg-star`'s signal yellow, so it shows up as an image outside the page, and a test keeps the two in step. `SparkleStar` draws the same path inline.
-- `wordmark.svg`: "Déjà Gatsby" set in Aero and outlined, so the logo doesn't depend on the font loading. The `Wordmark` component draws both tones below from tokens, and the file is exported in the screen tone. Bone-white with the V5 "stacked tape" shadows: `0.03em 0.04em 0 #2B3BFF, 0.06em 0.08em 0 rgba(255,75,31,0.55)`. No chrome and no gloss. On artwork it's white with a `0.045em 0.06em` black drop.
+- `wordmark.svg`: "Déjà Gatsby" set in Aero and outlined, so the logo doesn't depend on the font loading. The `Wordmark` component draws both tones below from tokens, and the file is exported in the screen tone. Bone-white with the V5 "stacked tape" shadows: `0.03em 0.04em 0 #2B3BFF, 0.06em 0.08em 0 rgba(255,75,31,0.55)`. No chrome and no gloss. On artwork it's white with a `0.045em 0.06em` black drop. The file is one path drawn by three `<use>`s, under 6 KB. Its viewBox holds the whole mark, shadows included, and its size is the mark at a 100 px em (619 × 91). A test keeps its path, offsets and colours equal to the component's and the tokens'.
 - Platform icons as inline SVG: the five main platforms (Spotify, Apple Music, YouTube Music, SoundCloud, Bandcamp) and the three under "More" (Amazon Music, Deezer, Tidal). The two social icons (Instagram, TikTok) are inline SVG too. Source: Simple Icons (CC0). Each brand's own trademark guidelines still apply, so keep brand icons monochrome in `--dg-fg`. Downloading them is an ask-first step.
 
 ## Components
@@ -188,7 +188,7 @@ Every component is presentational. It renders from props and raises callbacks, a
 | Component | Props (summary) | States to show on `/system` |
 |---|---|---|
 | `SparkleStar` | `size` (px), `twinkle?`, `label?`. Filled with `currentColor`, which is `--dg-star`. A parent retints it by setting `--dg-star`, as the hero label does with the accent. Decorative (`aria-hidden`) unless labelled, then `role="img"` with that name | static, twinkling, reduced motion, amber in the hero label |
-| `Wordmark` | `size: xl \| l`, `tone: screen \| artwork` | xl, l, artwork |
+| `Wordmark` | `size: xl \| l`, `tone: screen \| artwork` (default `screen`). Its box is the type's own at line-height 1, 6.099em × 1em, so it lays out like the canvas's line of Aero. As on type, the D's slant and the tape draw past that box. `role="img"`, named "Déjà Gatsby" | xl, l, artwork |
 | `VhsReadout` | `mode`, `elapsed`, `duration` | load, play, stop, ended (reads "END") |
 | `Button` | `variant: primary \| ghost \| hardware`, `icon?`, `label` (required when icon-only) | default, hover, focus-visible, active, disabled |
 | `ReleaseHero` | `release` (single, EP or album), `leadTrackId`, `playingTrackId`, `playState`, `elapsed`, `onPlay`, `streamLinks` | single, EP (all tracks listed), album (first five plus "Show all"), playing, 360 and 1280 px |

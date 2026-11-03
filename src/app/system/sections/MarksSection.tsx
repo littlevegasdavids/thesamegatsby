@@ -4,16 +4,19 @@ import Image from "next/image";
 // From its own file, not index.ts: through the barrel, which also exports
 // Screen, the build put /system's CSS in the chunk / loads.
 import { SparkleStar } from "../../../design-system/components/SparkleStar/SparkleStar";
+import { Wordmark } from "../../../design-system/components/Wordmark/Wordmark";
 import starFile from "../../../design-system/assets/sparkle-star.svg";
+import wordmarkFile from "../../../design-system/assets/wordmark.svg";
 import styles from "../system.module.css";
 
 const SIZES = [56, 28, 14] as const;
 
-// The star in each state the spec lists, at the style tile's motif-row sizes.
-// The file's size is read at build time, like the token values.
-export function MarksSection() {
-  const fileBytes = statSync(join(process.cwd(), "src/design-system/assets/sparkle-star.svg")).size;
+const bytes = (asset: string) => statSync(join(process.cwd(), "src/design-system/assets", asset)).size;
 
+// The star and the wordmark in each state the spec lists, the star at the
+// style tile's motif-row sizes. The files' sizes are read at build time, like
+// the token values.
+export function MarksSection() {
   return (
     <section className={styles.section} aria-labelledby="marks">
       <h2 id="marks" className={styles.heading}>Marks</h2>
@@ -49,8 +52,36 @@ export function MarksSection() {
             </li>
             <li className={styles.stack}>
               <Image src={starFile} alt="" width={56} height={56} />
-              <span className={styles.cap}>The file · signal yellow baked in · {fileBytes} B</span>
+              <span className={styles.cap}>The file · signal yellow baked in · {bytes("sparkle-star.svg")} B</span>
               <code className={styles.code}>assets/sparkle-star.svg</code>
+            </li>
+          </ul>
+        </section>
+
+        <section aria-labelledby="marks-wordmark">
+          <h3 id="marks-wordmark" className={`${styles.label} ${styles.blockHeading}`}>Wordmark</h3>
+          <ul className={styles.rows}>
+            <li className={styles.stack}>
+              <Wordmark size="xl" />
+              <span className={styles.cap}>xl · 30 to 72 px · V5 stacked tape</span>
+              <code className={styles.code}>--dg-text-display-xl · --dg-tape</code>
+            </li>
+            <li className={styles.stack}>
+              <Wordmark size="l" />
+              <span className={styles.cap}>l · 28 to 36 px · the header and footer</span>
+              <code className={styles.code}>--dg-text-display-l</code>
+            </li>
+            <li className={styles.stack}>
+              <span className={styles.artworkStage}>
+                <Wordmark size="xl" tone="artwork" />
+              </span>
+              <span className={styles.cap}>Artwork · V7 · white on a black drop</span>
+              <code className={styles.code}>--dg-tape-artwork</code>
+            </li>
+            <li className={styles.stack}>
+              <Image src={wordmarkFile} alt="" className={styles.file} />
+              <span className={styles.cap}>The file · screen tone baked in · {bytes("wordmark.svg")} B</span>
+              <code className={styles.code}>assets/wordmark.svg</code>
             </li>
           </ul>
         </section>

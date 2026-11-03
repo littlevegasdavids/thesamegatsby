@@ -1,0 +1,38 @@
+/* The mark sits in the type's box, so it lays out like the canvas's line of
+   Aero. Like type, the D's slant and the tape draw past that box. */
+.wordmark {
+  display: block;
+  flex: none;
+  overflow: visible;
+}
+
+.xl {
+  font-size: var(--dg-text-display-xl);
+}
+
+.l {
+  font-size: var(--dg-text-display-l);
+}
+
+/* The copies' fills. The screen tone is V5 "stacked tape", as --dg-tape draws
+   it on type; artwork is V7, as --dg-tape-artwork. tests/wordmark.test.ts
+   keeps these equal to the tokens. */
+.hazard {
+  fill: color-mix(in srgb, var(--dg-hazard-500) 55%, transparent);
+}
+
+.ultra {
+  fill: var(--dg-ultra-500);
+}
+
+.bone {
+  fill: var(--dg-fg);
+}
+
+.ink {
+  fill: var(--dg-ink-950);
+}
+
+.white {
+  fill: var(--dg-white);
+}
