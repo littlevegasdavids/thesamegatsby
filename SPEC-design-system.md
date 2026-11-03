@@ -138,12 +138,12 @@ Read off the approved screens on 3 Nov 2026.
 | `--dg-glow-cover` | `0 0 40px`, ultramarine at 25%. `0 0 60px` at 28% from 768 px | Hero covers. It sits outside the art, never over it |
 | `--dg-tape` | `0.03em 0.04em 0` ultramarine, then `0.06em 0.08em 0` hazard at 55% | All Aero display type (V5) |
 | `--dg-tape-artwork` | `0.045em 0.06em 0` ink-950, with a `--dg-white` fill | The wordmark on artwork |
-| `--dg-grid-line` | Ultramarine at 38%, or 32% from 768 px | Backdrop grid lines |
+| `--dg-grid-line` | Ultramarine at 20%, or 17% from 768 px, on a 1 px line. That matches the canvas, whose pattern tiles clip half of a 1 px stroke at 50% (45%). Reno chose it at Checkpoint 4 (3 Nov 2026) | Backdrop grid lines |
 | `--dg-grid-cell` | 32 px, or 40 px from 768 px | Backdrop grid |
 | `--dg-grid-drift` | 5 s, or 6 s from 768 px, for one cell | Backdrop grid |
 | `--dg-grid-glow` | Ultramarine at 30% (28% from 768 px), a radial in the upper part of the screen: 70% of the screen across and down, centred at 50% 20% (60%, at 30% 25%, from 768 px) | Backdrop, behind the hero |
 | `--dg-scanline` | ink-950 at 22%, a 1 px line every 3 px | The now-playing bar |
-| `--dg-vignette` | Black at 30% at the edges, clear inside the middle 65% | The page frame |
+| `--dg-vignette` | Black at 30% at the edges, clear inside the middle 65%, an ellipse centred at 50% 35%, as on the phone board. `none` from 768 px, as on the desktop board. Reno chose both at Checkpoint 4 (3 Nov 2026) | The page frame, on phones |
 
 ## Fonts
 
@@ -170,7 +170,7 @@ Read off the approved screens on 3 Nov 2026.
 | `.dg-glass` | `--dg-surface-glass` with `backdrop-filter: var(--dg-glass-filter)`. Solid `--dg-surface` where `backdrop-filter` isn't supported | The header and filter boxes |
 | `.dg-glow` | `--dg-glow-accent` as a text-shadow | Active readouts and the play state. Lit boxes (the progress fill, a lamp dot) take `--dg-glow-accent-box` as their box-shadow, because a box-shadow on a readout would light its whole box |
 | `.dg-sticker` | Stacked `drop-shadow` outline | Cutout images |
-| `.dg-vignette` | `radial-gradient` overlay | The page frame |
+| `.dg-vignette` | `radial-gradient` overlay | The page frame, below 768 px |
 | `.dg-backdrop` | One fixed layer behind all content: the `--dg-grid-*` grid at roughly even strength top to bottom, drifting downward one cell per `--dg-grid-drift` in a seamless loop, with the `--dg-grid-glow` behind the hero | Transform only, so it never triggers layout or paint. The grid is a conic-gradient tile on a layer one cell taller than the screen, moved down one cell per loop. Static under reduced motion. DS-8 scrolled two glass boxes over it at 4× CPU with no long frames |
 
 The page-level layers (grain and vignette) are one fixed element with `pointer-events: none`. They must not add layout shift or make scrolling janky on a mid-range phone.

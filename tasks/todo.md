@@ -356,9 +356,22 @@ Review round 3 (3 Nov 2026):
   - **Size:** M
 
 ### Checkpoint 4: Surfaces
-- [ ] With nothing on it, the page (backdrop, grain, vignette) matches `Main.dc.html` and `HomeDesktop.dc.html`
-- [ ] The DS-7 and DS-8 performance traces are noted, with no long frames at 4× CPU
-- [ ] Drift from the canvas is listed
+- [x] With nothing on it, the page (backdrop, grain, vignette) matches `Main.dc.html` and `HomeDesktop.dc.html`. **Reno settled both open items on 3 Nov 2026. The tokens and spec rows are updated:**
+  - **Grid lines are 20%, or 17% from 768 px** (they were 38% and 32%). The spec's value came from applying the canvas's stroke opacity times its fade to a full 1 px line, but each canvas tile clips half its stroke. The blue a line adds, top / middle / bottom, measured on the bare page with grain and vignette:
+    - phone: canvas 39 / 39 / 39, before 68 / 77 / 84, now 37 / 41 / 44
+    - desktop: canvas 35 / 33 / 35, before 61 / 67 / 72, now 34 / 35 / 40
+  - **The vignette sits at `50% 35%` on phones and is `none` from 768 px**, as the two boards draw it. `HomeDesktop.dc.html` has no vignette at all, which DS-7 missed. On grey at 390 px, the top corners now darken 10%, the same as the board. Centred, they darkened 27%. `/system`'s Vignette tile now reads "below 768 px".
+  - The side-by-sides at 390 and 1440 px are in the session notes (`checkpoint-4/`): canvas | before | proposed, and canvas | after. The canvas frames are rebuilt from each board's own grid, vignette and grain markup. After the change, `/` and `/system` at 360, 768, 1280, 390 and 1440 px show no console problems and no horizontal scroll.
+- [x] The DS-7 and DS-8 performance traces are noted, with no long frames at 4× CPU:
+  - **DS-7:** 8 runs, none, with a worst gap of 17 ms.
+  - **DS-8, warm runs:** none, headless or headed, with worst gaps of 17 and 10 ms.
+  - **DS-8, cold first runs:** these did have long frames. The first two runs in a fresh headless browser had frames of up to 693 ms (glass over the drift) and 181 ms (no glass), recorded in `ds8-report.json`. The first traced headed run had one of 243 ms. DS-8's note gives the first and the last of these, not the 181 ms. Watch the cold case when DS-18 puts real glass on the page.
+  - The checkpoint's token changes only alter colours, so nothing was re-traced.
+- [x] Drift from the canvas is listed. What's left on the bare page is where the spec wins (plan.md's known cases):
+  - **Grain:** 0.07 with normal blending, against the canvas's 0.09 screen.
+  - **No fade on the grid.**
+  - **The vignette lies over the header and the bar on phones.**
+  - The `/system` samples differ from the style tile as DS-7 listed.
 
 ---
 

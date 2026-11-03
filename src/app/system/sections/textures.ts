@@ -14,7 +14,7 @@ export const TEXTURES = [
   { utility: "dg-glow", name: "Glow", tokens: ["--dg-glow-accent", "--dg-glow-accent-box"], use: "Active readouts, lit boxes" },
   { utility: "dg-sticker", name: "Sticker", tokens: [], use: "Cutout images" },
   { utility: "dg-glass", name: "Glass", tokens: ["--dg-glass-filter"], use: "The header and filter boxes" },
-  { utility: "dg-vignette", name: "Vignette", tokens: ["--dg-vignette"], use: "The page frame" },
+  { utility: "dg-vignette", name: "Vignette", tokens: ["--dg-vignette"], use: "The page frame, below 768 px" },
   {
     utility: "dg-backdrop",
     name: "Grid backdrop",

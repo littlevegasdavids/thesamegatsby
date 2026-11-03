@@ -46,6 +46,8 @@ The options Reno didn't pick aren't references: Socials B and C, Groupings B and
 
 These are the known cases:
 - **Grain.** The canvas uses 9% with a screen blend. The spec caps grain at 8% (`--dg-grain-opacity: 0.07`, normal blending, chosen in DS-7), so the built page will look slightly cleaner.
+- **Grid fade.** The boards fade the grid from 85% to 70%, top to bottom (80% to 65% on desktop). The spec keeps it even, as approved at Checkpoint 0.
+- **Vignette stacking.** The phone board draws the vignette under the header and the bar. The spec makes grain and vignette one layer over everything, so on phones the header's top corners darken slightly, and the bar's bottom corners more (27% at the corner, on grey). From 768 px there's no vignette, as on the desktop board.
 - **Touch targets.** On the canvas the phone hero stream chips are 36 px tall, the desktop filter buttons 40 px, and the bar's "More" toggle 32 px. All are built at 44 px or more.
 - **Scanlines.** The canvas lays them over the bar's cover thumbnail. The spec says never over cover art, so they sit beneath it.
 - **"More" in the hero.** On the canvas it's a plain link, and it's missing from the phone single hero. Per the spec, it's a disclosure button, shown whenever the release has an extra platform.
