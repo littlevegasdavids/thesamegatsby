@@ -1,0 +1,7 @@
+/* /system's ground, until DS-7's Screen frames every page. It's imported by
+   this route only, so `/` doesn't load it. */
+body {
+  margin: 0;
+  background: var(--dg-bg);
+  color: var(--dg-fg);
+}

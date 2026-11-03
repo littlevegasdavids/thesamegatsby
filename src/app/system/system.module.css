@@ -1,0 +1,287 @@
+/* /system's layout. The samples take their values from tokens; the spec has
+   no tokens for tracking or line-height, so those are written here as
+   SPEC-design-system.md › Typography gives them. */
+
+.page {
+  color-scheme: dark;
+  min-height: 100dvh;
+  padding: var(--dg-space-6) var(--dg-space-4) var(--dg-space-9);
+  font-family: var(--dg-font-ui);
+  font-size: var(--dg-text-body);
+  line-height: 1.5;
+}
+
+.intro {
+  margin-bottom: var(--dg-space-7);
+}
+
+/* Aero has one weight. Headings default to bold, which would fake one. */
+.pageTitle {
+  margin: 0;
+  font-family: var(--dg-font-display);
+  font-size: var(--dg-text-display-l);
+  font-weight: 400;
+  line-height: 1;
+  text-shadow: var(--dg-tape);
+}
+
+.lede {
+  max-width: 60ch;
+  margin: var(--dg-space-3) 0 0;
+  color: var(--dg-fg-muted);
+}
+
+.section {
+  padding-top: var(--dg-space-5);
+  border-top: 1px solid var(--dg-line);
+}
+
+.heading {
+  margin: 0 0 var(--dg-space-6);
+  font-size: var(--dg-text-title);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Blocks sit side by side once two fit, the way the style tile sets colour
+   beside type, without a second breakpoint. */
+.blocks {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 30rem), 1fr));
+  gap: var(--dg-space-7);
+}
+
+.blockHeading {
+  margin: 0 0 var(--dg-space-3);
+  color: var(--dg-fg-muted);
+  font-size: var(--dg-text-label);
+}
+
+.swatches,
+.typeScale,
+.rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.swatches {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr));
+  gap: var(--dg-space-3);
+}
+
+.typeScale {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dg-space-5);
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dg-space-3);
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dg-space-1);
+  min-width: 0;
+}
+
+.colour {
+  height: 64px;
+  border: 1px solid var(--dg-line);
+  border-radius: var(--dg-radius-s);
+}
+
+.colourSmall {
+  height: 32px;
+}
+
+.name {
+  font-size: var(--dg-text-small);
+  font-weight: 600;
+}
+
+.cap,
+.code {
+  font-family: var(--dg-font-readout);
+  font-size: var(--dg-text-readout-s);
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+.cap {
+  color: var(--dg-fg-subtle);
+  text-transform: uppercase;
+}
+
+.code {
+  color: var(--dg-fg-muted);
+}
+
+/* Type samples, one class per look in the Typography table. Each sample's
+   size is its token, set inline. */
+.sample {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.display {
+  font-family: var(--dg-font-display);
+  font-weight: 400;
+  line-height: 1.02;
+  text-shadow: var(--dg-tape);
+}
+
+.title,
+.button,
+.label {
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.title {
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+}
+
+.button,
+.label {
+  letter-spacing: 0.12em;
+}
+
+.body {
+  max-width: 60ch;
+  color: var(--dg-fg-muted);
+}
+
+.readout,
+.readoutSmall {
+  font-family: var(--dg-font-readout);
+  line-height: 1;
+}
+
+.readout {
+  display: flex;
+  align-items: center;
+  gap: var(--dg-space-2);
+  color: var(--dg-accent);
+  text-shadow: var(--dg-glow-accent);
+}
+
+.readoutSmall {
+  color: var(--dg-fg-subtle);
+}
+
+.glyph {
+  flex: none;
+  width: 0.5em;
+  height: 0.5em;
+}
+
+/* Space and radius */
+.measure {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--dg-space-1) var(--dg-space-3);
+}
+
+/* As wide as the widest step, --dg-space-9, so the labels line up. */
+.gauge {
+  flex: none;
+  width: 96px;
+}
+
+.spaceBar {
+  display: block;
+  height: 16px;
+  background: var(--dg-accent);
+}
+
+.radiusBox,
+.chamferBox {
+  display: block;
+  height: 64px;
+}
+
+.radiusBox {
+  border: 1px solid var(--dg-outline);
+  background: var(--dg-surface-raised);
+}
+
+.chamferBox {
+  background: var(--dg-accent);
+  clip-path: var(--dg-chamfer);
+}
+
+/* Motion: ticking the box slides each dot across its track, at that
+   duration and with --dg-ease-tape. Under reduced motion they jump. */
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--dg-space-3);
+  min-height: 44px;
+  margin-bottom: var(--dg-space-3);
+  font-size: var(--dg-text-small);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.toggleInput {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: var(--dg-accent);
+}
+
+.toggleInput:focus-visible {
+  outline: 2px solid var(--dg-focus);
+  outline-offset: 2px;
+}
+
+.track {
+  display: block;
+  max-width: 20rem;
+  border-bottom: 1px solid var(--dg-line);
+}
+
+.runner {
+  display: block;
+  width: calc(100% - 16px);
+  transition-property: transform;
+  transition-timing-function: var(--dg-ease-tape);
+}
+
+.motion:has(.toggleInput:checked) .runner {
+  transform: translateX(100%);
+}
+
+.dot {
+  display: block;
+  width: 16px;
+  height: 16px;
+  background: var(--dg-accent);
+}
+
+.easing {
+  margin: var(--dg-space-4) 0 0;
+}
+
+@media (min-width: 768px) {
+  .page {
+    padding: var(--dg-space-7) var(--dg-space-8) var(--dg-space-9);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .runner {
+    transition: none;
+  }
+}

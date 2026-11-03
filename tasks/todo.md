@@ -162,7 +162,7 @@ Review round 3 (3 Nov 2026):
   - **Files:** `src/design-system/fonts/*.woff2`, `src/design-system/fonts/OFL-*.txt`, `src/design-system/fonts.ts`, `src/design-system/tokens.css`, `src/app/layout.tsx`, `tests/fonts.test.ts`
   - **Size:** M
 
-- [ ] **DS-6: The `/system` route and its tokens section**
+- [x] **DS-6: The `/system` route and its tokens section**
   - An unlinked, `noindex` route. It shows every colour swatch with its contrast value against `--dg-bg`, the type scale in each font, and space, radius and motion samples. The section reads the values from `tokens.css` at build time and computes ratios with `contrast.ts`, so no hex appears in its source.
   - **Acceptance:**
     - `/system` renders at 360, 768 and 1280 px with no horizontal scroll and no console errors
@@ -173,8 +173,19 @@ Review round 3 (3 Nov 2026):
     - the built-in browser at each width
     - `grep` the chunk names in `out/index.html`
     - **Canvas:** `StyleTile.dc.html` at 1440 px, colour and type blocks. Same swatches, names and ratios, and the same type samples at the sizes G1 settled
+  - **Done 3 Nov 2026.** `/system` has `noindex`, nothing links to it, and its one extra asset is a CSS chunk that `out/index.html` doesn't reference. It's all server components, so there's no `/system` JS chunk at all. No horizontal scroll or console errors at 360, 768 and 1280 px, and the 768 px tokens switch as specified. Some choices the spec doesn't make:
+    - **The section shows every colour, type, space, radius and motion token.** That's the 14 primitives (the tile's 12 plus white and black), the 20 semantic colours, and all 11 type looks at their token sizes. `tests/system-tokens.test.ts` fails if a token in `tokens.css` has no sample. `--dg-glass-filter` and the `--dg-grid-*` colours wait for DS-7 and DS-8, and the shadows and tape for the textures section.
+    - **Every swatch shows its ratio on `--dg-bg`.** The tile's role words (Ground, Surface, Raised, Lines, Panels) go on their own line, under the ratio.
+    - **`src/app/system/body.css`** gives the route a dark ground and no body margin. It's imported by `/system` only, because no global stylesheet exists before DS-7, and `tokens.css` only takes `:root`. DS-7 can delete it once `Screen` frames every page.
+    - **Motion samples run from a checkbox**, using CSS `:has()` and no JS. Each dot slides at its duration on `--dg-ease-tape`, and under reduced motion they jump.
+    - **Checks:** Tab reaches the toggle, which shows the 2 px `--dg-focus` ring and has a 44 px label. The reduced-motion rule was checked by applying its body directly. Real `prefers-reduced-motion` emulation wasn't available: the pane can't emulate it, and the DevTools MCP needs Google Chrome, which isn't installed.
+    - **Canvas drift, for Checkpoint 2:**
+      - Ultra light reads 7.5:1 against the tile's 7.6. The true value is 7.547, so the tile and the spec's contrast table ("link on bg 7.6") round it wrong. The other six text ratios match.
+      - The type samples are at G1 sizes, not the tile's specimen sizes: the Aero sample is 72 px at 1440 px (48 on the tile), Give me that KaiZen is 15 px (18), and the readout is 22 px (28).
+      - Swatch names are 14 px and captions 18 px (13 and 17 on the tile), per the spec's small-type floor.
+      - The colour column is 632 px wide at 1440 px, against the tile's 540, with four swatches a row either way.
   - **Depends on:** DS-5
-  - **Files:** `src/app/system/page.tsx`, `src/app/system/system.module.css`, `src/app/system/sections/TokensSection.tsx`
+  - **Files:** `src/app/system/page.tsx`, `src/app/system/system.module.css`, `src/app/system/body.css`, `src/app/system/sections/TokensSection.tsx`, `src/app/system/sections/tokens.ts`, `tests/system-tokens.test.ts`
   - **Size:** S
 
 ### Checkpoint 2: `/system` matches the approved style tile
