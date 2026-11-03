@@ -392,6 +392,26 @@
   background: var(--dg-surface);
 }
 
+/* Marks: the style tile's motif row. */
+.marks {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--dg-space-4);
+}
+
+/* The hero's label row: amber text, with the star retinted to match by
+   setting --dg-star, as ReleaseHero will. */
+.heroLabel {
+  --dg-star: var(--dg-accent);
+  display: flex;
+  align-items: center;
+  gap: var(--dg-space-2);
+  margin: 0;
+  color: var(--dg-accent);
+  font-size: var(--dg-text-label);
+}
+
 @media (min-width: 768px) {
   .page {
     padding: var(--dg-space-7) var(--dg-space-8) var(--dg-space-9);

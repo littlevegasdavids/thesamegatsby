@@ -377,7 +377,7 @@ Review round 3 (3 Nov 2026):
 
 ## Phase 5: Primitives
 
-- [ ] **DS-9: `SparkleStar`**
+- [x] **DS-9: `SparkleStar`**
   - The four-point star drawn for this system on the canvas, as `assets/sparkle-star.svg` and an inline-SVG component with `size` and `twinkle?`. It's filled with `currentColor`, which defaults to `--dg-star`, so the hero's label row can show it in amber as on the canvas. It's decorative (`aria-hidden`) unless given a label.
   - **Acceptance:**
     - the twinkle uses `steps()` timing and stops under reduced motion
@@ -387,8 +387,25 @@ Review round 3 (3 Nov 2026):
     - reduced-motion emulation
     - the accessibility tree via `read_page`
     - **Canvas:** `StyleTile.dc.html` at 1440 px, the motif row with the star at 56, 28 and 14 px
+  - **Done 3 Nov 2026.** `SparkleStar` draws the canvas path inline. The path, the viewBox and the label-to-attributes logic live in `star.ts`, so the tests can import them. Its CSS sets `color: var(--dg-star)`, and the path fills with `currentColor`, so a parent retints the star by setting `--dg-star`. `/system`'s hero-label sample sets it to the accent. `assets/sparkle-star.svg` is 210 bytes. `/system` has a Marks section, with the static and twinkling rows at 56, 28 and 14 px, the hero label, and the file itself. `tests/sparkle-star.test.ts` checks the attributes, the file's size, path and colour, `steps()` timing, opacity and transform only, and reduced motion. Decisions:
+    - **The twinkle is DS-9's proposal, for Checkpoint 5.** The canvas draws every star still. Every 2.4 s (20 × `--dg-dur-1`), it snaps to 70% size at 40% opacity, then 85% at 70%, then back, one `--dg-dur-1` each. The spec now describes it.
+    - **The file bakes in signal yellow, not `currentColor`.** With `currentColor`, it would render black as an `<img>` or in a design tool. A test ties the hex to `--dg-star`.
+    - **`size` is a number of px**, as the canvas sizes every star.
+    - **Gotcha for DS-10 and later:** a `/system` section imports its component from the component's own file, never through `index.ts`. Through the barrel (which also exports `Screen`), Turbopack put all of `/system`'s CSS, the twinkle included, into the chunk `/` loads. A build of the previous commit showed that this change caused it. With the direct import, `/` loads the same CSS chunk as before.
+  - **Checks.** These ran in headed Brave through the DevTools MCP, and in headless Brave over the protocol (`ds-9/tools/` in the session notes), against `npm run build` served locally:
+    - **Accessibility tree:** the labelled star is `image "Sparkle star"`. The six other stars and the file's `alt=""` image don't appear.
+    - **Computed:** signal yellow by default, `rgb(255, 178, 63)` in the hero label. The twinkle is `steps(1)` over 2.4 s, from the star's centre. Stepping the animation by hand shows full size until 1.92 s, then 0.4 opacity at 0.7× for 120 ms, then 0.7 at 0.85× for 120 ms, then full, with no eased values in between.
+    - **Reduced motion, emulated:** nothing on the page animates (5 animations without it: two drifts and three twinkles). The twinkling stars hold full size and opacity for 3 s, longer than one cycle.
+    - **360, 768, 1280, 390 and 1440 px,** on `/system` and `/`: no horizontal scroll, no console errors or warnings, and the stars stay inside the column. `/` has no star. None of its JS chunks holds star or `/system` code.
+    - **Keyboard:** DS-9 adds no focusable element. The motion checkbox is still the only one.
+    - **Canvas:** the board's motif-row markup, rebuilt in headless Brave at 1440 px, is pixel-identical to `/system`'s static row at 56, 28 and 14 px (0 pixels differ). The board was also opened in the built-in pane, at Fit scale, since the hidden pane is 800 px wide.
+    - **Not checked:** Safari, a real phone, and the twinkle on a real screen beyond screenshots and stepped frames.
+  - **Canvas drift, for Checkpoint 5:**
+    - The motif row's gap is 16 px (`--dg-space-4`), where the tile uses 18 px. The caption sits under the row, not beside it.
+    - The twinkle has no canvas reference.
+    - `/system` shows seven stars and the file at once, more than the "at most three on screen" principle allows. It's a test bench, so it's listed only.
   - **Depends on:** DS-6
-  - **Files:** `src/design-system/assets/sparkle-star.svg`, `src/design-system/components/SparkleStar/*`, `src/app/system/sections/MarksSection.tsx`
+  - **Files:** `src/design-system/assets/sparkle-star.svg`, `src/design-system/components/SparkleStar/*`, `src/app/system/sections/MarksSection.tsx`. Also `src/app/system/system.module.css`, `tests/sparkle-star.test.ts` and the spec edits above
   - **Size:** S
 
 - [ ] **DS-10: `Wordmark`**

@@ -1,0 +1,35 @@
+/* The path fills with currentColor, and the star sets that to --dg-star. A
+   parent retints it by setting --dg-star, as the hero's label row does with
+   the accent. flex: none keeps it full size beside a long label. */
+.star {
+  flex: none;
+  color: var(--dg-star);
+}
+
+/* A tape flicker: the star holds, then snaps smaller and dimmer and back.
+   steps(1, end) holds each keyframe until the next, so nothing eases, and a
+   cycle of 20 × --dg-dur-1 makes each 5% one --dg-dur-1 step. */
+.twinkle {
+  animation: dg-star-twinkle calc(var(--dg-dur-1) * 20) steps(1, end) infinite;
+}
+
+@keyframes dg-star-twinkle {
+  80% {
+    opacity: 0.4;
+    transform: scale(0.7);
+  }
+  85% {
+    opacity: 0.7;
+    transform: scale(0.85);
+  }
+  90% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .twinkle {
+    animation: none;
+  }
+}

@@ -177,7 +177,7 @@ The page-level layers (grain and vignette) are one fixed element with `pointer-e
 
 ## Assets (`assets/`)
 
-- `sparkle-star.svg`: an original four-point star path, drawn for this system. It's the signature mark.
+- `sparkle-star.svg`: an original four-point star path on a 24 × 24 viewBox, drawn for this system. It's the signature mark. The file bakes in `--dg-star`'s signal yellow, so it shows up as an image outside the page, and a test keeps the two in step. `SparkleStar` draws the same path inline.
 - `wordmark.svg`: "Déjà Gatsby" set in Aero and outlined, so the logo doesn't depend on the font loading. The `Wordmark` component draws both tones below from tokens, and the file is exported in the screen tone. Bone-white with the V5 "stacked tape" shadows: `0.03em 0.04em 0 #2B3BFF, 0.06em 0.08em 0 rgba(255,75,31,0.55)`. No chrome and no gloss. On artwork it's white with a `0.045em 0.06em` black drop.
 - Platform icons as inline SVG: the five main platforms (Spotify, Apple Music, YouTube Music, SoundCloud, Bandcamp) and the three under "More" (Amazon Music, Deezer, Tidal). The two social icons (Instagram, TikTok) are inline SVG too. Source: Simple Icons (CC0). Each brand's own trademark guidelines still apply, so keep brand icons monochrome in `--dg-fg`. Downloading them is an ask-first step.
 
@@ -187,7 +187,7 @@ Every component is presentational. It renders from props and raises callbacks, a
 
 | Component | Props (summary) | States to show on `/system` |
 |---|---|---|
-| `SparkleStar` | `size`, `twinkle?`, `label?`. Filled with `currentColor`, which defaults to `--dg-star` | static, twinkling, reduced motion, amber in the hero label |
+| `SparkleStar` | `size` (px), `twinkle?`, `label?`. Filled with `currentColor`, which is `--dg-star`. A parent retints it by setting `--dg-star`, as the hero label does with the accent. Decorative (`aria-hidden`) unless labelled, then `role="img"` with that name | static, twinkling, reduced motion, amber in the hero label |
 | `Wordmark` | `size: xl \| l`, `tone: screen \| artwork` | xl, l, artwork |
 | `VhsReadout` | `mode`, `elapsed`, `duration` | load, play, stop, ended (reads "END") |
 | `Button` | `variant: primary \| ghost \| hardware`, `icon?`, `label` (required when icon-only) | default, hover, focus-visible, active, disabled |
@@ -203,6 +203,7 @@ Every component is presentational. It renders from props and raises callbacks, a
 | `SiteHeader` | `socials`, `variant: floating \| bar` | Floating (default): a box inset 10 px on a phone and 12 px from the top on desktop, with a 12 px radius, `--dg-surface-glass`, a `--dg-line` border and a soft shadow. Bar: full width with a bottom hairline. Both shown at the top and mid-scroll at 360 and 1280 px |
 
 **Behaviour the components must get right:**
+- `SparkleStar`'s twinkle is a tape flicker, since the canvas draws every star still. Every 2.4 s (20 × `--dg-dur-1`) it snaps to 70% size at 40% opacity, then 85% at 70%, then back, holding each for one `--dg-dur-1` on `steps()` timing. It animates `opacity` and `transform` only, and holds still under reduced motion. DS-9 proposed it, and Reno reviews it at Checkpoint 5.
 - `TrackRow`'s whole hit area is one `<button>` with `aria-pressed`, labelled "Play {title} snippet" or "Stop {title} snippet". Stream links are not inside the row button. While playing, the number becomes the sparkle and the time column counts `elapsed` ("00:12"). Once played, it reads "END".
 - `Button` variants:
   - `primary`: amber with `--dg-chamfer`, 48 px tall. The cut corner must not clip the focus ring
