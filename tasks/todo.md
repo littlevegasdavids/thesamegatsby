@@ -97,7 +97,7 @@ Review round 3 (3 Nov 2026):
   - **Files:** `package.json`, `eslint.config.mjs`, `.node-version`, `.gitignore`, `src/design-system/format.ts`, `tests/format.test.ts`
   - **Size:** S
 
-- [ ] **DS-3: Project `CLAUDE.md`**
+- [x] **DS-3: Project `CLAUDE.md`**
   - A lean working agreement. It covers:
     - what the site is
     - where the specs and the plan live
