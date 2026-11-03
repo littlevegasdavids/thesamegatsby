@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import "../design-system/tokens.css";
 
 export const metadata: Metadata = {
   title: "Déjà Gatsby",

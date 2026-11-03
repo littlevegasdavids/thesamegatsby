@@ -121,7 +121,7 @@ Review round 3 (3 Nov 2026):
 
 ## Phase 2: The look
 
-- [ ] **DS-4: Tokens, with contrast and no-stray-values tests**
+- [x] **DS-4: Tokens, with contrast and no-stray-values tests**
   - `tokens.css` holds every token in SPEC-design-system.md: primitive, semantic, type (as settled by G1), space, radius, motion, layers, and the canvas values folded in before DS-1. Phone values come first, redefined from 768 px in the same file (the header height, inset and sticky offsets differ). It's imported once in the root layout. `contrast.ts` parses colours and computes WCAG ratios, compositing translucent tokens such as the glass over `--dg-bg` first.
   - Two tests:
     - one checks every pair in the spec's contrast table, plus fg and fg-muted on the glass surface
@@ -131,6 +131,11 @@ Review round 3 (3 Nov 2026):
     - changing `--dg-fg-subtle` to `#5A5650` makes the contrast test fail
     - adding `color: #fff` to any component CSS makes the stray-values test fail
   - **Verify:** `npm test`. Break each rule once on purpose and confirm the failure.
+  - **Done 3 Nov 2026.** Some choices the spec doesn't make:
+    - **Layer values.** The spec gives the layer tokens no values. They're 100 (bar), 200 (overlay) and 300 (texture), so the grain sits over the bar, as it does on the canvas. DS-7 settles the stacking.
+    - **What the backdrop tokens hold.** `--dg-scanline` and `--dg-vignette` hold whole gradients. `--dg-grid-line` and `--dg-grid-glow` are colours only, so DS-8 draws the radial's shape.
+    - **The vignette is centred**, as the spec reads. The canvas centres it at 50% 35%.
+    - **Extra colour functions.** The stray-values test also catches `hsl()`, `hwb()`, `lab()`, `lch()`, `oklab()` and `oklch()`.
   - **Depends on:** DS-2, and G1 answered
   - **Files:** `src/design-system/tokens.css`, `src/design-system/contrast.ts`, `src/app/layout.tsx`, `tests/tokens.test.ts`, `tests/no-raw-values.test.ts`
   - **Size:** M

@@ -1,0 +1,155 @@
+/* Every Déjà Gatsby token, and the only file besides textures.css allowed a
+   raw colour or font family (tests/no-raw-values.test.ts). The contract is
+   SPEC-design-system.md › Tokens.
+
+   Phone values come first. The one breakpoint redefines what changes at
+   768 px; media queries can't read custom properties, so it's a literal.
+   Translucent colours are color-mix() of a primitive, so each hex is written
+   once and tests/tokens.test.ts can composite them before measuring. */
+
+:root {
+  /* Colour primitives */
+  --dg-ink-950: #07080D;
+  --dg-ink-900: #0E1120;
+  --dg-ink-800: #171B30;
+  --dg-ink-700: #2A3050;
+  --dg-bone-100: #F2EBDA;
+  --dg-bone-300: #BDB6A6;
+  --dg-bone-500: #8A8578;
+  --dg-sodium-400: #FFB23F;
+  --dg-signal-300: #F4E409;
+  --dg-hazard-500: #FF4B1F;
+  --dg-ultra-500: #2B3BFF;
+  --dg-ultra-300: #8C96FF;
+  --dg-white: #FFFFFF;
+  --dg-black: #000000;
+
+  /* Semantic */
+  --dg-bg: var(--dg-ink-950);
+  --dg-surface: var(--dg-ink-900);
+  --dg-surface-raised: var(--dg-ink-800);
+  --dg-surface-glass: color-mix(in srgb, var(--dg-ink-900) 82%, transparent);
+  --dg-glass-filter: blur(12px) saturate(1.2);
+  --dg-surface-translucent: color-mix(in srgb, var(--dg-ink-900) 55%, transparent);
+  --dg-field: color-mix(in srgb, var(--dg-ink-950) 60%, transparent);
+  --dg-accent-wash: color-mix(in srgb, var(--dg-sodium-400) 12%, transparent);
+  --dg-line: var(--dg-ink-700);
+  --dg-outline: var(--dg-bone-500);
+  --dg-fg: var(--dg-bone-100);
+  --dg-fg-muted: var(--dg-bone-300);
+  --dg-fg-subtle: var(--dg-bone-500);
+  --dg-accent: var(--dg-sodium-400);
+  --dg-on-accent: var(--dg-ink-950);
+  --dg-focus: var(--dg-signal-300);
+  --dg-star: var(--dg-signal-300);
+  --dg-rec: var(--dg-hazard-500);
+  --dg-link: var(--dg-ultra-300);
+  --dg-panel: var(--dg-ultra-500);
+  --dg-on-panel: var(--dg-bone-100);
+
+  /* Type. Aero is display only, never below 24 px: display-l bottoms out
+     at 28 px. */
+  --dg-font-display: "Aero", system-ui, sans-serif;
+  --dg-font-ui: "Chakra Petch", system-ui, sans-serif;
+  --dg-font-readout: "VT323", ui-monospace, monospace;
+  --dg-text-display-xl: clamp(1.875rem, 5.4vw, 4.5rem);
+  --dg-text-display-l: 1.75rem;
+  --dg-text-title: 0.9375rem;
+  --dg-text-title-s: 0.875rem;
+  --dg-text-body: 1rem;
+  --dg-text-small: 0.875rem;
+  --dg-text-label: 0.75rem;
+  --dg-text-micro: 0.625rem;
+  --dg-text-readout: 1.25rem;
+  --dg-text-readout-s: 1.125rem;
+
+  /* Space */
+  --dg-space-1: 4px;
+  --dg-space-2: 8px;
+  --dg-space-3: 12px;
+  --dg-space-4: 16px;
+  --dg-space-5: 24px;
+  --dg-space-6: 32px;
+  --dg-space-7: 48px;
+  --dg-space-8: 64px;
+  --dg-space-9: 96px;
+
+  /* Radius */
+  --dg-radius-0: 0;
+  --dg-radius-s: 4px;
+  --dg-radius-m: 8px;
+  --dg-radius-l: 12px;
+  --dg-chamfer: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
+
+  /* Motion */
+  --dg-ease-tape: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --dg-dur-1: 120ms;
+  --dg-dur-2: 240ms;
+  --dg-dur-3: 480ms;
+
+  /* Layers. Grain lies over the whole frame, the bar included, as it does on
+     the canvas; its layer takes no pointer events. The gaps leave room for
+     the sticky header and filter. */
+  --dg-z-bar: 100;
+  --dg-z-overlay: 200;
+  --dg-z-texture: 300;
+
+  /* Sticky stack. Each layer's top is the sum of the layers above it. */
+  --dg-header-inset: 10px;
+  --dg-header-h: 60px;
+  --dg-sticky-gap: 6px;
+  --dg-filter-h: 60px;
+  --dg-sticky-filter: calc(var(--dg-header-inset) + var(--dg-header-h) + var(--dg-sticky-gap));
+  --dg-sticky-release: calc(var(--dg-sticky-filter) + var(--dg-filter-h) + var(--dg-sticky-gap));
+
+  /* Shadows, glows and the backdrop */
+  --dg-shadow-float: 0 8px 24px color-mix(in srgb, var(--dg-black) 45%, transparent);
+  --dg-shadow-menu: 0 16px 40px color-mix(in srgb, var(--dg-black) 60%, transparent);
+  --dg-shadow-bar: 0 -16px 32px color-mix(in srgb, var(--dg-black) 55%, transparent);
+  --dg-glow-accent: 0 0 8px color-mix(in srgb, var(--dg-sodium-400) 60%, transparent);
+  --dg-glow-accent-box: 0 0 8px color-mix(in srgb, var(--dg-sodium-400) 80%, transparent);
+  --dg-glow-cover: 0 0 40px color-mix(in srgb, var(--dg-ultra-500) 25%, transparent);
+  --dg-tape:
+    0.03em 0.04em 0 var(--dg-ultra-500),
+    0.06em 0.08em 0 color-mix(in srgb, var(--dg-hazard-500) 55%, transparent);
+  --dg-tape-artwork: 0.045em 0.06em 0 var(--dg-ink-950);
+  --dg-grid-line: color-mix(in srgb, var(--dg-ultra-500) 38%, transparent);
+  --dg-grid-cell: 32px;
+  --dg-grid-drift: 5s;
+  --dg-grid-glow: color-mix(in srgb, var(--dg-ultra-500) 30%, transparent);
+  --dg-scanline: repeating-linear-gradient(
+    0deg,
+    color-mix(in srgb, var(--dg-ink-950) 22%, transparent) 0 1px,
+    transparent 1px 3px
+  );
+  --dg-vignette: radial-gradient(
+    ellipse,
+    transparent 65%,
+    color-mix(in srgb, var(--dg-black) 30%, transparent)
+  );
+
+  /* Textures */
+  --dg-grain-opacity: 0.07;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --dg-text-display-l: 2.25rem;
+    --dg-text-title: 1rem;
+    --dg-text-title-s: 0.9375rem;
+    --dg-text-readout: 1.375rem;
+
+    --dg-header-inset: 12px;
+    --dg-header-h: 68px;
+    --dg-sticky-gap: 8px;
+    --dg-filter-h: 70px;
+
+    --dg-shadow-float: 0 10px 30px color-mix(in srgb, var(--dg-black) 45%, transparent);
+    --dg-shadow-bar: 0 -16px 40px color-mix(in srgb, var(--dg-black) 55%, transparent);
+    --dg-glow-cover: 0 0 60px color-mix(in srgb, var(--dg-ultra-500) 28%, transparent);
+    --dg-grid-line: color-mix(in srgb, var(--dg-ultra-500) 32%, transparent);
+    --dg-grid-cell: 40px;
+    --dg-grid-drift: 6s;
+    --dg-grid-glow: color-mix(in srgb, var(--dg-ultra-500) 28%, transparent);
+  }
+}
