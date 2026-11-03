@@ -74,13 +74,14 @@ Review round 3 (3 Nov 2026):
 
 ## Phase 1: Foundation
 
-- [ ] **DS-1: Upgrade to Next.js 16 with the App Router, exported as static files** 🔒 *(branch, dependencies)*
+- [x] **DS-1: Upgrade to Next.js 16 with the App Router, exported as static files** 🔒 *(branch, dependencies)*
   - Replace Next 13 / React 18 / Chakra with Next 16 / React 19 / TypeScript 5. Versions match teaming-adventures' pins. Set `output: 'export'` and `images: { unoptimized: true }`. `/` becomes a plain placeholder listing the six titles from `songs/index.ts`.
   - **Acceptance:**
     - `npm run build` writes `out/index.html` containing all six titles
     - `@chakra-ui/*`, `@emotion/*`, `framer-motion`, `react-icons` and `yarn.lock` are gone, along with `pages/`, `components/`, `styles/` and `next.config.js`
-    - no server output in `.next/`
+    - nothing needs a server: every route builds as static (○), the middleware and functions manifests are empty, and there's no `.next/standalone`. (`.next/server/` is still written, because every export build prerenders through it.)
   - **Verify:** `npm run build`. `npm run dev`, then load `/` in the built-in browser with no console errors.
+  - **Done 3 Nov 2026.** `.eslintrc.json` and the `lint` and `start` scripts were removed too, because `next lint` is gone in Next 16 and `next start` can't serve an export. DS-2 adds the flat config and `lint`.
   - **Depends on:** none
   - **Files:** `package.json`, `package-lock.json`, `next.config.ts`, `tsconfig.json`, `src/app/layout.tsx`, `src/app/page.tsx` (plus deletions)
   - **Size:** M
