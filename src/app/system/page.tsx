@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ButtonSection } from "./sections/ButtonSection";
 import { MarksSection } from "./sections/MarksSection";
+import { ReadoutSection } from "./sections/ReadoutSection";
 import { TexturesSection } from "./sections/TexturesSection";
 import { TokensSection } from "./sections/TokensSection";
 import styles from "./system.module.css";
@@ -26,6 +27,7 @@ export default function System() {
       <TexturesSection />
       <MarksSection />
       <ButtonSection />
+      <ReadoutSection />
     </main>
   );
 }

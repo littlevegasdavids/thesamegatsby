@@ -1,0 +1,26 @@
+/* The bar boards' readout: VT323 at --dg-text-readout, the glyph beside the
+   text. Muted while loading, stopped or ended; lit amber with its glow while
+   playing. It never moves, so reduced motion has nothing to stop.
+   tests/vhs-readout.test.ts holds the size, the colours and their contrast. */
+
+/* The gap is the nearest space token to the boards' 6 px. nowrap keeps the
+   time on one line in a narrow bar. */
+.readout {
+  display: flex;
+  align-items: center;
+  gap: var(--dg-space-2);
+  color: var(--dg-fg-muted);
+  font-family: var(--dg-font-readout);
+  font-size: var(--dg-text-readout);
+  line-height: normal;
+  white-space: nowrap;
+}
+
+.lit {
+  color: var(--dg-accent);
+  text-shadow: var(--dg-glow-accent);
+}
+
+.glyph {
+  flex: none;
+}

@@ -491,7 +491,7 @@ Review round 3 (3 Nov 2026):
   - **Files:** `src/design-system/components/Button/*`, `src/app/system/sections/ButtonSection.tsx`. Also `src/app/system/system.module.css`, `tests/button.test.ts` and the spec edits above
   - **Size:** S
 
-- [ ] **DS-12: `VhsReadout`**
+- [x] **DS-12: `VhsReadout`**
   - The load, play, stop and ended modes, using `formatTime`. It reads "PLAY 00:12 / 00:30", or "END 00:30 / 00:30" when ended, as on the canvas. The glyphs come from VT323 or the SVG fallback, as DS-5 found. Play glows amber, and ended drops to `--dg-fg-muted`.
   - **Acceptance:**
     - a screen reader reads the text correctly, with the glyphs `aria-hidden`
@@ -500,8 +500,26 @@ Review round 3 (3 Nov 2026):
   - **Verify:**
     - the accessibility tree via `read_page`
     - **Canvas:** the readout in `PhonePlaying.dc.html` and `PhoneEnded.dc.html` at 390 px, and the VT323 sample in `StyleTile.dc.html` at 1440 px
+  - **Done 4 Nov 2026.** `VhsReadout` renders one `<span>`: the mode's glyph as an 11 px SVG (`aria-hidden`), then the text. `modes.ts` holds each mode's word, glyph and whether it's lit, the glyph paths, and `readoutText()`, which builds "PLAY 00:12 / 00:30" through `formatTime`, so the tests can import them. Play and the square are the bar boards' own paths. VT323 has none of `▶■◌`, so no glyph is ever text. The CSS sets VT323 at `--dg-text-readout` with `nowrap`, muted by default, and `.lit` adds `--dg-accent` and `--dg-glow-accent` for play. `/system` has a Readout section with each mode on a `--dg-surface-raised` strip (the bar's surface), plus load before the length is known ("--:--"). `tests/vhs-readout.test.ts` (22 tests) checks the text in every mode, that it holds only Basic Latin and capitals, the glyph per mode and its size, that only play is lit, the glyph's `aria-hidden` and the absence of any live-region attribute or role in the `.tsx`, the one font size and its floor at 360 and 1280 px, the colours and glow, no motion, and 4.5:1 lit and muted on the bar and the page. Five mutations each failed the right test: `aria-live` on the span, the glyph without `aria-hidden`, a second font size, `▶` in the text, and stop lit. Decisions:
+    - **Load and stop are DS-12's proposal, for Checkpoint 5.** The canvas draws neither. Both are muted with no glow, like ended, so the lamp is lit only while the tape runs. Stop takes the square, and load takes a dotted circle, eight dots on a ring. Neither moves. The spec now describes them.
+    - **The word is written in capitals,** not set with `text-transform`. Brave puts transformed capitals in the accessible name (DS-11), and other browsers may not, so the text read is the text shown everywhere.
+    - **The gap is `--dg-space-2` (8 px),** the nearest token. The bar boards draw 6 px and the style tile 8 px.
+    - **`elapsed` isn't pinned to `duration` when ended.** The component shows what it's given. At the `ended` event, `currentTime` equals the duration, so the parent's value reads "END 00:30 / 00:30".
+    - **It's a `<span>`,** so it can sit in any phrasing context.
+  - **Checks.** These ran against `npm run build` served locally: in headless Brave over the protocol (`ds-12/tools/` in the session notes), and in headed Brave through the DevTools MCP.
+    - **360, 768, 1280, 390 and 1440 px:** 20 px below 768 and 22 px from it, in VT323, the glyph 11 × 11 and centred on the line. Play is `rgb(255, 178, 63)` with the glow, and the rest `rgb(189, 182, 166)` with none. No horizontal scroll, every readout stays inside its strip, and there are no console problems. `/` has no readout, none of its six files holds the readout's class, and its CSS chunk is still `0jh8-bqbyvw1l.css`.
+    - **Fonts:** `CSS.getPlatformFontsForNode` reports VT323 alone for every readout, with one glyph per character, so the line never switches typeface.
+    - **Accessibility tree,** headless and headed: each readout is one text node ("PLAY 00:12 / 00:30", "END 00:30 / 00:30" and so on) under an ignored generic. No glyph is in the tree, and nothing in the section is live. The page's only live region is Next's route announcer.
+    - **Keyboard:** Tab still makes 8 stops at 360 and 1280 px, as after DS-11. None is in the readout section.
+    - **Reduced motion:** nothing on the page animates (5 animations without it, as before). The readouts have no animation or transition.
+    - **Canvas:** the readout markup from `Main`'s bar (playing and ended) at 390 px, `HomeDesktop`'s bar at 1440 px, and the tile's 28 px sample were rebuilt in headless Brave in our VT323, on the bar's surface, beside ours. The text is pixel-identical in all four (0 pixels differ by more than 64), and so are the box heights and the glyph's centring on the text. The tile case set ours to 28 px for the comparison.
+    - **Not checked:** Safari, Windows, a real phone, and a real screen reader. The board wouldn't zoom to the player row in the built-in pane, so it wasn't checked there by eye.
+  - **Canvas drift, for Checkpoint 5:**
+    - The text sits 2 px further from the glyph than on the bars (8 px gap against 6), from the spacing token. It matches the tile.
+    - The tile's sample glyph is 13 px at 28 px. The built glyph is 11 px at every size, as the bars draw it.
+    - Load and stop have no canvas reference. The dotted circle is faint at 11 px.
   - **Depends on:** DS-2, DS-6
-  - **Files:** `src/design-system/components/VhsReadout/*`, `src/app/system/sections/ReadoutSection.tsx`
+  - **Files:** `src/design-system/components/VhsReadout/*`, `src/app/system/sections/ReadoutSection.tsx`. Also `src/app/system/system.module.css`, `tests/vhs-readout.test.ts` and the spec edits above
   - **Size:** S
 
 - [ ] **DS-13: `ProgressTape`**
