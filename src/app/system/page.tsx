@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ButtonSection } from "./sections/ButtonSection";
 import { MarksSection } from "./sections/MarksSection";
 import { TexturesSection } from "./sections/TexturesSection";
 import { TokensSection } from "./sections/TokensSection";
@@ -24,6 +25,7 @@ export default function System() {
       <TokensSection />
       <TexturesSection />
       <MarksSection />
+      <ButtonSection />
     </main>
   );
 }

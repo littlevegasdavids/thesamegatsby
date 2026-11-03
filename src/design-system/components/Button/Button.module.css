@@ -1,0 +1,124 @@
+/* The three variants G2 settled: primary is amber with the cut corner, ghost
+   is an outline, and hardware is the square icon button. Sizes and type are
+   the style tile's; the padding and gap are the nearest space tokens.
+
+   States change in a snap, with no transition, as tape does. Hover and press
+   light the button; press also pushes it down a pixel. They're keyed to
+   :enabled, so a disabled button stays put. Hover only applies where there's
+   a real pointer, so a tap doesn't leave it lit. tests/button.test.ts holds
+   the sizes, the ring and every label pair to the spec. */
+
+.button {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--dg-space-2);
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--dg-radius-0);
+  background-color: transparent;
+  font-family: var(--dg-font-ui);
+  font-size: var(--dg-text-small);
+  font-weight: 600;
+  line-height: normal;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--dg-focus);
+  outline-offset: 2px;
+}
+
+.button:enabled:active {
+  transform: translateY(1px);
+}
+
+.button:disabled {
+  cursor: not-allowed;
+}
+
+.glyph {
+  flex: none;
+}
+
+/* The chamfer clips a layer behind the label, not the button, so the focus
+   ring outside it stays whole. The right padding is a step wider because
+   the corner cuts 12 px into that side. */
+.primary {
+  position: relative;
+  isolation: isolate;
+  min-height: 48px;
+  padding: 0 var(--dg-space-5) 0 var(--dg-space-4);
+  color: var(--dg-on-accent);
+}
+
+.primary::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-color: var(--dg-accent);
+  clip-path: var(--dg-chamfer);
+}
+
+/* The lamp lights. A drop-shadow follows the cut corner, where a box-shadow
+   would be clipped with the layer. */
+.primary:enabled:active {
+  filter: drop-shadow(var(--dg-glow-accent-box));
+}
+
+.primary:disabled {
+  color: var(--dg-fg-subtle);
+}
+
+.primary:disabled::before {
+  background-color: var(--dg-surface-raised);
+}
+
+.ghost,
+.hardware {
+  border: 1px solid var(--dg-outline);
+  border-radius: var(--dg-radius-s);
+  color: var(--dg-fg);
+}
+
+.ghost {
+  min-height: 48px;
+  padding: 0 var(--dg-space-4);
+}
+
+.hardware {
+  flex: none;
+  width: 44px;
+  height: 44px;
+}
+
+/* On the now-playing bar the fill matches the bar, so the brighter border
+   is what shows there. */
+.ghost:enabled:active,
+.hardware:enabled:active {
+  border-color: var(--dg-fg);
+  background-color: var(--dg-surface-raised);
+}
+
+.ghost:disabled,
+.hardware:disabled {
+  color: var(--dg-fg-subtle);
+}
+
+@media (hover: hover) {
+  .primary:enabled:hover {
+    filter: drop-shadow(var(--dg-glow-accent-box));
+  }
+
+  .ghost:enabled:hover,
+  .hardware:enabled:hover {
+    border-color: var(--dg-fg);
+    background-color: var(--dg-surface-raised);
+  }
+}

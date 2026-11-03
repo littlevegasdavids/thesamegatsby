@@ -447,7 +447,7 @@ Review round 3 (3 Nov 2026):
   - **Files:** `src/design-system/assets/wordmark.svg`, `src/design-system/components/Wordmark/*`, `src/app/system/sections/MarksSection.tsx`. Also `src/app/system/system.module.css`, `tests/wordmark.test.ts` and the spec edits above
   - **Size:** M
 
-- [ ] **DS-11: `Button`**
+- [x] **DS-11: `Button`**
   - Three variants, as settled by G2:
     - `primary`: amber with the cut corner
     - `ghost`: outline
@@ -464,8 +464,31 @@ Review round 3 (3 Nov 2026):
     - Tab through `/system`
     - the contrast test covers the label pairs
     - **Canvas:** `StyleTile.dc.html` at 1440 px, the Components row (Play snippet, Ghost, Stop, Focus ring). The "Play snippet" button on `Main.dc.html` at 390 px
+  - **Done 3 Nov 2026.** `Button` renders one `<button type="button">`. `glyphs.ts` holds the four glyphs the canvas draws on buttons (play, stop, replay and close) at its sizes, painted in `currentColor`. The props require a `label` on every button: the visible text on primary and ghost, and `aria-label` on hardware. They also require an `icon` on hardware, so no button can be nameless. Primary's chamfer clips a `::before` layer behind the label, so the button's own outline is never clipped. `/system` has a Buttons section with each variant at rest and disabled, and hover, press and focus live. `tests/button.test.ts` (32 tests) checks the props through `@ts-expect-error` lines, which `npm run typecheck` runs. It reads `Button.module.css` for the sizes, the ring (keyboard only, `--dg-focus`, standing off the button), the clip on the inner layer only, and hover and press keyed to `:enabled`. It also checks every label pair in every state: 4.5:1 for text and 3:1 for the hardware icon, on `--dg-bg`, `--dg-surface` and `--dg-surface-raised`. Four mutations each failed the right test: the clip on the button, a 40 px hardware button, hover without `:enabled`, and a dim ghost label. Decisions:
+    - **The state looks are DS-11's proposal, for Checkpoint 5.** The canvas draws only rest. Hover and press light the button: primary takes `--dg-glow-accent-box` as a drop-shadow that follows the cut corner, while ghost and hardware fill with `--dg-surface-raised` and their border turns `--dg-fg`. Press also pushes it down 1 px. Disabled primary is `--dg-fg-subtle` on `--dg-surface-raised`, the lamp off. Each change is a snap, with no transition. The spec now describes them.
+    - **`label` is required on every button,** where the spec said "required when icon-only". A text button's label is its text, so its name can't drift from what it shows.
+    - **`icon` is a name, not a node,** so the button sizes and colours the glyph and hides it from assistive tech. A later task that needs another icon adds a glyph.
+    - **There's no `pressed` prop yet.** DS-23's "Stop snippet" needs `aria-pressed`, and adds it then.
+    - **There's no `"use client"`.** The button holds no state, and a client parent that passes `onClick` brings it into the client bundle.
+    - **Padding and gap are the nearest space tokens,** per SPEC.md's rule against raw spacing: 16 and 24 px with an 8 px gap on primary (the board has 18, 22 and 10), and 16 px on ghost (the board has 20).
+    - **Hover and press aren't pinned on `/system`.** Pinning them would need a prop or selector that exists only for the bench, so the checks forced them through the protocol instead.
+  - **Checks.** These ran against `npm run build` served locally: in headless Brave over the protocol (`ds-11/tools/` in the session notes), and in headed Brave through the DevTools MCP.
+    - **360, 768, 1280, 390 and 1440 px:** primary 177.3 × 48, ghost 87.6 × 48 and hardware 44 × 44 at every width. No horizontal scroll, the ring always has room on screen, and there are no console problems. `/` has no button, none of the seven files it loads holds a Button class, and its CSS chunk is still `0jh8-bqbyvw1l.css`.
+    - **States, forced through `CSS.forcePseudoState`:** the computed colours are the tokens. The label contrast is 11.1:1 on primary, 4.6:1 on disabled primary, 16.8:1 on ghost and hardware at rest (14.3:1 hovered or pressed), and 5.4:1 disabled. Press moves the button 1 px, and no button has a transition.
+    - **Ring and chamfer, in pixels:** focused, the signal-yellow ring is whole 3 px outside the cut corner and at four other points, while the corner inside the box shows the ground. Hover lights the edge below the primary (19,21,48 becomes 81,63,54).
+    - **Keyboard:** at 360 and 1280 px, Tab goes from the motion checkbox through the seven enabled buttons in order, each with the ring, and skips the three disabled ones. Shift+Tab goes back. A mouse click focuses a button without the ring, and a disabled button doesn't take focus.
+    - **Accessibility tree:** ten buttons, with the three disabled ones marked disabled. The hardware buttons are "Stop snippet", "Replay snippet" and "Close player". No glyph is exposed. Brave builds a text button's name from its rendered text, so it reads "PLAY SNIPPET" in capitals.
+    - **Reduced motion:** nothing on the page animates, and the buttons have no transitions to stop.
+    - **Canvas:** the tile's Components row and `Main`'s hero button were rebuilt from the board source in headless Brave, at 1440 and 390 px and in our Chakra Petch, beside ours. Heights, label widths (113.34 px) and label lines (15 px down) match. The widths differ only by the spacing tokens. The board was also opened in the built-in pane at Fit scale and checked by eye.
+    - **Not checked:** Safari, Windows and a real phone, including whether iOS shows `:active` on a tap.
+  - **Canvas drift, for Checkpoint 5:**
+    - Primary is 2 px narrower and ghost 8 px narrower than drawn, from the spacing tokens.
+    - The tile's Stop is 48 px. The spec's 44 px is built, as the bar boards draw it.
+    - The ended bar's Close is drawn borderless in `--dg-fg-muted`. The spec makes it a hardware button, so it's outlined in `--dg-fg`. DS-24 inherits this.
+    - The ring round the primary is a square box and doesn't follow the cut corner. The tile's ring sample is rounded by 4 px, as ours is on ghost and hardware.
+    - Hover, press and disabled have no canvas reference.
   - **Depends on:** DS-6, and G2 answered
-  - **Files:** `src/design-system/components/Button/*`, `src/app/system/sections/ButtonSection.tsx`
+  - **Files:** `src/design-system/components/Button/*`, `src/app/system/sections/ButtonSection.tsx`. Also `src/app/system/system.module.css`, `tests/button.test.ts` and the spec edits above
   - **Size:** S
 
 - [ ] **DS-12: `VhsReadout`**

@@ -190,7 +190,7 @@ Every component is presentational. It renders from props and raises callbacks, a
 | `SparkleStar` | `size` (px), `twinkle?`, `label?`. Filled with `currentColor`, which is `--dg-star`. A parent retints it by setting `--dg-star`, as the hero label does with the accent. Decorative (`aria-hidden`) unless labelled, then `role="img"` with that name | static, twinkling, reduced motion, amber in the hero label |
 | `Wordmark` | `size: xl \| l`, `tone: screen \| artwork` (default `screen`). Its box is the type's own at line-height 1, 6.099em × 1em, so it lays out like the canvas's line of Aero. As on type, the D's slant and the tape draw past that box. `role="img"`, named "Déjà Gatsby" | xl, l, artwork |
 | `VhsReadout` | `mode`, `elapsed`, `duration` | load, play, stop, ended (reads "END") |
-| `Button` | `variant: primary \| ghost \| hardware`, `icon?`, `label` (required when icon-only) | default, hover, focus-visible, active, disabled |
+| `Button` | `variant: primary \| ghost \| hardware`, `label`, `icon?: play \| stop \| replay \| close`, `disabled?`, `onClick?`. Every button takes a `label`: it's the visible text on primary and ghost, and the accessible name on hardware, which shows only its icon. Hardware requires `icon`. The types reject a button without a name | default, hover, focus-visible, active, disabled |
 | `ReleaseHero` | `release` (single, EP or album), `leadTrackId`, `playingTrackId`, `playState`, `elapsed`, `onPlay`, `streamLinks` | single, EP (all tracks listed), album (first five plus "Show all"), playing, 360 and 1280 px |
 | `ReleaseFilter` | `options[]` (label, count), `selected`, `onSelect` | Below 768 px, a "Show" dropdown: closed ("All releases"), open (the selected option ticked in amber). From 768 px up, a row of buttons with the selected one filled amber. Both show one type selected, a type with no releases left out, and the filter stuck under the header mid-scroll |
 | `ReleaseRow` | `release` (single, EP or album, with cover, title and tracks), `expanded`, `playingTrackId`, `playState`, `elapsed`, `onToggle`, `onPlay` | single idle, playing ("PLAYING 00:09") and played ("PLAYED"), EP collapsed and expanded with a nested track playing, remix and edit tags, long title at 360 px, an expanded album stuck under the filter mid-scroll, and the hand-off as its last track leaves |
@@ -206,9 +206,15 @@ Every component is presentational. It renders from props and raises callbacks, a
 - `SparkleStar`'s twinkle is a tape flicker, since the canvas draws every star still. Every 2.4 s (20 × `--dg-dur-1`) it snaps to 70% size at 40% opacity, then 85% at 70%, then back, holding each for one `--dg-dur-1` on `steps()` timing. It animates `opacity` and `transform` only, and holds still under reduced motion. DS-9 proposed it, and Reno reviews it at Checkpoint 5.
 - `TrackRow`'s whole hit area is one `<button>` with `aria-pressed`, labelled "Play {title} snippet" or "Stop {title} snippet". Stream links are not inside the row button. While playing, the number becomes the sparkle and the time column counts `elapsed` ("00:12"). Once played, it reads "END".
 - `Button` variants:
-  - `primary`: amber with `--dg-chamfer`, 48 px tall. The cut corner must not clip the focus ring
-  - `ghost`: an `--dg-outline` border
-  - `hardware`: the square icon button (stop, replay, close), 44 px
+  - `primary`: amber with `--dg-chamfer`, 48 px tall. The cut corner must not clip the focus ring, so the chamfer clips a layer behind the label, not the button
+  - `ghost`: an `--dg-outline` border, 48 px tall, as on the style tile
+  - `hardware`: the square icon button (stop, replay, close), 44 px, with the same border as ghost
+  - The type is `--dg-text-small` (Chakra Petch 600, uppercase, `0.12em`). The glyphs are the canvas's, filled or stroked in the label's colour.
+  - **States.** The canvas draws none of these, so they're DS-11's proposal, which Reno reviews at Checkpoint 5. Each change is a snap, with no transition:
+    - **Hover and press light the button.** Primary takes `--dg-glow-accent-box` as a drop-shadow, which follows the cut corner. Ghost and hardware fill with `--dg-surface-raised`, and their border turns `--dg-fg`. On the now-playing bar the fill matches the bar, so the border is what shows. Hover applies only where there's a real pointer (`hover: hover`), so a tap doesn't leave a button lit.
+    - **Press also pushes it down 1 px.**
+    - **Focus-visible:** a 2 px `--dg-focus` outline, 2 px out, on keyboard focus only.
+    - **Disabled** uses the `disabled` attribute, so it's announced and skipped by Tab. Primary turns `--dg-fg-subtle` on `--dg-surface-raised` (the lamp off), while ghost and hardware keep their border and turn their label `--dg-fg-subtle`. Hover and press leave it alone.
 - In `ReleaseHero`, the playing track's row takes the playing look. While the lead track plays, the main button reads "Stop snippet" (`aria-pressed`).
 - `SiteHeader` is sticky to the top: the wordmark on the left, `SocialLinks` on the right. The page reserves its height, so nothing loads hidden beneath it. The grid and content scroll behind its glass. Where `backdrop-filter` isn't supported, it falls back to a solid `--dg-surface`.
 - **Three sticky layers while scrolling the discography, in order from the top:**
