@@ -86,7 +86,7 @@ Review round 3 (3 Nov 2026):
   - **Files:** `package.json`, `package-lock.json`, `next.config.ts`, `tsconfig.json`, `src/app/layout.tsx`, `src/app/page.tsx` (plus deletions)
   - **Size:** M
 
-- [ ] **DS-2: Check scripts and repo hygiene**
+- [x] **DS-2: Check scripts and repo hygiene**
   - Add `lint` (ESLint 9 flat config), `typecheck`, `test` (`node --test`) and `ci` (all three, then build). Add `.node-version` (`24`). Add `.env`, `.env.*`, `.dev.vars*` and `.wrangler/` to `.gitignore`. First real code: `formatTime` with its test.
   - **Acceptance:**
     - `npm run ci` passes
