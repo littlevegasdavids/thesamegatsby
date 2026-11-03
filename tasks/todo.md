@@ -113,9 +113,9 @@ Review round 3 (3 Nov 2026):
   - **Size:** XS
 
 ### Checkpoint 1
-- [ ] `npm run ci` passes on a clean checkout
-- [ ] The placeholder `/` renders in dev
-- [ ] DS-1 to DS-3 are committed on `redesign` (not pushed)
+- [x] `npm run ci` passes on a clean checkout
+- [x] The placeholder `/` renders in dev
+- [x] DS-1 to DS-3 are committed on `redesign` (not pushed)
 
 ---
 
