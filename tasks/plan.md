@@ -208,7 +208,7 @@ The fixture covers are made with macOS's built-in `sips` and `qlmanage`, so they
 | Risk | Impact | Mitigation |
 |---|---|---|
 | Aero's licence isn't confirmed by launch | High: blocks public launch | Pay and email the designer now, since replies can take a while. Building carries on in the meantime |
-| The glass blur over a constantly moving grid is costly on mid-range phones, because the blur has to redraw every frame | Medium | DS-8 tests a plain glass box over the drifting grid at 4× CPU, before any header exists. Fallbacks, in order: a slower drift, a static grid behind the sticky boxes only, then solid `--dg-surface` boxes |
+| The glass blur over a constantly moving grid is costly on mid-range phones, because the blur has to redraw every frame | Medium | DS-8 tests a plain glass box over the drifting grid at 4× CPU, before any header exists. Fallbacks, in order: a slower drift, a static grid behind the sticky boxes only, then solid `--dg-surface` boxes. **DS-8 found no long frames, so none is in use.** A real phone is still unchecked |
 | `clip-path` on the chamfered primary button clips its focus outline | Medium: an invisible focus ring fails the spec | Draw the chamfer on an inner layer, so the button's own outline isn't clipped. DS-11 checks the ring by keyboard |
 | A `position: sticky` layer stops sticking because an ancestor sets `overflow: hidden` | Medium | `Screen` uses `overflow-x: clip`. DS-22 checks all three layers at three widths |
 | The desktop filter row wraps between 768 and 1023 px, changing its height and breaking the offsets below it | Medium | The row has a fixed height, and its buttons scroll sideways inside the box if they must. DS-21 checks at 768 px |

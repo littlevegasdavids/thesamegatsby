@@ -315,7 +315,7 @@ Review round 3 (3 Nov 2026):
   - **Files:** `src/design-system/textures.css`, `src/design-system/components/Screen/*`, `src/app/layout.tsx`, `src/app/system/sections/TexturesSection.tsx`. Also `src/design-system/index.ts` (new), `src/app/system/sections/textures.ts`, `src/app/system/system.module.css`, `tests/textures.test.ts` and `tests/system-textures.test.ts`, plus the spec and plan edits above, with `src/app/system/body.css` deleted
   - **Size:** M
 
-- [ ] **DS-8: The drifting grid backdrop**
+- [x] **DS-8: The drifting grid backdrop**
   - `.dg-backdrop`, rendered by `Screen` as one fixed layer behind all content:
     - an ultramarine grid of 32 px cells below 768 px and 40 px from 768 px
     - roughly even strength from top to bottom
@@ -332,6 +332,25 @@ Review round 3 (3 Nov 2026):
     - paint flashing
     - reduced-motion emulation
     - **Canvas:** `Main.dc.html` at 390 px and `HomeDesktop.dc.html` at 1440 px, both with Tweaks › background set to grid. Cell size, line strength, glow position and drift speed match
+  - **Done 3 Nov 2026.** `Screen` renders `.dg-backdrop` as its first child, fixed at z-index −1, so it lies over the `html` ground and under everything in flow. Grain and vignette stay on top at 300. In `textures.css`, the glow is the host's background, and the grid is its `::before`, one cell taller than the host. One `conic-gradient` tile per cell draws the top and left edges, so lines don't double up where they cross, and `transform` moves the layer down one cell per `--dg-grid-drift`. The glow's shape and position are read off the boards (70% at 50% 20% on a phone, 60% at 30% 25% from 768 px), and the spec now gives them. `/system`'s Textures section has a Grid backdrop tile, and `tests/system-textures.test.ts` now fails if a `--dg-grid-*` token has no sample. `tests/textures.test.ts` checks the one-cell loop, transform-only keyframes, reduced motion, no mask and the fixed layer.
+  - **Checks.** In headless Brave 1.98 (Chromium 156) over the DevTools protocol, and in headed Brave through the DevTools MCP, against `npm run build` served locally:
+    - **360, 768, 1280, 390 and 1440 px:** no horizontal scroll, and no console errors or warnings. The layer is fixed, `inset: 0`, z-index −1 and `pointer-events: none`, and it doesn't take a click at the centre. Cells are 32 px, then 40 px, the drift is 5 s, then 6 s, and the grid layer is exactly one cell taller than the viewport.
+    - **The loop:** held at the end of a cycle, the frame is pixel-identical to its start (largest channel difference 0) at 390 and 1440 px. Half a cycle moves the lines exactly half a cell.
+    - **Paint flashing:** over 3 s of drift there were 5 `Paint` events, and no paint rects on screen. A control drifting by `background-position` repainted the whole screen every frame (378 events). No animation reported `compositeFailed`.
+    - **Glass over the drift at 4× CPU:** two fixed `.dg-glass` boxes sat at the header and filter positions while touch-scrolling the whole of `/system` at 360 px and back. Over 13 headless runs, alternating glass over the drift, no glass, and glass over a still grid, there were no long animation frames and no long tasks. The worst frame gap was 17 ms. In headed Brave on the Mac's GPU, 9 warm runs had none either, with a worst gap of 10 ms. **No mitigation is needed.** Two one-offs didn't recur:
+      - In a fresh headless browser, eight 200–360 ms `GPUTask`s ran when the glass first appeared mid-scroll (first use of the blur, in software GL).
+      - The first traced headed run had one 243 ms frame.
+    - **Reduced motion, emulated:** no drift animation runs, and the backdrop's frame doesn't change over 1 s.
+    - **Keyboard:** DS-8 adds no focusable element.
+    - **Safari:** WKWebView draws the grid and the glow at 390 and 1280 px. Its drift wasn't checked.
+    - **Not checked:** a real phone, 3× displays, and the built-in pane.
+  - **Canvas drift, for Checkpoint 4** (side-by-sides in the session notes, `ds-8/`):
+    - **Line strength.** Our lines are about 1.9× as strong as the canvas's:
+      - Each canvas tile strokes a 1 px line along its own edge and clips half of it, so the canvas lines are 0.5 px wide, at 50% (45% from 768 px) under the fade. The spec's 38% (32%) is that opacity times the fade, applied to a full 1 px line.
+      - Measured as the blue a line adds, top / middle / bottom of a phone screen: canvas 47 / 47 / 43, ours 85 / 89 / 92.
+      - `--dg-grid-line` at 20% (17% from 768 px) would give 46 / 49 / 48. On desktop: canvas 38 / 38 / 37, ours at 17% 36 / 39 / 41.
+    - **No fade.** The canvas fades its grid from 85% to 70%, top to bottom (80% to 65% on desktop). Ours is even, as the spec says.
+    - **The glow matches** the canvas at every point sampled, on both boards.
   - **Depends on:** DS-7
   - **Files:** `src/design-system/textures.css`, `src/design-system/components/Screen/*`, `src/app/system/sections/TexturesSection.tsx`
   - **Size:** M

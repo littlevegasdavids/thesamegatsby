@@ -13,6 +13,16 @@
   line-height: 1.5;
 }
 
+/* The drifting grid, one fixed layer behind the content. -1 puts it under
+   the page's in-flow content and over the html ground, since nothing
+   between them sets a background. */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
 /* Grain and vignette, one fixed layer over everything, the bar included. */
 .texture {
   position: fixed;

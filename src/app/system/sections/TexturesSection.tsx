@@ -41,6 +41,11 @@ const SAMPLES: Record<Utility, ReactNode> = {
       <span className={`${styles.layer} dg-vignette`} />
     </span>
   ),
+  "dg-backdrop": (
+    <span className={`${styles.textureBox} ${styles.ground}`}>
+      <span className={`${styles.layer} dg-backdrop`} />
+    </span>
+  ),
 };
 
 export function TexturesSection() {

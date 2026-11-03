@@ -300,6 +300,10 @@
   background-color: var(--dg-panel);
 }
 
+.ground {
+  background-color: var(--dg-bg);
+}
+
 /* The tile shows its grain at 35% so the texture can be seen. The page
    itself carries it at the token's 7%. */
 .grainLoud {

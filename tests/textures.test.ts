@@ -18,6 +18,11 @@ function declarations(css: string, selector: string): string {
   return match[1];
 }
 
+// Every innermost rule as [selector, declarations], at-rule bodies included.
+function rules(css: string): [string, string][] {
+  return [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)].map(([, selector, body]) => [selector.trim(), body]);
+}
+
 function atRule(css: string, prelude: string): string {
   const start = css.indexOf(prelude);
   assert.ok(start >= 0, `no ${prelude} block`);
@@ -31,8 +36,7 @@ function atRule(css: string, prelude: string): string {
 
 describe("textures.css", () => {
   test("defines every utility in SPEC-design-system.md › Textures", () => {
-    // .dg-backdrop arrives with DS-8.
-    for (const utility of ["grain", "scanlines", "halftone", "tape", "glass", "glow", "sticker", "vignette"]) {
+    for (const utility of ["grain", "scanlines", "halftone", "tape", "glass", "glow", "sticker", "vignette", "backdrop"]) {
       assert.match(textures, new RegExp(`\\.dg-${utility}\\b`), `.dg-${utility} is missing`);
     }
   });
@@ -64,8 +68,42 @@ describe("textures.css", () => {
     assert.match(declarations(fallback, ".dg-glass"), /background:\s*var\(--dg-surface\)/);
   });
 
-  test("animates nothing, so reduced motion has nothing to stop", () => {
-    assert.doesNotMatch(textures, /animation|transition|@keyframes/);
+  test("animates nothing but the backdrop's grid", () => {
+    const moving = rules(textures).filter(([, body]) => /animation|transition/.test(body)).map(([selector]) => selector);
+    assert.deepEqual([...new Set(moving)], [".dg-backdrop::before"]);
+    assert.equal(textures.match(/@keyframes/g)?.length, 1);
+  });
+});
+
+describe(".dg-backdrop", () => {
+  const grid = declarations(textures, ".dg-backdrop::before");
+
+  test("draws --dg-grid-line one --dg-grid-cell apart, with no fade mask", () => {
+    assert.match(grid, /var\(--dg-grid-line\)/);
+    assert.match(grid, /\/\s*var\(--dg-grid-cell\)\s+var\(--dg-grid-cell\)/);
+    const backdrop = rules(textures).filter(([selector]) => selector.includes(".dg-backdrop")).map(([, body]) => body);
+    assert.doesNotMatch(backdrop.join(""), /mask|opacity/);
+  });
+
+  test("drifts down exactly one cell per --dg-grid-drift, so the loop doesn't jump", () => {
+    assert.match(grid, /top:\s*calc\(-1 \* var\(--dg-grid-cell\)\)/);
+    assert.match(grid, /animation:\s*dg-backdrop-drift var\(--dg-grid-drift\) linear infinite/);
+    assert.match(atRule(textures, "@keyframes dg-backdrop-drift"), /^\s*to\s*\{\s*transform:\s*translateY\(var\(--dg-grid-cell\)\);?\s*\}\s*$/);
+  });
+
+  test("animates transform alone, so a frame never repaints", () => {
+    const keyframes = atRule(textures, "@keyframes dg-backdrop-drift");
+    const animated = [...keyframes.matchAll(/([\w-]+)\s*:/g)].map((match) => match[1]);
+    assert.deepEqual([...new Set(animated)], ["transform"]);
+  });
+
+  test("holds still under reduced motion", () => {
+    const reduced = atRule(textures, "@media (prefers-reduced-motion: reduce)");
+    assert.match(declarations(reduced, ".dg-backdrop::before"), /animation:\s*none/);
+  });
+
+  test("lays --dg-grid-glow under the grid", () => {
+    assert.match(declarations(textures, ".dg-backdrop"), /background-image:\s*radial-gradient\([^;]*var\(--dg-grid-glow\)/);
   });
 });
 
@@ -80,6 +118,14 @@ describe("Screen", () => {
     for (const side of ["top", "right", "bottom", "left"]) {
       assert.match(padding, new RegExp(`env\\(safe-area-inset-${side}\\)`), `no ${side} inset`);
     }
+  });
+
+  test("lays the backdrop as one fixed layer behind the content, taking no pointer events", () => {
+    const layer = declarations(screen, ".backdrop");
+    assert.match(layer, /position:\s*fixed/);
+    assert.match(layer, /inset:\s*0/);
+    assert.match(layer, /z-index:\s*-1/);
+    assert.match(layer, /pointer-events:\s*none/);
   });
 
   test("lays grain and vignette as one fixed layer that takes no pointer events", () => {

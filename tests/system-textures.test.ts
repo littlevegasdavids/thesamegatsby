@@ -13,10 +13,9 @@ describe("/system textures section", () => {
     assert.deepEqual(TEXTURES.map((sample) => `.${sample.utility}`).sort(), utilities.sort());
   });
 
-  // The grid's tokens are shown with the backdrop they draw (DS-8).
-  test("shows every shadow, glow, tape and texture token", () => {
+  test("shows every shadow, glow, tape, grid and texture token", () => {
     const textureTokens = [...tokens.keys()].filter((name) =>
-      /^--dg-(?:shadow|glow|tape|scanline|vignette|grain|glass-filter)/.test(name));
+      /^--dg-(?:shadow|glow|tape|scanline|vignette|grain|glass-filter|grid)/.test(name));
     const shown = [...TEXTURES.flatMap((sample) => sample.tokens), ...SHADOWS.map((shadow) => shadow.token)];
     assert.deepEqual([...new Set(shown)].sort(), textureTokens.sort());
   });
