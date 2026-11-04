@@ -160,9 +160,9 @@ describe("ReleaseRow's markup", () => {
 });
 
 describe("ReleaseRow's layout", () => {
-  test("is the boards' height, border-box, with a hairline under it", () => {
-    assert.equal(px(value(NARROW, ".row", "height")), 72);
-    assert.equal(px(value(WIDE, ".row", "height")), 80);
+  test("is --dg-release-h tall (the boards' 72 and 80 px), border-box, with a hairline under it", () => {
+    assert.equal(value(NARROW, ".row", "height"), "var(--dg-release-h)");
+    assert.equal(value(WIDE, ".row", "height"), undefined);
     assert.equal(value(NARROW, ".row", "box-sizing"), "border-box");
     assert.equal(value(NARROW, ".row", "border-bottom"), "1px solid var(--dg-line)");
   });

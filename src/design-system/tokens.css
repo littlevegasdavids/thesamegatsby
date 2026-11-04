@@ -102,6 +102,10 @@
   --dg-filter-h: 60px;
   --dg-sticky-filter: calc(var(--dg-header-inset) + var(--dg-header-h) + var(--dg-sticky-gap));
   --dg-sticky-release: calc(var(--dg-sticky-filter) + var(--dg-filter-h) + var(--dg-sticky-gap));
+  --dg-release-h: 72px;
+  /* How far the stack reaches with a release stuck: a scroll container pads
+     its top by this, so keyboard focus never lands beneath it. */
+  --dg-sticky-clear: calc(var(--dg-sticky-release) + var(--dg-release-h) + var(--dg-sticky-gap));
 
   /* Shadows, glows and the backdrop */
   --dg-shadow-float: 0 8px 24px color-mix(in srgb, var(--dg-black) 45%, transparent);
@@ -144,6 +148,7 @@
     --dg-header-h: 68px;
     --dg-sticky-gap: 8px;
     --dg-filter-h: 70px;
+    --dg-release-h: 80px;
 
     --dg-shadow-float: 0 10px 30px color-mix(in srgb, var(--dg-black) 45%, transparent);
     --dg-shadow-bar: 0 -16px 40px color-mix(in srgb, var(--dg-black) 55%, transparent);

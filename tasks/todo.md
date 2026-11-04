@@ -935,7 +935,7 @@ Review round 3 (3 Nov 2026):
   - **Files:** `src/design-system/components/ReleaseFilter/*`, `src/app/system/sections/DiscographySection.tsx`. Also `src/app/system/sections/FilterBench.tsx`, `tests/release-filter-ui.test.ts`, `src/app/system/system.module.css`, `src/design-system/index.ts` and the spec edits above
   - **Size:** M
 
-- [ ] **DS-22: The sticky stack, assembled on `/system`**
+- [x] **DS-22: The sticky stack, assembled on `/system`**
   - `SiteHeader`, `ReleaseFilter` and the release list composed in a phone-width `SystemFrame` and a desktop-width one. The list has the [bracketed] eight-track album and the EP expanded, so the hand-off can be seen. Each layer's `top` comes from the token sums. Whatever breaks gets fixed in the components' CSS.
   - **Acceptance:**
     - mid-scroll at 360, 768 and 1280 px, the stack has no gap or overlap: the header, then the filter 6–8 px below it, then the expanded release row
@@ -945,8 +945,31 @@ Review round 3 (3 Nov 2026):
   - **Verify:**
     - scroll each frame in the built-in browser, with screenshots mid-scroll and at the hand-off
     - **Canvas:** `PhoneSticky.dc.html` at 390 px (the filter and the [Album] row stuck). Scroll `HomeDesktop.dc.html` at 1440 px and compare
+  - **Done 4 Nov 2026.** `/system` has a Sticky stack section of four live frames, 640 px tall and full-bleed, so each width shows its own layout:
+    - at the top, with the album and the EP open
+    - mid-scroll, with the album stuck under the filter
+    - the hand-off, the album leaving with its last track
+    - everything collapsed
+
+    `StickyStack.tsx`, a client component, puts the page together as `site` will: the floating `SiteHeader`, a stand-in for the hero, then a discography section holding `ReleaseFilter` and the `ReleaseRow`s straight inside it, then a stand-in for the footer. It holds what `site` will hold: the filter, which releases are open, and what's playing. A tapped track counts up in 250 ms steps for 30 s, then reads as played, so the stack can be scrolled, filtered, opened and played on a phone. Each frame measures its own start from the laid-out page, so no offset is written as a number. The layers' offsets were already right from the tokens, so no component's offsets changed. One thing broke, and is fixed:
+    - **Focus landed under the stack.** Shift+Tab up the list scrolled each focused row in at the top of the frame, beneath the header, filter or stuck release: nine rows at 390 px. That fails WCAG 2.4.11 and the spec's visible-focus rule. Two new tokens: `--dg-release-h` (72 px, 80 px from 768 px), which `ReleaseRow` now uses, and `--dg-sticky-clear` (the stuck release's top + its height + a gap). `SystemFrame`'s scroller pads its top by `--dg-sticky-clear`, and the spec now says the page's own scroll container must too, so **`site` inherits it on the root**. Afterwards Shift+Tab never hid focus, at 390 or 1280 px.
+
+    `tests/sticky-stack.test.ts` (6 tests) checks the token sums, the release's 142 and 166 px tops, the clear token and the release height, the frame's scroll padding, and that the filter and rows sit straight in the discography and the header in the page's column. `tests/release-row.test.ts` now reads the height from `--dg-release-h`.
+  - **Checks.** These ran in headless Brave over the protocol (`phase-7/tools/ds22-stack.mjs`, `ds22-shots.mjs`, `ds22-live.mjs` and `page-check.mjs` in the session notes), against `npm run build` served locally:
+    - **The sweep:** at 360, 768, 1280, 390 and 1440 px, the first frame was scrolled from top to bottom in 20 px steps. The header sticks at 10 px below 768 px and 12 px from it. The filter sticks 6 px (8 px) below it, at 76 px (88 px). An expanded release sticks 6 px (8 px) below the filter, at 142 px (166 px). The gaps never vary, and nothing overlaps.
+    - **The hand-off:** what's stuck runs nothing → [Album title] → nothing → Can't You See → nothing at every width. So the album leaves with its last track, the singles between scroll by with only the header and filter stuck, and the EP takes the album's place.
+    - **Under the release row:** up to three of the album's tracks are under its stuck row at once. In the album-stuck frame, with the frame on screen, the row is the topmost element at its middle, track 5 is the next row below it, and track 3 shows through the 6 px gap above it, on its translucent surface. At the hand-off, the row slides up under the filter (106–178 px against the filter's 76–136 at 390 px).
+    - **Collapsed:** in the fourth frame, mid-list, only the header and filter stick.
+    - **Live, at 390 and 1280 px:** a tap on Welcome to Vapor_City reads "PLAYING 00:01" after a second, a second tap stops it, the album collapses and reopens, and on a phone the filter's EPs leaves only the EP.
+    - **Page-wide:** no horizontal scroll at the five widths, and no console problems. Tab makes 181 stops on `/system`. Each frame adds its scroller, the header's two links, the filter's trigger (or the five buttons from 768 px) and its rows, all with the ring. 0 animations under reduced motion, against 13 without it (the four new frames' drifts). `/` loads none of the stack's classes or words.
+    - **Screenshots** of the album-stuck and hand-off frames at 390 and 1440 px are `ds22-*-frame1.png` and `ds22-*-frame2.png` in the session scratchpad.
+    - **Not checked:** a real phone (Checkpoint 7), Safari and WebKit, headed Brave, and a performance trace of the stack scrolling at 4× CPU. DS-8 and DS-18 found no long frames with two glass boxes over the drift.
+  - **Canvas drift, for Checkpoint 7:**
+    - **The stuck release sits at 142 px on a phone,** against `PhoneSticky.dc.html`'s 144, because the filter box is the 60 px token, not the board's drawn 62 (DS-21).
+    - **On desktop it sits at 166 px,** against `HomeDesktop.dc.html`'s 162, because the filter buttons are 44 px, not 40, which makes the box 70 px. The header and filter sit exactly where the boards put them, at 10 and 76 px, then 12 and 88 px.
+    - **The frames' stand-in hero and footer are captions,** not the real components (DS-23, and `site`).
   - **Depends on:** DS-18, DS-20, DS-21
-  - **Files:** `src/app/system/sections/StickyStackSection.tsx`, `src/design-system/tokens.css` (offset fixes), and the module CSS of `SiteHeader`, `ReleaseFilter` and `ReleaseRow` if they need fixes
+  - **Files:** `src/app/system/sections/StickyStackSection.tsx`, `src/design-system/tokens.css` (offset fixes), and the module CSS of `SiteHeader`, `ReleaseFilter` and `ReleaseRow` if they need fixes. Also `src/app/system/sections/StickyStack.tsx`, `src/app/system/SystemFrame.module.css`, `src/app/system/system.module.css`, `src/app/system/page.tsx`, `tests/sticky-stack.test.ts`, `tests/release-row.test.ts` and the spec edits above
   - **Size:** M
 
 ### Checkpoint 7: Reno scrolls the sticky stack on a phone

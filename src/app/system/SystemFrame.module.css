@@ -15,11 +15,15 @@
   pointer-events: none;
 }
 
+/* It pads its top by the sticky stack's reach, as site's page will, so
+   Shift+Tab never leaves focus beneath the header, filter or a stuck
+   release (WCAG 2.4.11). */
 .scroller {
   position: relative;
   height: 100%;
   overflow-y: auto;
   overscroll-behavior: contain;
+  scroll-padding-top: var(--dg-sticky-clear);
 }
 
 .scroller:focus-visible {

@@ -7,6 +7,7 @@ import { IconsSection } from "./sections/IconsSection";
 import { LinksSection } from "./sections/LinksSection";
 import { MarksSection } from "./sections/MarksSection";
 import { ReadoutSection } from "./sections/ReadoutSection";
+import { StickyStackSection } from "./sections/StickyStackSection";
 import { TexturesSection } from "./sections/TexturesSection";
 import { TokensSection } from "./sections/TokensSection";
 import styles from "./system.module.css";
@@ -38,6 +39,7 @@ export default function System() {
       <LinksSection />
       <HeaderSection />
       <DiscographySection />
+      <StickyStackSection />
     </main>
   );
 }

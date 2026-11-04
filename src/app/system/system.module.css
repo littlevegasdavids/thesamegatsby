@@ -552,6 +552,26 @@
   border-top: 1px solid var(--dg-line);
 }
 
+/* The sticky stack's stand-in page. On a phone the discography sits one
+   header inset from the screen's edges, so the filter box and the rows line
+   up with the floating header, as on Main.dc.html. From 768 px it spans the
+   page's container, as the header does. */
+.stackHero {
+  min-height: 240px;
+  margin: 0;
+  padding: var(--dg-space-6) var(--dg-space-5);
+}
+
+.stackDiscography {
+  padding-inline: var(--dg-header-inset);
+}
+
+.stackEnd {
+  min-height: 480px;
+  margin: var(--dg-space-6) 0 0;
+  padding: 0 var(--dg-space-5);
+}
+
 /* Each live filter in its own box, so its sticky box can't stick across the
    bench. The open one leaves room for its list. */
 .filterBench {
@@ -583,6 +603,10 @@
 
   .trackGroup {
     margin-inline: 0;
+  }
+
+  .stackDiscography {
+    padding-inline: 0;
   }
 }
 

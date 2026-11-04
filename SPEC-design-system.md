@@ -123,6 +123,8 @@ I checked these on 3 Nov 2026. The test suite re-checks them from `tokens.css`.
   - `--dg-filter-h` is 60 px, or 70 px
   - `--dg-sticky-filter` = inset + header + gap
   - `--dg-sticky-release` = `--dg-sticky-filter` + filter + gap
+  - `--dg-release-h` is 72 px, or 80 px: a `ReleaseRow`'s height
+  - `--dg-sticky-clear` = `--dg-sticky-release` + release + gap, the stack's reach with a release stuck. A scroll container pads its top by it (DS-22)
 
 ### Shadows, glows and the backdrop
 
@@ -234,6 +236,7 @@ Every component is presentational. It renders from props and raises callbacks, a
     - **Counting:** each release counts under exactly one type. A single whose track is a remix or edit counts under Remixes & edits, not Singles. An EP or album counts under its own type, even if it holds a remix. "All" counts everything.
   - An **expanded** EP or album `ReleaseRow`: opaque `--dg-surface`, sticking directly under the filter box. It's sticky inside its own release group, so it stays put while that release's tracks scroll beneath it, then leaves with its last track and the next expanded release takes its place. Collapsed releases and singles never stick.
   - Each layer's `top` is the sum of the layers above it. Nested tracks scroll under the release row on a translucent surface.
+  - **The page's scroll container sets `scroll-padding-top: var(--dg-sticky-clear)`** (on `/system`, each `SystemFrame`, and in `site`, the root). Without it, Shift+Tab up the list scrolls a focused row in beneath the header, filter or stuck release, which fails WCAG 2.4.11 and this spec's visible-focus rule. DS-22 found this.
 - `NowPlayingBar` is fixed to the bottom, respects `env(safe-area-inset-bottom)`, and reserves its height so nothing on the page is ever hidden behind it. In the `ended` state it stays up:
   - the readout reads "END"
   - Replay and Close replace Stop
