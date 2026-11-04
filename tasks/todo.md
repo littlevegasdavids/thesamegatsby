@@ -698,7 +698,7 @@ Review round 3 (3 Nov 2026):
   - **Files:** `src/design-system/components/StreamLinks/*`, `src/app/system/sections/LinksSection.tsx`. Also `tests/stream-links.test.ts`, `src/app/system/system.module.css`, `src/design-system/index.ts` and `src/app/system/page.tsx`
   - **Size:** M
 
-- [ ] **DS-17: `SocialLinks`**
+- [x] **DS-17: `SocialLinks`**
   - Instagram and TikTok, in three variants:
     - `icons`: 44 px icon targets, named "Instagram" and "TikTok"
     - `handles`: the icon plus "@thesamegatsby" in VT323, named "Instagram: @thesamegatsby"
@@ -710,8 +710,29 @@ Review round 3 (3 Nov 2026):
   - **Verify:**
     - Tab through the three variants
     - **Canvas:** the header icons on `Main.dc.html` and the footer on `HomePhoneFull.dc.html` at 390 px. The header handles on `HomeDesktop.dc.html` at 1440 px
+  - **Done 4 Nov 2026.** `SocialLinks` takes `links` and `variant` (`icons`, `handles` or `footer`). It's a server component with no state. `networks.ts` holds the fixed order (Instagram, then TikTok), the labels, the footer's heading, `orderSocials()`, `socialHandle()` and `socialName()`, so the tests can import them. Every link opens in a new tab with `rel="noopener"` and draws its network's mark through `PlatformIcon` at 20 px. icons are two 44 × 44 targets named "Instagram" and "TikTok". handles add "@thesamegatsby" in VT323 at `--dg-text-readout`, named "Instagram: @thesamegatsby". footer is a nav labelled by its "Follow the signal" `<h2>`, with two outlined 44 px buttons in two equal columns, icon and name. The header variants are a `<nav aria-label="Social">`, as the boards mark them. Hover is pointer-only and snaps: the text turns amber, and so does the footer's border. `/system` › Links has a Social links block: icons and handles each on the header's glass, and the footer on the page. `tests/social-links.test.ts` (22 tests) checks the order, the first of two links kept, the single "@", the names, the footer heading, each link's target, rel and name, the two navs and the `<h2>`, the 20 px mark, what each variant shows, no client state, the 44 px targets, the handle's VT323 at the readout size, the footer's grid, outline and heading, the focus ring, hover only inside `hover: hover`, no transition, and contrast on the glass and the page. Four mutations each failed the right test: a doubled "@", a handles link named without its handle, a 40 px icon target, and TikTok first. Decisions:
+    - **The handle is in the name where it shows.** "Instagram: @thesamegatsby" holds the visible "@thesamegatsby", as the desktop board names it. icons and footer are named for the network alone.
+    - **A handle stored with its "@" still shows one.** The types say it's stored without, and `socialHandle()` makes a slip harmless.
+    - **The header variants are a nav named "Social", and the footer a nav named by its heading,** so a phone page has two navigation landmarks, each for what it holds. `SiteHeader` renders icons and handles both, and CSS shows one, so only one header nav is ever exposed.
+    - **The handle is `--dg-text-readout`,** 22 px from 768 px, where the board draws 21 px. The handles only show from 768 px.
+    - **Spacing is the nearest token:** 8 px padding on the handles (the board's 10), and an 8 px gap between icon and name in the footer (the board's 10).
+    - **The footer buttons are 44 px, as this task fixes.** The board's links size their content box, so they draw at 46.
+    - `SocialLinks` is exported from `index.ts`.
+  - **Checks.** These ran in headless Brave over the protocol (`phase-6/tools/page-check.mjs` and `ds17-canvas.mjs` in the session notes), against `npm run build` served locally:
+    - **360, 768, 1280, 390 and 1440 px:** icons are 44 × 44, handles 156 × 44 below 768 px (VT323 at 20 px) and 167.2 × 44 from it (22 px), and the footer buttons 44 tall in two equal columns. Every icon is 20 px. All of them are inside the column, with no horizontal scroll and no console problems.
+    - **Keyboard:** Tab reaches the six social links, each with the 2 px `rgb(244, 228, 9)` ring 2 px out, after the stream links. That makes 65 stops on `/system`.
+    - **Accessibility tree:** two navigations named "Social", with links "Instagram" and "TikTok", and "Instagram: @thesamegatsby" and "TikTok: @thesamegatsby". The footer is a navigation named "FOLLOW THE SIGNAL", with its heading and the two links. No icon is exposed.
+    - **Hover, forced:** each link's text goes from `rgb(242, 235, 218)` to `rgb(255, 178, 63)`. The footer's border goes from `rgb(138, 133, 120)` to amber. Each has a 0 s transition.
+    - **Reduced motion:** 0 animations, against 5 without it.
+    - **`/`:** none of its 11 files holds "Follow the signal", the handle or a SocialLinks class.
+    - **Canvas:** the boards' markup was rebuilt in our fonts beside ours. `Main.dc.html`'s header nav at 390 px matches exactly: 120 × 44, two 44 × 44 links at the same offsets. `HomeDesktop.dc.html`'s handles at 1440 px are 167.2 px wide against 165.6, with the second starting 1 px later. `Main`'s footer (which `HomePhoneFull.dc.html` shows) is the same width, 171 px per button, and 74 px tall against 76.
+    - **Not checked:** headed Brave, Safari, a real phone, a real mouse, and a real screen reader.
+  - **Canvas drift, for Checkpoint 6:**
+    - **The footer's buttons are 44 px, against the board's 46** drawn. The icon sits 2 px closer to the name (8 px gap against 10).
+    - **The handles are 1.6 px wider each:** VT323 at 22 px against 21, with 8 px padding against 10.
+    - Brave names the footer's nav "FOLLOW THE SIGNAL" in capitals, from `text-transform`, as it does every transformed label.
   - **Depends on:** DS-15
-  - **Files:** `src/design-system/components/SocialLinks/*`, `src/app/system/sections/LinksSection.tsx`
+  - **Files:** `src/design-system/components/SocialLinks/*`, `src/app/system/sections/LinksSection.tsx`. Also `tests/social-links.test.ts`, `src/app/system/system.module.css` and `src/design-system/index.ts`
   - **Size:** S
 
 - [ ] **DS-18: `SiteHeader`**

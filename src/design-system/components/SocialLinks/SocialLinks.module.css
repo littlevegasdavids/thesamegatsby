@@ -1,0 +1,88 @@
+/* The three layouts the boards draw. icons: two 44 px square targets for the
+   phone header. handles: each icon with "@thesamegatsby" in VT323, for the
+   desktop header. footer: the phone's "Follow the signal" block, two
+   outlined buttons with icon and name.
+
+   Hover follows the desktop boards: the header links' text turns amber, and
+   the footer buttons' border too. It's pointer-only and snaps, as on
+   Button. tests/social-links.test.ts holds the sizes, states and contrast. */
+
+.list {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--dg-space-2);
+  box-sizing: border-box;
+  min-height: 44px;
+  border-radius: var(--dg-radius-s);
+  color: var(--dg-fg);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.link svg {
+  flex: none;
+}
+
+.link:focus-visible {
+  outline: 2px solid var(--dg-focus);
+  outline-offset: 2px;
+}
+
+.icons .link {
+  width: 44px;
+  height: 44px;
+}
+
+.handles .list {
+  gap: var(--dg-space-1);
+}
+
+.handles .link {
+  padding: 0 var(--dg-space-2);
+}
+
+.handle {
+  font-family: var(--dg-font-readout);
+  font-size: var(--dg-text-readout);
+  line-height: 1;
+}
+
+.heading {
+  margin: 0 0 var(--dg-space-3);
+  color: var(--dg-fg-muted);
+  font-size: var(--dg-text-label);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.footer .list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--dg-space-2);
+}
+
+.footer .link {
+  justify-content: flex-start;
+  padding: 0 var(--dg-space-3);
+  border: 1px solid var(--dg-outline);
+  font-size: var(--dg-text-small);
+}
+
+@media (hover: hover) {
+  .link:hover {
+    color: var(--dg-accent);
+  }
+
+  .footer .link:hover {
+    border-color: var(--dg-accent);
+  }
+}

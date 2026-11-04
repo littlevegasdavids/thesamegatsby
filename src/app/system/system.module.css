@@ -502,6 +502,15 @@
   background-color: var(--dg-surface-raised);
 }
 
+/* The header's glass box, holding a header row's links at its right end. */
+.headerRow {
+  display: flex;
+  justify-content: flex-end;
+  padding: var(--dg-space-2);
+  border: 1px solid var(--dg-line);
+  border-radius: var(--dg-radius-l);
+}
+
 @media (min-width: 768px) {
   .page {
     padding: var(--dg-space-7) var(--dg-space-8) var(--dg-space-9);
