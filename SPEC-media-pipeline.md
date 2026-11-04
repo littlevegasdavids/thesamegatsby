@@ -2,7 +2,7 @@
 
 Module of the [Déjà Gatsby rebuild](SPEC.md). Depends on `cloudflare-infra` for the R2 bucket, the media domain and Wrangler. `audio-engine`, `site` and `release-kit` read the catalogue it writes.
 
-Approved by Reno on 4 Nov 2026, as drafted. The open questions at the end are still open, each with a recommendation, and get answered before `tasks/plan.md` covers this module.
+Approved by Reno on 4 Nov 2026, as drafted, and its seven open questions answered the same day.
 
 ## Objective
 
@@ -33,7 +33,7 @@ All that's left by hand is committing and deploying (SPEC.md, success criteria).
 Tried on 4 Nov 2026, on the current files:
 - **`afconvert` uses Apple's own AAC encoder** (`-d aac`), which SPEC.md leaned towards, **and it writes `moov` before `mdat`** (`ftyp moov free mdat`). So neither ffmpeg nor a `+faststart` remux is needed.
 - **Two encodes of the same input differ in only six bytes:** the creation and modification times in the `mvhd`, `tkhd` and `mdhd` boxes. Zeroing those makes the output byte-identical, so a content hash names the same file the same way every time.
-- **`sips` writes AVIF on this macOS (27.0.1), and renders the Bring That Change SVG to a 1600² PNG.** Its AVIF output is byte-identical across runs and carries an sRGB profile. It can't write WebP, which is why `cwebp` matters (open question 2).
+- **`sips` writes AVIF on this macOS (27.0.1), and renders the Bring That Change SVG to a 1600² PNG.** Its AVIF output is byte-identical across runs and carries an sRGB profile. It can't write WebP, which is why `cwebp` is used for WebP (open question 2).
 
 Neither `afconvert` nor `sips` can cut a time range or fade, so that part is Node code over PCM (see Snippet).
 
@@ -54,8 +54,8 @@ The order is fixed: **build, then upload, then verify, then write**. The catalog
 |---|---|---|
 | Input | Anything Core Audio reads (WAV, AIFF, FLAC), 1 or 2 channels | Masters stay outside the repo. `add-song` reads them from the path it's given |
 | Length | **30 s**, cut from `--start` | Confirmed assumption 1. A master shorter than start + 30 s is refused, not padded |
-| Fades | Baked into the samples: **0.15 s in, 2 s out**, on a raised-cosine curve. `--fade-in` and `--fade-out` override them per song | SPEC.md's decision to bake fades in at encode time. The values are open question 1 |
-| Gain | None. The master's level is kept | Open question 5 |
+| Fades | Baked into the samples: **0.15 s in, 2 s out**, on a raised-cosine curve. `--fade-in` and `--fade-out` override them per song | SPEC.md's decision to bake fades in at encode time. Reno chose the values (open question 1) |
+| Gain | None. The master's level is kept, and `add-song` prints the snippet's peak level | Open question 5 |
 | Codec | AAC-LC, Apple's encoder through `afconvert -d aac -b 160000 -s 2 -q 127` (constrained VBR, best encoder quality) | SPEC.md's lean: about 160 kbps, Apple's encoder |
 | Sample rate | The master's when it's 44.1 or 48 kHz. Anything else is resampled to 48 kHz | Avoids resampling the usual masters |
 | Container | `.m4a`, `moov` first, timestamps zeroed | Fast start, and deterministic bytes for the hash |
@@ -69,7 +69,8 @@ The cut and the fades are plain `.ts`: parsing a float WAV, slicing it, multiply
 |---|---|
 | Source | Anything `sips` reads (PNG, JPEG, TIFF, HEIC, and SVG as Bring That Change shows). **It must be square and at least 1080 px.** A non-square cover is refused, unless `--crop` centre-crops it. A smaller one is refused outright |
 | Widths | **192, 384, 768 and 1080 px** |
-| Formats | AVIF through `sips`, and WebP through `cwebp` as the fallback (open question 2) |
+| Formats | AVIF through `sips`, and WebP through `cwebp` as the fallback (open question 2). `add-song` checks `cwebp` is there before it starts, and stops with `brew install webp` if not |
+| Quality | AVIF at 50, overridden per release with `--cover-quality` (open question 3) |
 | Colour | `sips` first writes the source out as a full-size sRGB PNG, which both encoders read (`cwebp` can't read SVG or HEIC). The art is shown opaque, so any alpha channel is flattened. Three of the current PNGs have one, and whether any of their pixels are actually transparent gets checked when they're re-cut |
 | Metadata | No EXIF or GPS in the output |
 
@@ -225,6 +226,7 @@ npm run check-media
 | `--release-title <text>`, `--release-id <slug>` | For a new EP or album. A single takes its track's title and id |
 | `--cover <file>`, `--date YYYY-MM-DD` | Required for a new release |
 | `--crop` | Centre-crop a cover that isn't square |
+| `--cover-quality <0–100>` | Override the AVIF quality for this release's cover. Default 50 |
 | `--lead` | Make this track the release's lead. The first track added is the lead by default |
 | `--featured` | Feature this release in the hero, and clear any other release's flag |
 | `--spotify`, `--apple-music`, `--youtube-music`, `--soundcloud`, `--bandcamp`, `--amazon-music`, `--deezer`, `--tidal` `<url>` | The release's links. They can also be added to `songs.json` by hand later |
@@ -332,6 +334,7 @@ Workers Builds runs `npm run ci` on Linux, with no `afconvert` or `sips`. So the
 
 - Playing anything (`audio-engine`), and laying covers out on the page, including the `sizes` the hero uses (`site`).
 - The Open Graph image and favicon (`site`).
+- `/system`'s fixture covers, which stay local (open question 4).
 - The old site's `public/background.webp` and `public/profile_pic.jpg` (3.8 MB), which `site` keeps or removes.
 - Deleting objects that a re-cut or new cover leaves behind in R2. They're small, immutable and unreferenced.
 - Full-length audio, loudness normalisation (open question 5), waveform data, ISRCs, credits beyond the title, and lyrics.
@@ -339,12 +342,12 @@ Workers Builds runs `npm run ci` on Linux, with no `afconvert` or `sips`. So the
 
 ## Open questions
 
-1. **Fade lengths: 0.15 s in, 2 s out?** My recommendation. The cut usually lands on a beat or a drop, so a long fade-in would blunt it and work against "play feels instant". 0.15 s removes the click without being heard as a fade. Two seconds out lets the snippet end gently rather than stop. Both can be overridden per song.
-2. **The cover fallback: WebP through `cwebp`?** My recommendation, because it keeps the infra spec's AVIF + WebP keys. AVIF covers almost every browser, and WebP catches the rest at about AVIF's size: at 1080 px, 65 KB against 58 KB for Vapor_City. `cwebp` is already installed through Homebrew, but it isn't part of macOS, so `add-song` checks for it and stops with `brew install webp` if it's missing. It never installs anything itself. The alternatives:
-   - JPEG through `sips`, which needs nothing extra but is 2–4× bigger (Can't You See at 1080: 477 KB)
-   - No fallback at all
-3. **Cover quality: AVIF at 50 by default, with a `--cover-quality` override per release?** My recommendation. At 60, Can't You See's 1080 is 200 KB, almost two-thirds of what the first-load budget has left after JS and fonts. At 50 it's 133 KB, and the other four are well under 100 KB. Reno checks the five releases by eye at that setting before anything uploads. Whether phones fetch 768 or 1080 for the hero is `site`'s call, through `sizes`, measured against the 350 KB budget.
-4. **`/system` keeps its own local fixture covers?** My recommendation. The design-system spec says real covers come from `media-pipeline`. But a test bench that works offline, gives the same screenshots every time and still runs before the bucket exists is worth more than real files there. Real covers show up on `/` through `site`. The alternative is pointing the five real fixture releases at the catalogue's R2 covers.
-5. **No loudness normalisation?** My recommendation. The masters are already mastered, and changing their level changes the art. Phones set the volume anyway. `add-song` prints each snippet's peak level, so a clipping cut gets noticed.
-6. **Confirm the encoder settings and the tooling change.** This spec picks 160 kbps constrained VBR, Apple's encoder, through `afconvert`, with no ffmpeg. SPEC.md's tech stack says "ffmpeg for `media-pipeline` (not installed yet)". If Reno approves, I change that line in SPEC.md in the same commit, as a tooling detail rather than a confirmed assumption.
-7. **Order of work against `cloudflare-infra`.** Everything up to `--dry-run` can be built and tested now. The first real upload needs CF-1 (the zone), CF-2 (Wrangler) and CF-3 (the bucket, domain and rules). My recommendation: the plan builds the pipeline first, then stops for CF-1 to CF-3 before the upload task. `audio-engine` can't be tested on real snippets until that's done.
+All seven were answered on 4 Nov 2026: Reno accepted every recommendation. They stay here as the record of why the spec reads as it does.
+
+1. **Fade lengths. Decided: 0.15 s in, 2 s out**, overridable per song. The cut usually lands on a beat or a drop, so a long fade-in would blunt it and work against "play feels instant". 0.15 s removes the click without being heard as a fade, and two seconds out lets the snippet end gently rather than stop.
+2. **The cover fallback. Decided: WebP through `cwebp`**, which keeps the infra spec's AVIF + WebP keys. AVIF covers almost every browser, and WebP catches the rest at about AVIF's size: at 1080 px, 65 KB against 58 KB for Vapor_City. `cwebp` is installed through Homebrew but isn't part of macOS, so `add-song` checks for it and stops with `brew install webp` if it's missing. It never installs anything itself. JPEG through `sips` (2–4× bigger: Can't You See at 1080 is 477 KB) and no fallback at all were the alternatives.
+3. **Cover quality. Decided: AVIF at 50 by default, with a `--cover-quality` override per release.** At 60, Can't You See's 1080 is 200 KB, almost two-thirds of what the first-load budget has left after JS and fonts. At 50 it's 133 KB, and the other four are well under 100 KB. Reno checks the five releases by eye at that setting before anything uploads. Whether phones fetch 768 or 1080 for the hero is `site`'s call, through `sizes`, measured against the 350 KB budget.
+4. **`/system`'s covers. Decided: it keeps its own local fixture covers.** The design-system spec says real covers come from `media-pipeline`, but a test bench that works offline, gives the same screenshots every time and runs before the bucket exists is worth more than real files there. Real covers show up on `/` through `site`.
+5. **Loudness. Decided: no normalisation.** The masters are already mastered, and changing their level changes the art. Phones set the volume anyway. `add-song` prints each snippet's peak level, so a clipping cut gets noticed.
+6. **Encoder settings and tooling. Decided: 160 kbps constrained VBR, Apple's encoder, through `afconvert`, with no ffmpeg.** SPEC.md's tech stack now says so.
+7. **Order of work against `cloudflare-infra`. Decided: the pipeline is built and tested up to `--dry-run` first, then the plan stops for CF-1 (the zone), CF-2 (Wrangler) and CF-3 (the bucket, domain and rules) before the first real upload.** `audio-engine` can't be tested on real snippets until that's done.
