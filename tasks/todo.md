@@ -783,8 +783,16 @@ Review round 3 (3 Nov 2026):
   - **Size:** M
 
 ### Checkpoint 6: Links and header
-- [ ] The header, in both variants, at the top and mid-scroll, matches `Main.dc.html` and `HomeDesktop.dc.html`
-- [ ] Drift from the canvas is listed
+- [x] The header, in both variants, at the top and mid-scroll, matches `Main.dc.html` and `HomeDesktop.dc.html`. **Reno approved it on 4 Nov 2026**, from the eight `/system` frames at 390 and 1440 px, with the looks the canvas doesn't draw:
+  - the open chips putting the extras after "More", which now has a chevron in every layout, pointing down while closed (DS-16)
+  - the desktop bar, full width with the floating shadow kept, as the phone bar has it (DS-18)
+
+  Before this checkpoint, Reno also chose four answers the spec now records: the Amazon Music stand-in, the amber hover on links, and "More"/"Less", along with the open-chips order above.
+- [x] Drift from the canvas is listed, under each task's **Canvas drift** line, and Reno accepted it as it stands. What carries forward:
+  - **Before public launch:** Amazon Music's stand-in is replaced with Amazon's own mark, which is a separate ask.
+  - **DS-24 inherits:** the bar's `StreamLinks` wraps in `/system`'s column at 768 px, so check it inside the real bar.
+  - **`site` inherits:** the desktop header needs about 606 px, so a 768 px screen fits it with up to 81 px of side padding.
+  - The rest is the spec winning (44 px targets, 14 px type, the desktop header 12 px from the top) and token roundings. Nothing is changed for them.
 
 ---
 
