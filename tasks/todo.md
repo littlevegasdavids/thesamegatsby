@@ -572,7 +572,7 @@ Review round 3 (3 Nov 2026):
 
 ## Phase 6: Links and header
 
-- [ ] **DS-14: View types, the `/system` fixture and filter options**
+- [x] **DS-14: View types, the `/system` fixture and filter options**
   - `types.ts` holds the shapes the components render:
     - release: id, type single/EP/album, title, cover, tracks, lead track, links
     - track: id, title, kind original/remix/edit, duration
@@ -592,8 +592,26 @@ Review round 3 (3 Nov 2026):
     - `npm test`
     - `du -sh public/system-fixtures`
     - **Canvas:** the same releases, in the same order, as the discography on `Main.dc.html` with the examples Tweak on
+  - **Done 4 Nov 2026.** `types.ts` holds `Release`, `Track`, `StreamLink` and `SocialLink`, plus the `PlatformId`, `SocialNetwork`, `TrackKind` and `ReleaseType` unions. `release-filter.ts` holds `releaseCategory()`, which puts each release under exactly one type, and `releaseFilterOptions()`, which returns All first, then Singles, EPs, Albums and Remixes & edits in that order, each with its count, leaving out empty types. Both and the types are exported from `index.ts`. `src/app/system/fixtures.ts` holds the eight releases in `Main.dc.html`'s order, as in its examples Tweak, and the two socials. `public/system-fixtures/` holds five 320 × 320 JPEGs and `placeholder.svg`, a hand-written ink tile with bone brackets. `/system` has a Fixture section: each release with its cover at 56 px, type, track count and the type it counts under, and the filter options with their counts. `tests/release-filter.test.ts` (11 tests) covers the counts, All first, the fixed order, empty types left out, remix and edit singles under Remixes & edits, an EP holding a remix under EPs, the lead track deciding a single, and the canvas's counts for the fixture. `tests/system-fixture.test.ts` (9 tests) checks the order against the canvas, the album's eight tracks and the EP's two, that each lead track is one of the release's own, unique ids, the three More platforms on the bracketed releases, the five main platforms on the real ones, that every cover exists, and the 200 KB budget. Three mutations each failed the right test: an EP holding a remix counted as a remix, empty types kept, and a single judged by any track instead of its lead. Decisions:
+    - **A single takes its lead track's kind.** G6 speaks of "a single whose track is a remix". Every single in the catalogue has one track, and the lead track settles one with a B-side.
+    - **`duration` is the snippet's length in seconds,** which is what the rows and the readout show, not the full song's.
+    - **Links belong to the release.** The canvas also gives UKG 333 its own links in the player bar. `NowPlayingBar` takes its own `streamLinks`, so `site` can pass a track's links once the catalogue has them, without a second links field here.
+    - **The handle is stored without its "@",** which `SocialLinks` adds.
+    - **All is labelled "All",** as on the desktop buttons. The phone dropdown reads "All releases", which is DS-21's to render.
+    - **The covers are JPEG quality 70.** At 80 they came to 218 KB. At 70 they're 185,478 bytes, and `du -sh` reports 192 K with the placeholder. KaiZen's cover is 1469 × 1457, so it was cropped to a centred square first, 6 px off each side. Bring That Change's SVG went through `qlmanage` at 1600 px, then `sips`.
+    - **The bracketed releases carry all eight platforms with `#` links,** so DS-16 can show More from them. The real releases carry the five main ones, with the canvas's links (tracking parameters dropped) and the Bandcamp artist page.
+    - **The artwork-tone wordmark now sits on the KaiZen cover** on `/system` › Marks, in place of the `--dg-panel` stage, as Checkpoint 5 carried forward. KaiZen's own cover sets the name the same way.
+  - **Checks.** These ran in headless Brave over the protocol (`phase-6/tools/ds14-check.mjs` in the session notes), against `npm run build` served locally:
+    - **360, 768, 1280, 390 and 1440 px:** the Fixture section lists the eight releases in the canvas's order, each cover 56 × 56 and loaded at 320 px, inside the column. The options read All 8, Singles 4, EPs 1, Albums 1, Remixes & edits 2, as on `HomeDesktop.dc.html`'s buttons and `Main.dc.html`'s dropdown. The artwork stage's cover loads and fills it, with the wordmark in front and inside it. No horizontal scroll, and no console problems.
+    - **`/`:** it makes no request for any fixture file, at any width.
+    - **Keyboard:** Tab still makes 9 stops. DS-14 adds no focusable element.
+    - **Reduced motion:** 0 animations, against 5 without it, as before.
+    - **Not checked:** headed Brave, Safari and a real phone. The placeholder tile wasn't compared with the canvas's own placeholder image, which can't be read from the board source.
+  - **Canvas drift, for Checkpoint 6:**
+    - The bracketed releases show our placeholder tile, not the canvas's.
+    - KaiZen's fixture cover loses 6 px off each side to the square crop.
   - **Depends on:** DS-6, and G6 answered
-  - **Files:** `src/design-system/types.ts`, `src/design-system/release-filter.ts`, `tests/release-filter.test.ts`, `src/app/system/fixtures.ts`, `public/system-fixtures/*`
+  - **Files:** `src/design-system/types.ts`, `src/design-system/release-filter.ts`, `tests/release-filter.test.ts`, `src/app/system/fixtures.ts`, `public/system-fixtures/*`. Also `tests/system-fixture.test.ts`, `src/app/system/sections/FixtureSection.tsx`, `src/app/system/sections/MarksSection.tsx`, `src/app/system/system.module.css`, `src/design-system/index.ts` and `src/app/system/page.tsx`
   - **Size:** M
 
 - [ ] **DS-15: Platform and social icons** 🔒 *(Simple Icons download)*

@@ -4,3 +4,6 @@ export { Screen } from "./components/Screen/Screen";
 export { SparkleStar } from "./components/SparkleStar/SparkleStar";
 export { VhsReadout } from "./components/VhsReadout/VhsReadout";
 export { Wordmark } from "./components/Wordmark/Wordmark";
+export { releaseCategory, releaseFilterOptions } from "./release-filter";
+export type { FilterKey, FilterOption, ReleaseCategory } from "./release-filter";
+export type * from "./types";

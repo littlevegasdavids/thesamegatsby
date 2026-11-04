@@ -11,6 +11,9 @@ import styles from "../system.module.css";
 
 const SIZES = [56, 28, 14] as const;
 
+// The artwork tone is for setting the mark on a cover, as this one sets it.
+const STAGE_COVER = "/system-fixtures/give-me-that-kaizen.jpg";
+
 const bytes = (asset: string) => statSync(join(process.cwd(), "src/design-system/assets", asset)).size;
 
 // The star and the wordmark in each state the spec lists, the star at the
@@ -73,9 +76,12 @@ export function MarksSection() {
             </li>
             <li className={styles.stack}>
               <span className={styles.artworkStage}>
-                <Wordmark size="xl" tone="artwork" />
+                <Image src={STAGE_COVER} alt="" fill sizes="30rem" className={styles.stageCover} />
+                <span className={styles.stageMark}>
+                  <Wordmark size="xl" tone="artwork" />
+                </span>
               </span>
-              <span className={styles.cap}>Artwork · V7 · white on a black drop</span>
+              <span className={styles.cap}>Artwork · V7 · white on a black drop · on the KaiZen cover</span>
               <code className={styles.code}>--dg-tape-artwork</code>
             </li>
             <li className={styles.stack}>

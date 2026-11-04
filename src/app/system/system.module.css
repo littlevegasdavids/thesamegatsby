@@ -412,13 +412,25 @@
   font-size: var(--dg-text-label);
 }
 
-/* The artwork wordmark on a duotone panel, since its black drop barely
-   shows on tape black. align-self keeps the stage to the mark's width. */
+/* The artwork wordmark on a fixture cover, the way the covers set it. Its
+   black drop barely shows on tape black. align-self keeps the stage to the
+   mark's width, and the cover fills it behind the mark. */
 .artworkStage {
+  position: relative;
   align-self: start;
   padding: var(--dg-space-5);
+  overflow: clip;
   border-radius: var(--dg-radius-l);
-  background-color: var(--dg-panel);
+}
+
+.stageCover {
+  object-fit: cover;
+}
+
+/* The mark sits in front of the cover, which next/image positions. */
+.stageMark {
+  position: relative;
+  display: block;
 }
 
 /* An asset shown at its own size, or the column's width if that's less. */
@@ -451,6 +463,22 @@
    it goes with, as on the bar boards. */
 .tapeStrip {
   background-color: var(--dg-surface-raised);
+}
+
+/* Fixture: each release with its cover at the row size the canvas draws. */
+.fixtureRow {
+  display: flex;
+  align-items: center;
+  gap: var(--dg-space-3);
+}
+
+.fixtureCover {
+  flex: none;
+  border-radius: var(--dg-radius-s);
+}
+
+.fixtureNote {
+  margin: var(--dg-space-4) 0 0;
 }
 
 @media (min-width: 768px) {
