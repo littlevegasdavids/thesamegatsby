@@ -1158,7 +1158,7 @@ Review round 3 (3 Nov 2026):
   - **`site` inherits:** `scroll-padding-bottom: calc(var(--dg-bar-h) + var(--dg-space-1))` on its root, replacing Checkpoint 8's `var(--dg-bar-h)`, beside `scroll-padding-top: var(--dg-sticky-clear)`.
   - **CF-4:** re-run Lighthouse and the traces on the preview URL. DS-25's numbers are from a local server with no compression or caching.
   - **Before public launch:** Amazon Music's stand-in, and the Aero licence (SPEC.md open question 1), as before.
-- [ ] Next step: write `SPEC-media-pipeline.md` for review
+- [x] Next step: write `SPEC-media-pipeline.md` for review. **Reno approved it as drafted on 4 Nov 2026.** Its seven open questions are still open
 
 ---
 

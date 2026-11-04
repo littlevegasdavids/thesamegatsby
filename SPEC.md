@@ -67,7 +67,7 @@ Approved 3 Nov 2026. The module ids are stable and are never renamed.
 |---|---|---|---|
 | `design-system` | Tokens as CSS custom properties, self-hosted fonts, textures, the sparkle star and icons, presentational React components, the `/system` preview route | — | [SPEC-design-system.md](SPEC-design-system.md) |
 | `cloudflare-infra` | Cloudflare zone and DNS migration, the static-assets Worker, the R2 bucket at `media.thesamegatsby.com` with edge caching and CORS, cutover and rollback | — | [SPEC-cloudflare-infra.md](SPEC-cloudflare-infra.md) |
-| `media-pipeline` | `npm run add-song`: cut and encode the snippet, size the covers, content-hash the names, upload to R2, write the typed catalogue entry. Re-cut the six existing songs | `cloudflare-infra` | written when reached |
+| `media-pipeline` | `npm run add-song`: cut and encode the snippet, size the covers, content-hash the names, upload to R2, write the typed catalogue entry. Re-cut the six existing songs | `cloudflare-infra` | [SPEC-media-pipeline.md](SPEC-media-pipeline.md) |
 | `audio-engine` | Player core: one shared `<audio>` element, fast start, preload on intent, one snippet at a time, stop at end, Media Session for the lock screen. No UI | `media-pipeline` | written when reached |
 | `site` | The homepage built from `design-system` components and wired to `audio-engine`, plus metadata, Open Graph image and favicon | `design-system`, `audio-engine`, `media-pipeline` | written when reached |
 | `release-kit` | Unlinked `/kit` route: upload a cover, pick a track, export the post and story PNGs | `design-system`, `media-pipeline` | written when reached |
