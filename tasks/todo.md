@@ -556,8 +556,17 @@ Review round 3 (3 Nov 2026):
   - **Size:** S
 
 ### Checkpoint 5: Primitives
-- [ ] DS-9 to DS-13 are on `/system` in every state, matched against `StyleTile.dc.html` and `WordmarkVariants.dc.html`
-- [ ] Drift from the canvas is listed
+- [x] DS-9 to DS-13 are on `/system` in every state, matched against `StyleTile.dc.html` and `WordmarkVariants.dc.html`. **Reno approved them on 4 Nov 2026, with the four looks the canvas doesn't draw:**
+  - the star's twinkle (DS-9)
+  - Button's hover, press and disabled states (DS-11)
+  - the readout's muted load and stop modes (DS-12)
+  - the tape's glide between updates (DS-13)
+
+  The spec no longer calls them proposals.
+- [x] Drift from the canvas is listed, under each task's **Canvas drift** line, and Reno accepted it as it stands. What carries forward:
+  - **DS-24 inherits two:** the ended bar's Close is an outlined hardware button, not the board's borderless one, and the tape's glow past the tip is 8 × ratio px, not 8 px.
+  - **DS-14's fixture covers** replace the `--dg-panel` stage behind the artwork-tone wordmark.
+  - The rest are spacing-token roundings (Button, readout gap, motif row) and Mac font smoothing on the board's wordmark. Nothing is changed for them.
 
 ---
 
