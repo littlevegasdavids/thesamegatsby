@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ButtonSection } from "./sections/ButtonSection";
 import { FixtureSection } from "./sections/FixtureSection";
+import { HeaderSection } from "./sections/HeaderSection";
 import { IconsSection } from "./sections/IconsSection";
 import { LinksSection } from "./sections/LinksSection";
 import { MarksSection } from "./sections/MarksSection";
@@ -34,6 +35,7 @@ export default function System() {
       <FixtureSection />
       <IconsSection />
       <LinksSection />
+      <HeaderSection />
     </main>
   );
 }

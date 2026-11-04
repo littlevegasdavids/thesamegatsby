@@ -76,7 +76,7 @@ export function MarksSection() {
             </li>
             <li className={styles.stack}>
               <span className={styles.artworkStage}>
-                <Image src={STAGE_COVER} alt="" fill sizes="30rem" className={styles.stageCover} />
+                <Image src={STAGE_COVER} alt="" fill sizes="30rem" loading="eager" className={styles.stageCover} />
                 <span className={styles.stageMark}>
                   <Wordmark size="xl" tone="artwork" />
                 </span>

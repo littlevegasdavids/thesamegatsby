@@ -1,0 +1,52 @@
+/* The first sticky layer. Floating, the default, is a glass box inset from
+   the screen's edges on a phone and from the top on desktop, where its
+   parent sets the width, as the desktop board's page container does. Bar is
+   the same glass across its parent with a bottom hairline, as the phone
+   board's Tweak draws it, shadow kept. The inset and height are tokens, so
+   the filter and release rows below can sum them for their own top.
+
+   No ancestor of a sticky element may clip, so nothing here sets overflow.
+   tests/site-header.test.ts holds the box to the spec. */
+
+.header {
+  position: sticky;
+  top: var(--dg-header-inset);
+  z-index: var(--dg-z-bar);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--dg-space-3);
+  box-sizing: border-box;
+  height: var(--dg-header-h);
+  margin: var(--dg-header-inset) var(--dg-header-inset) 0;
+  padding: 0 var(--dg-space-1) 0 var(--dg-space-4);
+  border: 1px solid var(--dg-line);
+  border-radius: var(--dg-radius-l);
+  box-shadow: var(--dg-shadow-float);
+}
+
+.bar {
+  top: 0;
+  margin: 0;
+  border-width: 0 0 1px;
+  border-radius: var(--dg-radius-0);
+}
+
+.desktop {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .header {
+    margin-inline: 0;
+    padding: var(--dg-space-2) var(--dg-space-3) var(--dg-space-2) var(--dg-space-5);
+  }
+
+  .phone {
+    display: none;
+  }
+
+  .desktop {
+    display: block;
+  }
+}

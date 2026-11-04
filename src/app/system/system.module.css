@@ -511,9 +511,49 @@
   border-radius: var(--dg-radius-l);
 }
 
+/* Header: the frames, a stand-in page in each. On a phone the header spans
+   the frame, inset by its own margin; from 768 px the page has side padding,
+   as the desktop board's container does, and the header spans it. The gap
+   under the header is the boards': 12 px on a phone, 28 on desktop, at the
+   nearest tokens. */
+.frames {
+  gap: var(--dg-space-6);
+}
+
+.frameContent {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 10rem), 1fr));
+  gap: var(--dg-space-4);
+  margin: var(--dg-space-3) 0 0;
+  padding: 0 var(--dg-space-5) var(--dg-space-6);
+  list-style: none;
+}
+
+.frameItem {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dg-space-2);
+}
+
+.frameCover {
+  width: 100%;
+  height: auto;
+  border-radius: var(--dg-radius-m);
+}
+
 @media (min-width: 768px) {
   .page {
     padding: var(--dg-space-7) var(--dg-space-8) var(--dg-space-9);
+  }
+
+  .framePage {
+    padding: 0 var(--dg-space-6);
+  }
+
+  .frameContent {
+    grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+    margin-top: var(--dg-space-6);
+    padding-inline: 0;
   }
 
   .barStrip {

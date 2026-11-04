@@ -1,0 +1,34 @@
+/* The frame runs to the screen's edges at every width, past /system's own
+   padding, so it's as wide as the screen it stands for, and a header inset
+   10 px sits 10 px from its edges. */
+.frame {
+  position: relative;
+  height: var(--frame-h);
+  margin-inline: calc(var(--dg-space-4) * -1);
+  contain: layout paint;
+  background-color: var(--dg-bg);
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.scroller {
+  position: relative;
+  height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.scroller:focus-visible {
+  outline: 2px solid var(--dg-focus);
+  outline-offset: -2px;
+}
+
+@media (min-width: 768px) {
+  .frame {
+    margin-inline: calc(var(--dg-space-8) * -1);
+  }
+}

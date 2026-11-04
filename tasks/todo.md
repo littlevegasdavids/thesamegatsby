@@ -735,7 +735,7 @@ Review round 3 (3 Nov 2026):
   - **Files:** `src/design-system/components/SocialLinks/*`, `src/app/system/sections/LinksSection.tsx`. Also `tests/social-links.test.ts`, `src/app/system/system.module.css` and `src/design-system/index.ts`
   - **Size:** S
 
-- [ ] **DS-18: `SiteHeader`**
+- [x] **DS-18: `SiteHeader`**
   - Sticky to the top, with `Wordmark` (`l`) on the left and `SocialLinks` on the right: icons below 768 px, handles from 768 px. Two variants:
     - `floating` (the default): a box inset 10 px on a phone and 12 px from the top on desktop, with a 12 px radius, `.dg-glass`, a `--dg-line` border and the floating shadow, at the heights from the tokens
     - `bar`: full width with a bottom hairline
@@ -751,8 +751,35 @@ Review round 3 (3 Nov 2026):
     - both variants at the top and mid-scroll, at 360, 768 and 1280 px
     - a performance trace
     - **Canvas:** `Main.dc.html` at 390 px, floating, and with Tweaks › header set to bar. The header on `HomeDesktop.dc.html` at 1440 px. Inset, height, radius, blur, border, shadow, wordmark size and icon/handle spacing match
+  - **Done 4 Nov 2026.** `SiteHeader` takes `socials` and `variant` (`floating`, the default, or `bar`). It renders one `<header>` on `.dg-glass`: `Wordmark` at `l`, then `SocialLinks` twice, icons and handles, with CSS showing the icons below 768 px and the handles from it. It holds no state. It's sticky at `--dg-header-inset` (bar at 0), on `--dg-z-bar`, at `--dg-header-h` with `border-box`, and stays in flow, so the page reserves its height. Floating has a 1 px `--dg-line` border, `--dg-radius-l` and `--dg-shadow-float`. It's inset by `--dg-header-inset` on three sides on a phone, and from 768 px spans its parent. Bar has a bottom hairline only, square corners and no margin. Padding is the boards': 0 4 0 16 px on a phone, 8 12 8 24 px from 768 px, all tokens. `SystemFrame` (`/system` only, a client component) is an outer box with `contain: layout paint` and its own drifting grid, which doesn't scroll, around an inner box that does. It takes `label`, `height` (set through `--frame-h`) and `scrollTop`, and the scroller is a focusable, labelled region. `/system` has a Header section with four frames: floating and bar, each at the top and mid-scroll, over a stand-in page of the fixture's covers. `tests/site-header.test.ts` (18 tests) checks the markup, the wordmark's size and place, both socials layouts and the CSS that picks one, no state, sticky at the inset with the bar at 0, in flow at the token height, the insets and spans, the floating box, the bar, the padding, the glass with its `--dg-surface` fallback, the layer, no overflow, and the frame's containment, scroller, height, starting offset, keyboard access and backdrop. Five mutations each failed the right test: `fixed` in place of `sticky`, `overflow: hidden`, a raw 64 px height, a frame without containment, and the bar stuck at the inset. Decisions:
+    - **`SystemFrame` is two boxes.** A scroll container that is also the containing block takes its fixed children along when it scrolls. The outer box contains layout and paint and stays put, so a fixed child (DS-24's bar) stays put too. The inner box scrolls, and the sticky header sticks to it.
+    - **The frames run to the screen's edges at every width,** past `/system`'s own padding, so each is as wide as the screen it stands for. In the 640 px column at 768 px, the header got 574 px and the handles overflowed it by 21 px. A real 768 px screen gives it about 706 px.
+    - **The header needs about 606 px from 768 px:** 36 px of padding, the 220 px wordmark, a 12 px gap and the 338 px of handles. A 768 px screen fits that with up to 81 px of side padding. `site` sets that padding.
+    - **From 768 px the floating header spans its parent,** as on `HomeDesktop.dc.html`, where it sits in the page's container and aligns with the content. On a phone it's inset 10 px from the screen's edges, wider than the content, as on `Main.dc.html`. On `/system` the bar sits straight in the frame, since it's full width.
+    - **The bar keeps the floating shadow,** as `Main.dc.html`'s Tweak draws it.
+    - **The desktop header is 12 px from the top at rest and when stuck,** as the spec says. The board's 16 px rest margin is listed as drift below.
+    - **No `overflow` anywhere in the header,** so nothing in it clips and nothing stops it sticking.
+    - **The frames' covers load eagerly.** Fluid and lazy, they drew a DevTools issue ("Lazy-loaded images should have explicit dimensions"). The fill cover behind the artwork wordmark (DS-14) does the same.
+    - `SiteHeader` is exported from `index.ts`.
+  - **Checks.** These ran against `npm run build` served locally: in headless Brave over the protocol (`phase-6/tools/page-check.mjs`, `ds18-extra.mjs` and `ds18-shots.mjs` in the session notes), and in headed Brave through the DevTools MCP.
+    - **360 and 390 px, every frame:** floating is 10 px from the frame's top, left and right, 340 × 60 at 360 px and 370 × 60 at 390, with a 12 px radius, a 1 px `rgb(42, 48, 80)` border, the glass at 0.82 with `blur(12px) saturate(1.2)`, and `0 8px 24px` shadow. Bar is at 0, 0, 0, full width and 60 tall, with a 1 px bottom border and 0 radius. The wordmark (170.8 × 28) and both 44 px icons sit on one row, with no overflow. The visible nav is the icons.
+    - **768, 1280 and 1440 px, every frame:** floating is 12 px from the top and spans the 32 px-padded container, 68 tall, with the `0 10px 30px` shadow. Bar spans the frame at 0. The wordmark (219.6 × 36) and both handles sit on one row, the handles ending 13 px from the right. The visible nav is the handles.
+    - **Top and mid-scroll:** at the top, the first content starts 12 px below the header on a phone and 32 px on desktop, so nothing loads hidden beneath it. Mid-scroll (360 px down, or the most there is), the header is still at its inset, with a cover under its glass.
+    - **Glass without `backdrop-filter`:** with the `@supports` rule flipped over the protocol, as in DS-7, the header computes solid `rgb(14, 17, 32)`, which is `--dg-surface`.
+    - **Performance:** at 360 px with 4× CPU throttling, three touch scrolls of the mid-scroll frame all the way down (2,534 px) and back, with the grid drifting, showed 0 long animation frames and 0 frame gaps over 50 ms. The worst was 17 ms.
+    - **Keyboard:** Tab makes 77 stops on `/system`. Each frame adds its scroller (with an inset ring) and its two visible social links (with the ring 2 px out). The hidden nav takes none.
+    - **Reduced motion:** 0 animations, against 9 without it (the four frames' drifts are new).
+    - **Headed Brave,** emulated at 390 px with reduced motion, then at 1440 px: the same boxes (370 × 60 at the 10 px inset mid-scroll, 1376 × 68 at 12 px), covers behind the glass, no horizontal scroll, 0 animations reduced, no console errors or warnings. The window itself won't go below 500 px, where the phone layout still holds.
+    - **`/`:** none of its 11 files holds a frame or header class.
+    - **Canvas:** the boards' header markup was rebuilt in our fonts in the same frame as ours. `Main.dc.html` at 390 px, floating and bar, matches exactly: the box, the wordmark at 27, 26 (16, 15.5 in the bar) and the two icons at the same offsets. `HomeDesktop.dc.html` at 1440 px matches inside the box (the wordmark 25 px in and 16 px down, the handles 4 px apart and 13 px from the right edge), with the box 12 px from the top against the board's 16. Crops in the session scratchpad: `ds18-phone-floating.png`, `ds18-phone-bar.png`, `ds18-desk-floating.png`, and the eight `header-*.png` frames.
+    - **Not checked:** Safari, a real phone, and the header on a page with the real sticky filter beneath it (DS-22).
+  - **Canvas drift, for Checkpoint 6:**
+    - **The desktop header rests 12 px from the top,** against the board's 16 px (it sticks at 12 on both). The spec wins.
+    - **The desktop handles end about 3 px further left,** from their 1.6 px of extra width each (DS-17).
+    - **The desktop bar has no board.** It's built full width at 68 px, with the wordmark and handles at the desktop padding.
+    - The phone header and bar match the board to the pixel.
   - **Depends on:** DS-8, DS-10, DS-17
-  - **Files:** `src/design-system/components/SiteHeader/*`, `src/app/system/SystemFrame.tsx`, `src/app/system/SystemFrame.module.css`, `src/app/system/sections/HeaderSection.tsx`
+  - **Files:** `src/design-system/components/SiteHeader/*`, `src/app/system/SystemFrame.tsx`, `src/app/system/SystemFrame.module.css`, `src/app/system/sections/HeaderSection.tsx`. Also `tests/site-header.test.ts`, `src/app/system/system.module.css`, `src/app/system/sections/MarksSection.tsx` (the eager stage cover), `src/design-system/index.ts` and `src/app/system/page.tsx`
   - **Size:** M
 
 ### Checkpoint 6: Links and header
