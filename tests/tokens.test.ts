@@ -135,47 +135,39 @@ describe("tokenContrast", () => {
 });
 
 const css = readFileSync(new URL("../src/design-system/tokens.css", import.meta.url), "utf8");
+const spec = readFileSync(new URL("../SPEC-design-system.md", import.meta.url), "utf8");
+
+// The token names in the spec's text. It writes some in shorthand:
+// "`--dg-space-1` … `--dg-space-9`" and "`--dg-dur-1/2/3`" for a run, and
+// "`--dg-grid-*`" for a family whose members it also names in full.
+function specTokens(text: string): Set<string> {
+  const names = new Set<string>();
+  for (const [, stem, from, to] of text.matchAll(/`(--dg-[a-z-]+?)-(\d+)`\s*…\s*`\1-(\d+)`/g)) {
+    for (let i = Number(from); i <= Number(to); i++) names.add(`${stem}-${i}`);
+  }
+  for (const [, stem, list] of text.matchAll(/`(--dg-[a-z-]+?)-(\d+(?:\/\d+)+)`/g)) {
+    for (const n of list.split("/")) names.add(`${stem}-${n}`);
+  }
+  for (const [name] of text.matchAll(/--dg-[a-z0-9]+(?:-[a-z0-9]+)*(?![\w*/-])/g)) names.add(name);
+  return names;
+}
 
 describe("tokens.css", () => {
-  // Every token named in SPEC-design-system.md, in the order the spec lists them.
-  const SPEC_TOKENS = [
-    // Colour primitives
-    "--dg-ink-950", "--dg-ink-900", "--dg-ink-800", "--dg-ink-700",
-    "--dg-bone-100", "--dg-bone-300", "--dg-bone-500",
-    "--dg-sodium-400", "--dg-signal-300", "--dg-hazard-500", "--dg-ultra-500", "--dg-ultra-300",
-    "--dg-white", "--dg-black",
-    // Semantic tokens
-    "--dg-bg", "--dg-surface", "--dg-surface-raised", "--dg-surface-glass", "--dg-glass-filter",
-    "--dg-surface-translucent", "--dg-field", "--dg-accent-wash", "--dg-line", "--dg-outline",
-    "--dg-fg", "--dg-fg-muted", "--dg-fg-subtle", "--dg-accent", "--dg-on-accent",
-    "--dg-focus", "--dg-star", "--dg-rec", "--dg-link", "--dg-panel", "--dg-on-panel",
-    // Typography
-    "--dg-text-display-xl", "--dg-text-display-l", "--dg-text-title", "--dg-text-title-s",
-    "--dg-text-body", "--dg-text-small", "--dg-text-label", "--dg-text-micro",
-    "--dg-text-readout", "--dg-text-readout-s",
-    "--dg-font-display", "--dg-font-ui", "--dg-font-readout",
-    // Space, radius, motion, layers
-    "--dg-space-1", "--dg-space-2", "--dg-space-3", "--dg-space-4", "--dg-space-5",
-    "--dg-space-6", "--dg-space-7", "--dg-space-8", "--dg-space-9",
-    "--dg-radius-0", "--dg-radius-s", "--dg-radius-m", "--dg-radius-l", "--dg-chamfer",
-    "--dg-ease-tape", "--dg-dur-1", "--dg-dur-2", "--dg-dur-3",
-    "--dg-z-texture", "--dg-z-bar", "--dg-z-overlay",
-    // Sticky stack
-    "--dg-header-inset", "--dg-header-h", "--dg-sticky-gap", "--dg-filter-h",
-    "--dg-sticky-filter", "--dg-sticky-release",
-    // Shadows, glows and the backdrop
-    "--dg-shadow-float", "--dg-shadow-menu", "--dg-shadow-bar",
-    "--dg-glow-accent", "--dg-glow-accent-box", "--dg-glow-cover",
-    "--dg-tape", "--dg-tape-artwork",
-    "--dg-grid-line", "--dg-grid-cell", "--dg-grid-drift", "--dg-grid-glow",
-    "--dg-scanline", "--dg-vignette",
-    // Textures
-    "--dg-grain-opacity",
-  ];
+  // Every token SPEC-design-system.md names, read from the spec itself so a
+  // token it gains can't be missed here. specTokens() expands its shorthand.
+  const SPEC_TOKENS = specTokens(spec);
+
+  test("reads the spec's shorthand as the tokens it stands for", () => {
+    for (const name of ["--dg-space-1", "--dg-space-5", "--dg-space-9", "--dg-dur-2", "--dg-fg-muted", "--dg-bar-h", "--dg-sticky-clear"]) {
+      assert.ok(SPEC_TOKENS.has(name), name);
+    }
+    assert.equal(SPEC_TOKENS.has("--dg-grid"), false);
+    assert.equal(SPEC_TOKENS.has("--dg-dur"), false);
+  });
 
   test("defines every token in the spec", () => {
     const tokens = parseTokens(css, 360);
-    assert.deepEqual(SPEC_TOKENS.filter((name) => !tokens.has(name)), []);
+    assert.deepEqual([...SPEC_TOKENS].filter((name) => !tokens.has(name)), []);
   });
 
   // SPEC-design-system.md › Contrast, one entry per pair. `over` is the opaque
