@@ -30,7 +30,7 @@ The site's one job: a visitor taps a track, hears a 30-second snippet, and click
 1. Snippets are 30 s, cut from a start second chosen per song, with short fades. The current files are 15–18 s, so all six get re-cut from the masters.
 2. One dark theme, lifted by the bright accents from the moodboard. No light/dark toggle.
 3. Next.js upgraded and exported as static files. Tokens are plain CSS custom properties. Chakra UI, Emotion, Framer Motion, Howler and react-icons are removed.
-4. Cloudflare serves the site and an R2 bucket at `media.thesamegatsby.com`. DNS moves off Vercel. Vercel stays live until the Cloudflare version is checked.
+4. Cloudflare serves the site and an R2 bucket at `media.thesamegatsby.com`. DNS is on Cloudflare (since 4 Nov 2026). Reno deleted the Vercel site that day, and the domain points at nothing until the new site launches.
 5. Fonts: Aero (display), Chakra Petch (UI), VT323 (readouts). Reno confirms that Aero's licence covers web use.
 6. The release kit lives at an unlinked route, and the homepage never loads its code.
 
@@ -191,7 +191,7 @@ There's no browser e2e framework for now. Adding one (Playwright) is an ask-firs
 ## Boundaries
 
 **Always**
-- Work on the `redesign` branch. `main` keeps serving production on Vercel until cutover.
+- Work on the `redesign` branch. `main` doesn't move until launch.
 - Run `npm run typecheck`, `npm run lint` and `npm test` before every commit.
 - Report first-load size and the Lighthouse score whenever a change touches the homepage.
 - Respect `prefers-reduced-motion`. Keep touch targets at 44 px or more. Keep every text pair at WCAG AA or better.
@@ -203,13 +203,12 @@ There's no browser e2e framework for now. Adding one (Playwright) is an ask-firs
 - Anything in the Cloudflare, Vercel, Host Africa or GitHub dashboards or APIs: DNS, nameservers, buckets, rules, tokens, Worker settings.
 - Uploading media to R2, and publishing anything to Claude artifacts.
 - Changing the capability map, or a confirmed assumption.
-- Pushing to GitHub, which triggers Vercel and Workers builds.
+- Pushing to GitHub, which triggers Workers builds once CF-4 connects them.
 
 **Never**
 - Commit secrets, `.env`, `.dev.vars` or masters.
 - Serve production media from `r2.dev`.
 - Change nameservers before every existing DNS record has been inventoried and recreated.
-- Delete the Vercel project within 14 days of cutover.
 - Set Aero below 24 px or use it for body text.
 - Launch publicly in Aero before its licence is confirmed.
 

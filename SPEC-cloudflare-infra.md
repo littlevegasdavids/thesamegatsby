@@ -4,24 +4,26 @@ Module of the [Déjà Gatsby rebuild](SPEC.md). Depends on nothing. `media-pipel
 
 ## Objective
 
-Serve `www.thesamegatsby.com` from Cloudflare Workers Static Assets, and snippets and covers from R2 at `media.thesamegatsby.com`, cached at Cloudflare's edge worldwide. Move the domain's DNS from Vercel to Cloudflare with no downtime and a rollback path. Everything stays on free tiers.
+Serve `www.thesamegatsby.com` from Cloudflare Workers Static Assets, and snippets and covers from R2 at `media.thesamegatsby.com`, cached at Cloudflare's edge worldwide. The domain's DNS is on Cloudflare. Everything stays on free tiers.
 
 This module touches systems outside the repo. **Every step marked 🔒 is done only after Reno says yes to that step**, and steps marked 👤 are done by Reno in an account I don't operate.
 
-## Current state (checked 3 Nov 2026)
+## Current state (checked 4 Nov 2026)
 
 | | |
 |---|---|
 | Registrar | Host Africa (Pty) Ltd. Expires 5 Aug 2027 |
-| Nameservers | `ns1.vercel-dns.com`, `ns2.vercel-dns.com` |
-| Apex | `https://thesamegatsby.com` → `308` to `https://www.thesamegatsby.com/` |
-| `www` | Served by Vercel. HSTS `max-age=63072000` |
-| MX / TXT on apex | None. Reno confirms no mail uses this domain |
-| DNSSEC | Off (no DS record at the registry), so changing nameservers can't break resolution |
-| Other records | Vercel's defaults only: a wildcard sending every subdomain to Vercel (`mail.`, `api.`, `media.` and any random name resolve to Vercel IPs), CAA records for `letsencrypt.org`, `pki.goog` and `sectigo.com`, and a `_domainconnect` CNAME |
-| Repo | `github.com/littlevegasdavids/thesamegatsby`. Vercel deploys `main` |
+| Nameservers | `journey.ns.cloudflare.com`, `leland.ns.cloudflare.com`. The zone has been active on Cloudflare's Free plan since 4 Nov 2026 |
+| DNS records | **None.** The apex, `www` and every other name resolve to nothing |
+| Vercel | **Gone.** Reno deleted the Vercel project and removed the domain from it on 4 Nov 2026 |
+| What visitors see | Nothing, by Reno's choice, until the Cloudflare site is ready and launched (phase 4). There's no holding page |
+| MX / TXT | None. No mail uses this domain |
+| DNSSEC | Off |
+| Repo | `github.com/littlevegasdavids/thesamegatsby`. Nothing deploys from it until Workers Builds is connected (CF-4) |
 
-Because Vercel already sends a two-year HSTS header, browsers that have visited will only use HTTPS for this domain. Every host has to serve valid HTTPS from the first minute.
+**Before the move (3 Nov 2026):** Vercel's nameservers, the apex 308ing to `www`, Vercel serving `www`, and only Vercel's default records (a wildcard, CAA for three CAs, and `_domainconnect`). None of them were carried over.
+
+Vercel sent a two-year HSTS header, so browsers that visited before the move will only use HTTPS for this domain until late 2028. Every hostname has to serve valid HTTPS from its first minute.
 
 ## Target architecture
 
@@ -41,9 +43,12 @@ visitor ──► www.thesamegatsby.com ──► Worker "thesamegatsby" (static
   "name": "thesamegatsby",
   "compatibility_date": "<date of setup>",
   "assets": { "directory": "./out", "not_found_handling": "404-page" },
-  "routes": [{ "pattern": "www.thesamegatsby.com", "custom_domain": true }]
+  "preview_urls": true
 }
 ```
+
+- **`preview_urls: true`:** Wrangler 4.153 defaults it to `false`, which would leave branch uploads without a preview URL.
+- **No `routes` until launch:** phase 4 adds `"routes": [{ "pattern": "www.thesamegatsby.com", "custom_domain": true }]`. The production deploy then creates `www`'s DNS record and certificate. Until then, nothing points at the Worker.
 
 `public/_headers` (Next copies it into `out/`):
 
@@ -73,38 +78,27 @@ HTML keeps the static-assets default (`public, max-age=0, must-revalidate`), so 
 | Apex redirect | Single Redirect | hostname = `thesamegatsby.com` | 308 to `https://www.thesamegatsby.com${path}${query}` | Keeps today's behaviour. The apex gets a proxied `AAAA 100::` placeholder record so the rule has something to run on |
 | Tiered cache | Cache setting | zone | Smart Tiered Cache on | Cloudflare's R2 docs recommend it: one upper tier next to the bucket, fewer reads from R2 |
 
-The zone also gets SSL/TLS Full (strict), Always Use HTTPS and HSTS matching Vercel's two years, so nothing about HTTPS gets weaker during the move.
+The zone also gets SSL/TLS Full (strict), Always Use HTTPS, and HSTS at two years, as Vercel had, so HTTPS is never weaker than before the move.
 
 **Why media is on its own hostname and not proxied through the Worker:** an R2 binding in the Worker would make every audio request a billed Worker invocation (100k a day on the free tier) and would need cache code. A custom domain on R2 is served by the cache with no Worker in the path, and egress is free.
 
 ## Rollout
 
-Each phase leaves production working. Vercel keeps serving until phase 4.
-
-1. **Inventory: done publicly on 3 Nov 2026** (see Current state). Nothing is needed from Reno. One caveat: a subdomain attached to a separate Vercel project would hide behind the wildcard. Reno has confirmed there's none.
-2. **Zone on Cloudflare, DNS only** 🔒 👤.
-   - Add `thesamegatsby.com` to Cloudflare (Free plan), letting Cloudflare import the records.
-   - In the import, **keep only the apex and `www`**, still pointing at Vercel's IPs, **DNS-only (grey cloud)**, so Vercel keeps serving and renewing its own certificate.
-   - **Delete the wildcard, the CAA records and `_domainconnect`.** The wildcard would make every typo'd subdomain hit Vercel. The CAA list would restrict which certificate authorities Cloudflare can use.
-   - 👤 Change the nameservers at Host Africa to the pair Cloudflare assigns.
-   - Wait until Cloudflare shows the zone as active. Nothing visible changes, because the same apex and `www` answers now come from new nameservers.
-3. **Build the new side in parallel** 🔒.
+1. **Inventory: done on 3 Nov 2026.**
+2. **Zone on Cloudflare: done on 4 Nov 2026** 👤. Reno added the zone and changed the nameservers at Host Africa. The same day he deleted the Vercel project, so the zone holds no records. The planned import (apex and `www` left DNS-only on Vercel) no longer applies.
+3. **Build the new side** 🔒.
    - Create the bucket and connect `media.thesamegatsby.com`.
-   - Add the Cache, Transform and Tiered Cache settings.
+   - Add the zone settings, the Cache and Transform Rules, and Tiered Cache.
    - Create the Worker and connect it to GitHub through Workers Builds (see CI/CD below).
-   - Verify the `redesign` branch on its preview URL. `www` is still on Vercel.
-4. **Cutover** 🔒, at a quiet hour.
-   - Delete the `www` record that points at Vercel, and add `www.thesamegatsby.com` as the Worker's custom domain.
-   - Swap the apex to the proxied placeholder plus the Redirect Rule.
+   - Verify `redesign` on its preview URL. `www` stays unattached.
+4. **Launch** 🔒. This happens when `site` is built and the Aero licence is confirmed (SPEC.md, open question 1).
+   - Merge `redesign` into `main`, with the `www` custom-domain route added to `wrangler.jsonc`. The production deploy attaches `www`, and Cloudflare creates its record and certificate.
+   - Add the apex's proxied `AAAA 100::` placeholder and the Redirect Rule.
    - Run the acceptance checks below.
-   - The gap is the seconds between deleting the old `www` record and Cloudflare creating the new one.
-5. **Settle** 🔒.
-   - Leave the Vercel project untouched for 14 days.
-   - Then remove the domain from Vercel and disconnect its Git integration. Whether to delete the project is Reno's call.
 
-**Rollback** during phases 4–5: put the inventoried `www` and apex records back, pointing at Vercel. Vercel is still deploying `main`, so it serves the last good version.
+   There's nothing live to keep up, so this needs no downtime window.
 
-**Merge order:** `redesign` merges to `main` just before phase 4. Vercel builds that merge too, which is harmless because DNS moves off it minutes later.
+**Rollback** after launch: `npx wrangler rollback` returns production to an earlier version, from the Worker's version history. Removing the custom domain takes the site offline again, which is the state before launch.
 
 ## CI/CD
 
@@ -123,7 +117,6 @@ Push to deploy, with Workers Builds connected to the GitHub repo. There are no G
 - To `redesign` or any other branch: a checked build and a preview URL.
 - To `main`: a checked build, then production.
 
-Until Vercel is disconnected in phase 5, it also builds every push. That's harmless, because after cutover nothing points at it.
 
 ## Commands
 
@@ -135,7 +128,7 @@ npx wrangler r2 bucket list         # read-only check that the bucket exists
 
 ## Acceptance checks
 
-Run from the laptop after phase 3 (media) and phase 4 (site). `<key>` is any uploaded snippet.
+Run from the laptop after phase 3 (media) and phase 4 (launch). `<key>` is any uploaded snippet.
 
 | Check | Command | Pass |
 |---|---|---|
@@ -148,14 +141,13 @@ Run from the laptop after phase 3 (media) and phase 4 (site). `<key>` is any upl
 | CORS on a cached copy | prime with no `Origin` header, then `curl -sI -H "Origin: https://www.thesamegatsby.com" https://media.thesamegatsby.com/<key>` | `access-control-allow-origin: *` on a `HIT` |
 | Static asset cache | `curl -sI https://www.thesamegatsby.com/_next/static/<file>` | `immutable` |
 | r2.dev off | bucket settings | public `r2.dev` URL disabled |
-| No downtime | `while true; do curl -s -o /dev/null -w "%{http_code} " https://www.thesamegatsby.com; sleep 2; done` during cutover | at most one non-200 window, under one minute |
 
 Edge latency outside South Africa can't be measured from the laptop. Cache `HIT`s are the proxy for it, and the browser checks in `site` measure tap-to-sound against the deployed preview.
 
 ## Repo changes in this module
 
-- Add `wrangler` as a dev dependency 🔒, plus `wrangler.jsonc`, `public/_headers`, `.node-version`, and the `cf:dev` and `ci` scripts.
-- Fix `.gitignore`: today it ignores only `.env*.local`. Add `.env`, `.env.*`, `.dev.vars*` and `.wrangler/`.
+- `wrangler` as a dev dependency, pinned to 4.153.0 (CF-2). That is the earliest release whose bundled `undici` has the October 2026 fixes, since 4.152 and older pull in a version with high-severity advisories.
+- `wrangler.jsonc`, `public/_headers` and the `cf:dev` script (CF-2). `.node-version`, the `ci` script and the `.gitignore` entries for `.env`, `.env.*`, `.dev.vars*` and `.wrangler/` came with DS-2.
 
 ## Out of scope for this module
 
@@ -166,4 +158,4 @@ Encoding and uploading the real media (`media-pipeline`), the page itself (`site
 1. **Workers Builds details to confirm at setup:** that it reads `.node-version`, and that build results show as status checks on GitHub commits and pull requests. If either doesn't hold, the fallback is a `NODE_VERSION` build variable and the Cloudflare dashboard's build log.
 2. **Does the Transform Rule's static header apply to R2 custom-domain responses served from cache?** The "CORS on a cached copy" check proves it. If it fails, the fallback is an R2 CORS policy for the site's origins plus a cache purge for the media host.
 3. **Content-Security-Policy.** The App Router's static export inlines its bootstrap scripts, so a strict `script-src` breaks hydration. Whether to ship a CSP, and with which hashes or `'unsafe-inline'`, gets decided against the real `out/` build in `site`.
-4. **Do branch preview URLs need `workers_dev` left on?** This gets checked against the installed Wrangler's config schema at setup. `workers_dev` is turned off after cutover if previews don't depend on it.
+4. **Do branch preview URLs need `workers_dev` left on?** Wrangler 4.153's schema answers half of it: `preview_urls` defaults to `false`, so `wrangler.jsonc` sets it to `true`. `workers_dev` stays at its default (`true`). Whether previews still work with it off gets checked at CF-4. If they do, it's turned off at launch.

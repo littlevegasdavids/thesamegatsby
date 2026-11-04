@@ -14,7 +14,7 @@ By the end of this plan:
 - the R2 media domain caches and serves CORS headers correctly
 - every push to `redesign` produces a Cloudflare preview URL
 
-Production stays on Vercel and untouched throughout. **Cutover waits until `site` is built**, because until then there's nothing to cut over to.
+**Update, 4 Nov 2026:** Reno deleted the Vercel site, so there is no production until launch, and `www` points at nothing until then. **Launch (CF-5) waits until `site` is built**, because until then there's nothing to launch.
 
 ## The canvas is the visual reference
 
@@ -75,7 +75,7 @@ No decision is needed for one more thing: the canvas uses values the token table
 
 ## Architecture decisions
 
-- **One integration branch, `redesign`.** One commit per task, in conventional-commit style. `main` doesn't move until cutover, so Vercel keeps serving the current site. Once CF-4 is done, every push to `redesign` gets a Cloudflare preview URL you can open on your phone.
+- **One integration branch, `redesign`.** One commit per task, in conventional-commit style. `main` doesn't move until launch. Once CF-4 is done, every push to `redesign` gets a Cloudflare preview URL you can open on your phone.
 - **`/system` is the test bench.** Every component is built and checked there in every state, with no Storybook or other extra tooling. `claude-design-system` also publishes from it later.
 - **Components take view props, never data sources.** `src/design-system/types.ts` defines the release, track, stream-link and social shapes the components render. `media-pipeline`'s catalogue types arrive later, and `site` maps them onto these shapes. The design system imports neither the catalogue nor `audio-engine`.
 - **Testable logic lives in `.ts` files.** Node's type stripping can't run JSX, so `node --test` can't import `.tsx`. Time formatting, contrast, filter counts and platform order are plain `.ts` with tests, and the components stay thin.
@@ -139,7 +139,7 @@ The tasks run one at a time on `redesign` in the order listed, even where the gr
 - CF-3: Media bucket, zone settings, rules and a probe object, checked with `check-edge.sh`
 - CF-4: Workers Builds connected to GitHub, with a preview URL for `redesign`
 
-**Checkpoint 3:** the preview URL serves `/system`, `check-edge.sh` passes for media, and production is still on Vercel.
+**Checkpoint 3:** the preview URL serves `/system`, `check-edge.sh` passes for media, and `www` still points at nothing.
 
 ### Phase 4: Surfaces
 - DS-7: Textures, the glass surface and `Screen`
@@ -185,8 +185,7 @@ The tasks run one at a time on `redesign` in the order listed, even where the gr
 **Checkpoint 9:** every acceptance box in SPEC-design-system.md is ticked. Next comes writing `SPEC-media-pipeline.md`.
 
 ### Deferred until `site` is built
-- CF-5: Cutover
-- CF-6: Settle for 14 days, then remove Vercel
+- CF-5: Launch. CF-6, the 14 days on Vercel as a fallback, was dropped when Vercel was deleted
 
 ## Approvals I'll ask for, in order
 
@@ -200,7 +199,7 @@ Nothing here happens without a yes at the time.
 | CF-1 | You adding the zone in Cloudflare's dashboard and changing the nameservers at Host Africa. I give you the exact steps and check each one |
 | CF-2 | Adding `wrangler` as a dev dependency |
 | CF-3 | `wrangler login` (you approve the OAuth in your browser), creating the bucket, connecting the media domain, the zone settings and rules, and uploading one probe file |
-| CF-4 | You connecting the GitHub repo in Workers Builds, and me pushing `redesign`. That push also makes Vercel build a preview, which is harmless |
+| CF-4 | You connecting the GitHub repo in Workers Builds, and me pushing `redesign` |
 | Checkpoints 7 and 8 | Pushing `redesign` so you can review the preview on your phone |
 
 The fixture covers are made with macOS's built-in `sips` and `qlmanage`, so they need no download or install.

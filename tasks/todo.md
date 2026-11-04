@@ -200,25 +200,42 @@ Review round 3 (3 Nov 2026):
 
 ## Phase 3: Edge path (alongside phases 4–8)
 
-- [ ] **CF-1: Move the zone to Cloudflare as DNS only** 👤 🔒
+- [x] **CF-1: Move the zone to Cloudflare as DNS only** 👤 🔒
   - Reno adds `thesamegatsby.com` to Cloudflare (Free plan). In the import, keep only the apex and `www`, still pointing at Vercel's IPs, DNS-only. Delete the wildcard, the CAA records and `_domainconnect`. Then Reno changes the nameservers at Host Africa.
-  - **Acceptance:**
-    - `dig +short NS thesamegatsby.com` returns Cloudflare's nameservers
-    - `curl -sI https://www.thesamegatsby.com` still returns `200` with `server: Vercel`
-    - the apex still 308s to `www`
-    - `dig +short random-name.thesamegatsby.com` returns nothing
-  - **Verify:** those four checks, run until the change has propagated. Record the result in SPEC-cloudflare-infra.md's Current state.
-  - **Depends on:** none (can start immediately)
-  - **Files:** `SPEC-cloudflare-infra.md`
-  - **Size:** S (mostly waiting)
+  - **Done 4 Nov 2026, differently from planned.**
+    - **Reno deleted the Vercel project and removed the domain from Vercel** before the move, so there was nothing left to keep serving.
+    - **He chose to leave the domain pointing at nothing** until the new site is ready and launched, with no holding page.
+    - The zone holds no records. The import step, and the two acceptance checks that expected Vercel to keep serving, no longer apply.
+    - A first attempt put `tessa` and `west` at the registry, a pair Cloudflare had assigned to a mistaken `thesamegatsby.co.za`. They refused queries for the .com, so lookups failed for a while. Reno then added the .com, and the registry now lists its own pair.
+  - **Checks, run from the laptop:**
+    - `whois` and `dig NS` through 1.1.1.1 return `journey.ns.cloudflare.com` and `leland.ns.cloudflare.com`, and the dashboard shows the zone active
+    - both nameservers answer with `NOERROR` for the zone, and serve no A, AAAA, CNAME, MX, TXT or CAA records for the apex, `www` or a made-up name
+    - there's no DS record, so DNSSEC is off
+  - **Not checked:** resolvers other than 1.1.1.1 and 8.8.8.8, and the laptop's own resolver, which was still caching Vercel's answers.
+  - **Files:** `SPEC-cloudflare-infra.md` (Current state and Rollout rewritten for no Vercel)
+  - **Size:** S
 
-- [ ] **CF-2: Local Worker config and `cf:dev`** 🔒 *(wrangler dependency)*
+- [x] **CF-2: Local Worker config and `cf:dev`** 🔒 *(wrangler dependency)*
   - Add `wrangler.jsonc` (assets only, `./out`, `404-page`), `public/_headers` (immutable `/_next/static/*`, `nosniff`, referrer policy), and the `cf:dev` script.
   - **Acceptance:**
     - `npm run cf:dev` serves `/` and `/system` on :8787
     - `/_next/static/*` responses carry `immutable`
     - an unknown path returns the 404 page
   - **Verify:** `curl -sI` against `localhost:8787` for each case.
+  - **Done 4 Nov 2026.**
+    - **`wrangler` is pinned to 4.153.0** as a dev dependency. The two-week-old 4.151.3 was installed first, but its bundled `undici` 7.29 carries high-severity advisories (TLS validation bypass, cache poisoning). 4.153.0 is the earliest release with `undici` 7.30.1. After the change, `npm audit` is back to the 8 moderate ESLint-chain findings it had before.
+    - **`wrangler.jsonc`** is assets only, serving `./out` with `404-page`, and `compatibility_date` is `2026-10-26`.
+    - **`preview_urls: true`,** because Wrangler 4.153 defaults it to `false`, which would leave CF-4's branch uploads without a preview URL.
+    - **No `routes`.** `www` is attached at launch (CF-5), so nothing points at the Worker before then.
+    - **`public/_headers`** has the spec's two rules. Next copies it into `out/`, and Wrangler reports "Parsed 2 valid header rules".
+  - **Checks:** `npm run cf:dev` built the site and served `/system` on :8787 after 5 s. Run with `curl -sI` against `localhost:8787`:
+    - `/` and `/system`: `200`, with `public, max-age=0, must-revalidate`
+    - a JS chunk and a woff2 font under `/_next/static/`: `public, max-age=31536000, immutable`
+    - an unknown path: `404`, with Next's 404 page
+    - every response carries `nosniff` and `strict-origin-when-cross-origin`
+
+    The log showed no warnings. `npm run ci` passes.
+  - **Not checked:** the headers on Cloudflare's edge, which is CF-4's preview.
   - **Depends on:** DS-2
   - **Files:** `package.json`, `wrangler.jsonc`, `public/_headers`
   - **Size:** S
@@ -254,7 +271,7 @@ Review round 3 (3 Nov 2026):
   - **Acceptance:**
     - the push produces a preview URL serving `/` and `/system`
     - the build log shows Node 24 and the lint, typecheck and test steps running
-    - `main` and production are untouched (`curl` still shows `server: Vercel`)
+    - `main` and `www` are untouched: `www` still resolves to nothing
   - **Verify:** the build log, then `curl` and the built-in browser on the preview URL. Note whether a GitHub status check appears.
   - **Depends on:** CF-2, DS-2
   - **Files:** `wrangler.jsonc` (if the previews setting needs changing), `SPEC-cloudflare-infra.md` (answer its open questions 1 and 4)
@@ -263,7 +280,7 @@ Review round 3 (3 Nov 2026):
 ### Checkpoint 3
 - [ ] The preview URL serves the latest `redesign` push
 - [ ] `scripts/check-edge.sh media` passes
-- [ ] Production is still Vercel, and still `200`
+- [ ] `www` still points at nothing, as Reno chose
 
 ---
 
@@ -1164,5 +1181,4 @@ Review round 3 (3 Nov 2026):
 
 ## Deferred until `site` is built
 
-- [ ] **CF-5: Cutover**, done at a quiet hour as phase 4 of the infra spec, with `scripts/check-edge.sh site` and the downtime loop
-- [ ] **CF-6: Settle.** 14 days on Cloudflare, then Reno removes the domain from Vercel and disconnects it
+- [ ] **CF-5: Launch**, as phase 4 of the infra spec: merge `redesign` into `main` with the `www` route added, add the apex placeholder and the Redirect Rule, then run `scripts/check-edge.sh site`. It waits until `site` is built and the Aero licence is confirmed

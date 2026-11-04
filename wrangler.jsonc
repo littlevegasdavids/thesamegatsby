@@ -1,0 +1,13 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "thesamegatsby",
+  "compatibility_date": "2026-10-26",
+  // Assets only, with no `main` script: every request is a free static-asset
+  // request, served from the `next build` export.
+  "assets": { "directory": "./out", "not_found_handling": "404-page" },
+  // Branch pushes upload a version with its own preview URL (CF-4). Wrangler
+  // defaults this to false.
+  "preview_urls": true
+  // No `routes` yet. www.thesamegatsby.com stays unattached until the site is
+  // ready, and the custom-domain route is added at cutover (CF-5).
+}
