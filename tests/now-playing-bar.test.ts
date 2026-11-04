@@ -186,7 +186,8 @@ describe("the page around the bar", () => {
     assert.match(tokensCss, /--dg-bar-h:\s*0px;/);
   });
 
-  test("SystemFrame's scroller pads its bottom by the bar, so forward Tab never hides focus behind it", () => {
-    assert.equal(value(frameCss, ".scroller", "scroll-padding-bottom"), "var(--dg-bar-h)");
+  test("SystemFrame's scroller pads its bottom by the bar and the ring's reach, so forward Tab never hides focus or cuts its ring", () => {
+    // The ring is 2 px wide, 2 px out: --dg-space-1 (Checkpoint 9).
+    assert.equal(value(frameCss, ".scroller", "scroll-padding-bottom"), "calc(var(--dg-bar-h) + var(--dg-space-1))");
   });
 });
