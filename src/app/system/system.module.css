@@ -556,10 +556,10 @@
    header inset from the screen's edges, so the filter box and the rows line
    up with the floating header, as on Main.dc.html. From 768 px it spans the
    page's container, as the header does. */
+/* The hero sits 20 px from a phone's edges, as on the boards, and in the
+   page's container from 768 px. */
 .stackHero {
-  min-height: 240px;
-  margin: 0;
-  padding: var(--dg-space-6) var(--dg-space-5);
+  padding: var(--dg-space-3) calc(var(--dg-space-4) + var(--dg-space-1)) var(--dg-space-7);
 }
 
 .stackDiscography {
@@ -592,6 +592,24 @@
   max-width: 1120px;
   padding-bottom: var(--dg-space-8);
   border-bottom: 1px solid var(--dg-line);
+}
+
+/* Now playing: a stand-in page of release titles, long enough to scroll,
+   ending in a marked last line, which must clear the bar. */
+.playerPage {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dg-space-7);
+  margin: 0;
+  padding: var(--dg-space-6) var(--dg-space-5);
+  list-style: none;
+}
+
+.playerEnd {
+  padding: var(--dg-space-3);
+  border: 1px solid var(--dg-outline);
+  border-radius: var(--dg-radius-s);
+  color: var(--dg-accent);
 }
 
 /* Each live filter in its own box, so its sticky box can't stick across the
@@ -629,6 +647,10 @@
 
   .stackDiscography {
     padding-inline: 0;
+  }
+
+  .stackHero {
+    padding: var(--dg-space-6) 0 var(--dg-space-8);
   }
 
   .heroes {

@@ -106,6 +106,10 @@
   /* How far the stack reaches with a release stuck: a scroll container pads
      its top by this, so keyboard focus never lands beneath it. */
   --dg-sticky-clear: calc(var(--dg-sticky-release) + var(--dg-release-h) + var(--dg-sticky-gap));
+  /* The now-playing bar's height. NowPlayingBar measures itself and sets
+     this on its scroll container, which pads its bottom by it, as its
+     spacer is tall by it. 0 while nothing plays. */
+  --dg-bar-h: 0px;
 
   /* Shadows, glows and the backdrop */
   --dg-shadow-float: 0 8px 24px color-mix(in srgb, var(--dg-black) 45%, transparent);

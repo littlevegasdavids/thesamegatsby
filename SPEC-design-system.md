@@ -125,6 +125,7 @@ I checked these on 3 Nov 2026. The test suite re-checks them from `tokens.css`.
   - `--dg-sticky-release` = `--dg-sticky-filter` + filter + gap
   - `--dg-release-h` is 72 px, or 80 px: a `ReleaseRow`'s height
   - `--dg-sticky-clear` = `--dg-sticky-release` + release + gap, the stack's reach with a release stuck. A scroll container pads its top by it (DS-22)
+  - `--dg-bar-h` is 0 px, until `NowPlayingBar` sets it on its scroll container to its own measured height. The scroll container pads its bottom by it (DS-24)
 
 ### Shadows, glows and the backdrop
 
@@ -200,7 +201,7 @@ Every component is presentational. It renders from props and raises callbacks, a
 | `TrackRow` | `index` (the track's place on its release, from 1), `title`, `duration`, `elapsed`, `state: idle \| loading \| playing \| played`, `lead?`, `variant: nested \| list`, `onToggle` | `nested` (inside an expanded `ReleaseRow`) and `list` (the hero tracklist, with and without LEAD), each in all four states, plus a long title at 360 px |
 | `ProgressTape` | `ratio` (0–1). A 3 px `--dg-line` track with an `--dg-accent` fill and `--dg-glow-accent-box`, as the bar boards draw it. The fill keeps the track's width and is scaled from the left edge by `transform: scaleX()` on `--progress`, which is set inline, so it never causes layout. A ratio past either end is held to it, and NaN (before the audio knows its length) reads 0. `aria-hidden` | 0, mid (0.4, the boards' 12 of 30), 1, running, reduced motion |
 | `StreamLinks` | `links[]` (platform + URL), `variant: bar \| chips`, `heading`, `emphasis?` | the five main platforms only, all eight ("More" closed and open), a release missing one of the five, `bar` emphasised, `chips` |
-| `NowPlayingBar` | `track`, `state: loading \| playing \| ended`, `elapsed`, `duration`, `onStop`, `onReplay`, `onClose`, `streamLinks` | loading, playing, ended (Replay and Close, stream emphasised), "More" open, 360 px |
+| `NowPlayingBar` | `track` (title, cover), `state: loading \| playing \| ended`, `elapsed`, `duration`, `onStop`, `onReplay`, `onClose`, `streamLinks`, `defaultMoreOpen?` | loading, playing, ended (Replay and Close, stream emphasised), "More" open, a long title, 360 px |
 | `SocialLinks` | `links[]` (Instagram, TikTok, each with a handle), `variant: icons \| handles \| footer` | icons in the phone header row (44 px targets), icon + @handle in the desktop header row, phone footer block, focus |
 | `Screen` | `children` | The page frame: grain, vignette, safe-area padding |
 | `SiteHeader` | `socials`, `variant: floating \| bar` | Floating (default): a box inset 10 px on a phone and 12 px from the top on desktop, with a 12 px radius, `--dg-surface-glass`, a `--dg-line` border and a soft shadow. Bar: full width with a bottom hairline. Both shown at the top and mid-scroll at 360 and 1280 px |
@@ -249,6 +250,15 @@ Every component is presentational. It renders from props and raises callbacks, a
   - Replay and Close replace Stop
   - the heading becomes "Hear the full track", with the sparkle
   - the five stream buttons fill amber
+
+  How it's built (DS-24):
+  - **It goes at the end of the page.** It leaves an in-flow spacer there, and measures itself with a `ResizeObserver`, setting `--dg-bar-h` on its nearest scroll container (the page's root, or a `SystemFrame`). The spacer is that tall, and **the scroll container sets `scroll-padding-bottom: var(--dg-bar-h)`**, so the last content scrolls clear of the bar, and Tab never leaves focus behind it, even with "More" open or the links wrapped. `site` sets it on its root, beside `scroll-padding-top`.
+  - Stop and Replay are the same button, relabelled, so focus stays on it when the snippet ends. Close joins it once ended, as an outlined hardware button (the board's is borderless).
+  - A polite live region announces "Playing {title}" and "Snippet ended", never the time. `VhsReadout` stays plain text.
+  - The scanlines lie over the bar beneath its content, so they never cover the thumbnail.
+  - The bottom padding is `--dg-space-4` (`--dg-space-3` from 768 px) plus the inset.
+  - **Loading is DS-24's proposal, for Checkpoint 8.** The canvas doesn't draw it. The readout reads "LOAD 00:00 / 00:30", muted, with the dotted circle, the tape is at 0, and Stop shows, since a tap cancels it.
+  - **From 768 px the track and the links share one row where they fit, and the links wrap under the track where they don't. That's DS-24's proposal, for Checkpoint 8.** At 14 px type with 44 px targets, the heading and five links need 818 px, so with the 320 px track the row needs about 1170 px. The bar's 1200 px container gives 1136, so it's two rows at every desktop width, where `HomeDesktop.dc.html` draws one at 1440 px in 13 px type.
 - `StreamLinks` shows Spotify, Apple Music, YouTube Music, SoundCloud and Bandcamp as five equal buttons, in that fixed order. The `heading` sits on the same row as the "More" toggle. There are two variants:
   - `bar` (the now-playing bar): each button has an icon plus a visible label
   - `chips` (the hero): wrapping text chips, 44 px tall, with "More" as the last chip

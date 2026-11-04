@@ -1,0 +1,121 @@
+/* The now-playing bar, as the bar boards draw it. Below 768 px two rows: the
+   cover, title, readout and controls, then the stream links with "More" on
+   their heading row. From 768 px one row, the track first, the links beside
+   it, wrapping under it where they don't fit. The tape runs along the top
+   edge, and the scanlines lie over the bar beneath its content, so they
+   never cover the cover thumbnail.
+
+   Sizes are the boards'; gaps are the nearest space tokens. The bottom
+   padding adds the home indicator's inset. tests/now-playing-bar.test.ts
+   holds this to the spec. */
+
+/* Where the bar sits in the page, as tall as the bar: --dg-bar-h is set on
+   the scroll container from the bar's measured height. */
+.spacer {
+  height: var(--dg-bar-h);
+}
+
+.bar {
+  position: fixed;
+  inset: auto 0 0;
+  z-index: var(--dg-z-bar);
+  border-top: 1px solid var(--dg-line);
+  background-color: var(--dg-surface-raised);
+  box-shadow: var(--dg-shadow-bar);
+  color: var(--dg-fg);
+}
+
+.scan {
+  position: absolute;
+  inset: 3px 0 0;
+  pointer-events: none;
+}
+
+.content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--dg-space-3);
+  box-sizing: border-box;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--dg-space-3) var(--dg-space-4);
+  padding-bottom: calc(var(--dg-space-4) + env(safe-area-inset-bottom, 0px));
+}
+
+.track {
+  display: flex;
+  align-items: center;
+  gap: var(--dg-space-3);
+  min-width: 0;
+}
+
+.cover {
+  flex: none;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--dg-radius-s);
+  object-fit: cover;
+}
+
+.text {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--dg-space-1) / 2);
+}
+
+.title {
+  overflow: hidden;
+  font-size: var(--dg-text-title-s);
+  font-weight: 600;
+  line-height: normal;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.controls {
+  flex: none;
+  display: flex;
+  gap: var(--dg-space-3);
+}
+
+/* Read, not seen. */
+.announce {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (min-width: 768px) {
+  .content {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--dg-space-4) var(--dg-space-6);
+    padding: var(--dg-space-3) var(--dg-space-6);
+    padding-bottom: calc(var(--dg-space-3) + env(safe-area-inset-bottom, 0px));
+  }
+
+  .track {
+    flex: 1 1 320px;
+  }
+
+  .cover {
+    width: 56px;
+    height: 56px;
+  }
+
+  .streams {
+    flex: 0 1 auto;
+    min-width: 0;
+  }
+}

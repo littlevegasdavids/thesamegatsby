@@ -7,6 +7,7 @@ import { HeroSection } from "./sections/HeroSection";
 import { IconsSection } from "./sections/IconsSection";
 import { LinksSection } from "./sections/LinksSection";
 import { MarksSection } from "./sections/MarksSection";
+import { PlayerSection } from "./sections/PlayerSection";
 import { ReadoutSection } from "./sections/ReadoutSection";
 import { StickyStackSection } from "./sections/StickyStackSection";
 import { TexturesSection } from "./sections/TexturesSection";
@@ -42,6 +43,7 @@ export default function System() {
       <DiscographySection />
       <StickyStackSection />
       <HeroSection />
+      <PlayerSection />
     </main>
   );
 }

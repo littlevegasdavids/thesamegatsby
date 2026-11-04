@@ -3,7 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 // From their own files, not index.ts: through the barrel, the build put
 // /system's CSS in the chunk / loads.
+import { NowPlayingBar } from "../../../design-system/components/NowPlayingBar/NowPlayingBar";
 import { ReleaseFilter } from "../../../design-system/components/ReleaseFilter/ReleaseFilter";
+import { ReleaseHero } from "../../../design-system/components/ReleaseHero/ReleaseHero";
 import { ReleaseRow } from "../../../design-system/components/ReleaseRow/ReleaseRow";
 import type { PlayState } from "../../../design-system/components/ReleaseRow/view";
 import { SiteHeader } from "../../../design-system/components/SiteHeader/SiteHeader";
@@ -18,11 +20,19 @@ export type StackStart = "top" | "album-stuck" | "hand-off" | "collapsed";
 const SNIPPET = 30;
 const TICK_MS = 250;
 
-// The sticky stack as site will put it together: the header, the filter and
-// the discography, with the album and the EP open, inside a SystemFrame. It
-// holds what site will (the filter, which releases are open, and what's
-// playing), so the stack can be scrolled, filtered, opened and played on a
-// real phone. A tapped track counts up for 30 s, then reads as played.
+// The hero's release, as Main.dc.html's: the newest single.
+const HERO = FIXTURE_RELEASES.find(({ id }) => id === "vapor-city") ?? FIXTURE_RELEASES[0];
+
+// Each track with the release it's on, for the bar's cover and links.
+const TRACKS = new Map(FIXTURE_RELEASES.flatMap((release) => release.tracks.map((track) => [track.id, { track, release }] as const)));
+
+// The page as site will put it together: the header, the hero, the filter
+// and the discography, with the album and the EP open, and the now-playing
+// bar while anything plays, inside a SystemFrame. It holds what site will
+// (the filter, which releases are open, and what's playing), so the page
+// can be scrolled, filtered, opened and played on a real phone. A tapped
+// track counts up for 30 s, then ends: the bar stays up with Replay and
+// Close until one is tapped.
 export function StickyStack({ start }: { start: StackStart }) {
   const [filter, setFilter] = useState<FilterKey>("all");
   const [open, setOpen] = useState<Record<string, boolean>>(
@@ -71,11 +81,20 @@ export function StickyStack({ start }: { start: StackStart }) {
     );
 
   const shown = FIXTURE_RELEASES.filter((r) => filter === "all" || releaseCategory(r) === filter);
+  const current = playing && TRACKS.get(playing.trackId);
 
   return (
     <div ref={page} className={styles.framePage}>
       <SiteHeader socials={FIXTURE_SOCIALS} variant="floating" />
-      <p className={`${styles.cap} ${styles.stackHero}`}>The hero lands here in DS-23. Scroll down to the discography.</p>
+      <div className={styles.stackHero}>
+        <ReleaseHero
+          release={HERO}
+          playingTrackId={playing?.trackId}
+          playState={playing?.state}
+          elapsed={playing?.elapsed}
+          onPlay={play}
+        />
+      </div>
       <section data-discography className={styles.stackDiscography} aria-label="Discography">
         <ReleaseFilter options={releaseFilterOptions(FIXTURE_RELEASES)} selected={filter} onSelect={setFilter} />
         {shown.map((release) => (
@@ -93,6 +112,18 @@ export function StickyStack({ start }: { start: StackStart }) {
         ))}
       </section>
       <p className={`${styles.cap} ${styles.stackEnd}`}>The footer follows the discography.</p>
+      {playing && current && (
+        <NowPlayingBar
+          track={{ title: current.track.title, cover: current.release.cover }}
+          state={playing.state === "played" ? "ended" : playing.state}
+          elapsed={playing.elapsed}
+          duration={current.track.duration}
+          streamLinks={current.release.links}
+          onStop={() => setPlaying(null)}
+          onReplay={() => setPlaying({ trackId: playing.trackId, state: "playing", elapsed: 0 })}
+          onClose={() => setPlaying(null)}
+        />
+      )}
     </div>
   );
 }

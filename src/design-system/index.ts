@@ -1,6 +1,9 @@
 export { PlatformIcon } from "./assets/icons";
 export type { IconName } from "./assets/icon-paths";
 export { Button } from "./components/Button/Button";
+export { NowPlayingBar } from "./components/NowPlayingBar/NowPlayingBar";
+export type { NowPlayingTrack } from "./components/NowPlayingBar/NowPlayingBar";
+export type { NowPlayingState } from "./components/NowPlayingBar/view";
 export { ProgressTape } from "./components/ProgressTape/ProgressTape";
 export { ReleaseHero } from "./components/ReleaseHero/ReleaseHero";
 export { ReleaseFilter } from "./components/ReleaseFilter/ReleaseFilter";

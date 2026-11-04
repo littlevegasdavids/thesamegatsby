@@ -17,13 +17,15 @@
 
 /* It pads its top by the sticky stack's reach, as site's page will, so
    Shift+Tab never leaves focus beneath the header, filter or a stuck
-   release (WCAG 2.4.11). */
+   release (WCAG 2.4.11). It pads its bottom by the now-playing bar, which
+   sets --dg-bar-h on it, so Tab never leaves focus behind the bar. */
 .scroller {
   position: relative;
   height: 100%;
   overflow-y: auto;
   overscroll-behavior: contain;
   scroll-padding-top: var(--dg-sticky-clear);
+  scroll-padding-bottom: var(--dg-bar-h);
 }
 
 .scroller:focus-visible {
