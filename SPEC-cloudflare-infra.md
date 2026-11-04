@@ -63,7 +63,7 @@ HTML keeps the static-assets default (`public, max-age=0, must-revalidate`), so 
 
 | Setting | Value |
 |---|---|
-| Bucket | `thesamegatsby-media`, Standard storage, automatic location |
+| Bucket | `thesamegatsby-media`, Standard storage, placed in Western Europe (WEUR). Smart Tiered Cache keeps reads from it rare |
 | Public access | Custom domain `media.thesamegatsby.com` only. `r2.dev` stays disabled |
 | Keys | Content-hashed, so every object is immutable: `snippets/<slug>.<hash>.m4a`, `covers/<slug>.<hash>.<width>.avif`, `.webp` |
 | Object metadata | `Content-Type` set per file. `Cache-Control: public, max-age=31536000, immutable`. Set by `media-pipeline` at upload |
@@ -78,7 +78,7 @@ HTML keeps the static-assets default (`public, max-age=0, must-revalidate`), so 
 | Apex redirect | Single Redirect | hostname = `thesamegatsby.com` | 308 to `https://www.thesamegatsby.com${path}${query}` | Keeps today's behaviour. The apex gets a proxied `AAAA 100::` placeholder record so the rule has something to run on |
 | Tiered cache | Cache setting | zone | Smart Tiered Cache on | Cloudflare's R2 docs recommend it: one upper tier next to the bucket, fewer reads from R2 |
 
-The zone also gets SSL/TLS Full (strict), Always Use HTTPS, and HSTS at two years, as Vercel had, so HTTPS is never weaker than before the move.
+The zone also gets SSL/TLS Full (strict), Always Use HTTPS, minimum TLS 1.2 (on the zone and on the R2 custom domain), and HSTS. The dashboard offers 12 months at most, where Vercel sent two years, and each visit renews it.
 
 **Why media is on its own hostname and not proxied through the Worker:** an R2 binding in the Worker would make every audio request a billed Worker invocation (100k a day on the free tier) and would need cache code. A custom domain on R2 is served by the cache with no Worker in the path, and egress is free.
 
@@ -156,6 +156,6 @@ Encoding and uploading the real media (`media-pipeline`), the page itself (`site
 ## Open questions
 
 1. **Workers Builds details to confirm at setup:** that it reads `.node-version`, and that build results show as status checks on GitHub commits and pull requests. If either doesn't hold, the fallback is a `NODE_VERSION` build variable and the Cloudflare dashboard's build log.
-2. **Does the Transform Rule's static header apply to R2 custom-domain responses served from cache?** The "CORS on a cached copy" check proves it. If it fails, the fallback is an R2 CORS policy for the site's origins plus a cache purge for the media host.
+2. **Does the Transform Rule's static header apply to R2 custom-domain responses served from cache?** **Yes, checked on 4 Nov 2026.** A copy cached without `Origin` comes back as a `HIT` with `access-control-allow-origin: *`. R2 sends `Vary: Origin`, so a request with `Origin` can have its own cache entry, and the header is on that too. No R2 CORS policy is needed.
 3. **Content-Security-Policy.** The App Router's static export inlines its bootstrap scripts, so a strict `script-src` breaks hydration. Whether to ship a CSP, and with which hashes or `'unsafe-inline'`, gets decided against the real `out/` build in `site`.
 4. **Do branch preview URLs need `workers_dev` left on?** Wrangler 4.153's schema answers half of it: `preview_urls` defaults to `false`, so `wrangler.jsonc` sets it to `true`. `workers_dev` stays at its default (`true`). Whether previews still work with it off gets checked at CF-4. If they do, it's turned off at launch.

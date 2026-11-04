@@ -240,7 +240,7 @@ Review round 3 (3 Nov 2026):
   - **Files:** `package.json`, `wrangler.jsonc`, `public/_headers`
   - **Size:** S
 
-- [ ] **CF-3: Media bucket, zone settings, rules and a probe object** 🔒 👤
+- [x] **CF-3: Media bucket, zone settings, rules and a probe object** 🔒 👤
   - Run `wrangler login`. Create the `thesamegatsby-media` bucket and connect `media.thesamegatsby.com`.
   - Set the zone to SSL/TLS Full (strict), Always Use HTTPS, and HSTS at Vercel's two years. SPEC-cloudflare-infra.md lists these, but the first version of this plan left them out. They only touch proxied hostnames, so Vercel's DNS-only `www` is unaffected.
   - Add the Cache Rule, the Transform Rule (static `Access-Control-Allow-Origin: *`) and Smart Tiered Cache.
@@ -255,6 +255,23 @@ Review round 3 (3 Nov 2026):
       - `http://` redirects to `https://`
     - `r2.dev` is disabled
   - **Verify:** run the script twice, with a cache purge of the probe in between to prove the `HIT` comes from the rule.
+  - **Done 4 Nov 2026.**
+    - **Reno did most of it in the dashboard.** He enabled R2, created the bucket (Standard, placed in Western Europe) and connected `media.thesamegatsby.com` himself.
+    - **I uploaded the probe with Reno's OK.** It's Kaizen's current `audio.m4a`, at `probe/snippet.m4a`, with `audio/mp4` and immutable `Cache-Control`. Read back, its SHA-256 matches the original.
+    - **Reno also uploaded a test `.jpeg`.** It can't stand in for the probe, because Cloudflare caches `.jpeg` by default and it isn't audio. It stays unless Reno deletes it.
+    - **Reno set the zone and the rules from my steps:**
+      - Full (strict)
+      - Always Use HTTPS
+      - HSTS at 12 months, the longest the dashboard offers, so not Vercel's two years
+      - minimum TLS 1.2 on the zone and on the media domain
+      - the Cache Rule and the Transform Rule
+      - Smart Tiered Cache
+  - **Checks:**
+    - **Before the rules,** `check-edge.sh media` failed three rows: `DYNAMIC` (so `.m4a` isn't cached by default, as the spec said), no CORS header, and plain `http://` served.
+    - **After the rules and Reno's purge of the probe URL,** the first request was a `MISS` and then all 10 rows passed: `HIT`, immutable, `audio/mp4`, `206`, CORS with and without `Origin`, HSTS, the `https://` redirect and `r2.dev` off. TLS 1.1 is refused and TLS 1.2 works.
+    - **R2 sends `Vary: Origin`,** so the first request with `Origin` can be a `MISS` even when the plain copy is cached. The Transform Rule adds the header either way. The script checks the header on the plain cached copy and on a request with `Origin`, not a `HIT` for the second.
+    - **The script resolves names through 1.1.1.1** and pins them with `--resolve`. The laptop's resolver was still caching the earlier `NXDOMAIN` for the media host.
+  - **Not checked from outside:** Full (strict) and Smart Tiered Cache, which don't show in responses. Reno set them in the dashboard.
   - **Depends on:** CF-1 (zone active)
   - **Files:** `scripts/check-edge.sh`
   - **Size:** S
@@ -279,7 +296,7 @@ Review round 3 (3 Nov 2026):
 
 ### Checkpoint 3
 - [ ] The preview URL serves the latest `redesign` push
-- [ ] `scripts/check-edge.sh media` passes
+- [x] `scripts/check-edge.sh media` passes (CF-3, 4 Nov 2026)
 - [ ] `www` still points at nothing, as Reno chose
 
 ---
