@@ -973,9 +973,15 @@ Review round 3 (3 Nov 2026):
   - **Size:** M
 
 ### Checkpoint 7: Reno scrolls the sticky stack on a phone
-- [ ] Pushed to the preview (🔒 push). If CF-4 isn't done yet, I serve it from the laptop on the local network instead
-- [ ] Reno has scrolled the stack on a real phone
-- [ ] Changes are either done or recorded in the spec
+- [x] Pushed to the preview (🔒 push). If CF-4 isn't done yet, I serve it from the laptop on the local network instead. **CF-4 isn't done, so nothing was pushed.** The build was served from the laptop at `192.168.10.100:8098` (`python3 -m http.server`, bound to the LAN address), and Reno scrolled `/system` › Sticky stack on his phone.
+- [x] Reno has scrolled the stack on a real phone. **He approved it as is on 4 Nov 2026,** with these calls:
+  - the loading look (DS-19, DS-20) and the keyboard ring on the filter list's active option (DS-21). The spec no longer calls them proposals
+  - the desktop filter row scrolling sideways where it doesn't fit, kept as plan.md planned, so neither DS-21 alternative is taken
+  - the focus scroll padding, `--dg-sticky-clear` (DS-22)
+  - the chevron's hairline ring, and no mark on a collapsed EP or album while one of its tracks plays (DS-20)
+- [x] Changes are either done or recorded in the spec. Drift from the canvas is listed under each task's **Canvas drift** line, and Reno accepted it as it stands. What carries forward:
+  - **`site` inherits:** `scroll-padding-top: var(--dg-sticky-clear)` on its root, and the phone page's padding (the discography sits one header inset from the screen's edges, as on `/system`).
+  - **DS-24 inherits:** the bar needs a matching `scroll-padding-bottom`, so forward Tab doesn't hide focus behind it.
 
 ---
 
