@@ -1107,7 +1107,7 @@ Review round 3 (3 Nov 2026):
 
 ## Phase 9: Hardening
 
-- [ ] **DS-25: Acceptance pass against SPEC-design-system.md and the canvas**
+- [x] **DS-25: Acceptance pass against SPEC-design-system.md and the canvas**
   - Go through every acceptance box in the spec, and every reference board one last time, fixing what fails. Record the measured numbers: font KB, `/system` Lighthouse, JS on `/`.
   - **Acceptance:**
     - every box in SPEC-design-system.md's acceptance criteria is ticked, each with its evidence noted
@@ -1117,8 +1117,36 @@ Review round 3 (3 Nov 2026):
     - built-in browser checks at three widths, by keyboard, with reduced motion
     - Lighthouse via DevTools on the preview URL
     - **Canvas:** every board in plan.md's reference table, at its own width
+  - **Done 4 Nov 2026.** All eight acceptance boxes in the spec are ticked, each with its evidence. The checks ran against `npm run build` served locally, in headless Brave 1.98 (Chromium 156), and in headed Brave through the DevTools MCP for Lighthouse and the traces. The probes are in the session notes (`phase-9/tools/`).
+  - **Three fixes, one commit each:**
+    - **The desktop filter row left a focused button out of view** (`693d753`). Chromium scrolls a focused element into view only when none of it shows. So at 768 px, a Tab to "Remixes & edits", which showed 1 px at the row's edge, left the row where it was. The row now scrolls a focused button whole into view, with 4 px for the ring, in both Tab directions. The spec says so.
+    - **The token test checked a stale list** (`76dcb26`). It was missing `--dg-release-h`, `--dg-sticky-clear` and `--dg-bar-h`, so deleting any of them would have passed. It now reads the token names from the spec itself.
+    - **Three `/system` captions still said "proposal"** for looks approved at Checkpoints 7 and 8 (`c4afa76`).
+  - **Measured numbers:**
+    - **Fonts:** 43,260 bytes (42.2 KiB), against the 90 KB budget. Two preloads, all `swap`.
+    - **JS on `/`:** six scripts, 570,131 bytes raw, 174,230 gzipped (`gzip -9`). It's all Next's and React's runtime: `/` is still the placeholder and imports no design-system component. `/`'s CSS is 8,318 bytes (2,604 gzipped): tokens, textures, fonts and `Screen`.
+    - **`/system` Lighthouse,** run locally through the DevTools MCP in Brave, **not on the edge.** On mobile: accessibility 97, best practices 100, SEO 54. On desktop: 100, 100, 54. The MCP's Lighthouse leaves out performance, so a trace stands in: at 390 px with 4× CPU, Slow 4G and a cold cache, `/system` has LCP 2,055 ms and CLS 0.0013, and `/` has LCP 1,566 ms and CLS 0.
+    - `python3 -m http.server` doesn't compress or cache, which counts against both pages, so **the edge numbers are re-checked after CF-4.**
+  - **What Lighthouse flags, and why it's left alone:**
+    - **SEO 54** is the `noindex` the spec requires, plus the bench's missing meta description.
+    - **"Label in name"** flags the row buttons. Their names, "Play {title} snippet" (or "Show {title} tracks"), are the spec's. They hold the visible title, but not the row's meta text ("SINGLE 0:30").
+    - **"Target size"** flags one album track part-hidden under the stuck album row mid-scroll, which is how the sticky stack works.
+    - **CLS 0.0013** comes from VT323 swapping in, as DS-7 found. VT323 isn't preloaded because the spec allows two preloads.
+  - **Keyboard and focus:** Tab made 317 stops at 360 px and 348 at 1280 px, and reached every focusable element. Every stop shows the 2 px `--dg-focus` ring, and nothing covers a focused element.
+    - The one cut left: when forward Tab scrolls a row up from below a `SystemFrame`'s bottom, the browser stops with the row's own edge at the frame's edge. That cuts the ring's lower 4 px, because `scroll-padding-bottom` is `var(--dg-bar-h)`, which is 0 with no bar.
+    - The ring still shows on three sides. The same will happen at `site`'s root. Adding the ring's 4 px to `scroll-padding-bottom` would fix it, but that changes a value the spec gives, so it's a call for Checkpoint 9.
+  - **The canvas:**
+    - **Nothing has changed since its comparison.** The canvas's live version (`1793749386-a258`) dates from 3 Nov, 23:43 UTC, before DS-12, so Checkpoints 5–8 were reviewed against today's boards. Every component change since landed before Checkpoint 8 was approved, apart from the filter fix, which changes behaviour only.
+    - **The accepted drift lists re-measure the same at each board's width,** 390 and 1440 px:
+      - the header at 10 and 76 px, then 12 and 88 px, and the stuck release at 142 and 166 px
+      - hero covers of 350, 480 and 440 px, with titles at 30 and 72 px and a line-height of 1.05
+      - bars of 180, 194 and 256 px, then 144 px
+      - chips, filter buttons and the trigger at 44 px, and the options at 48 px
+    - The screenshots are in the session notes (`phase-9/shots/`). No drift turned up that isn't already listed.
+    - **`HomePhoneFull.dc.html`'s page rhythm and footer block can't be compared until `site` lays out the page.** `/system`'s frames only stand captions in for the footer.
+  - **Not checked:** a real phone, Safari and WebKit, hover (the headless runs have no real pointer), a screen reader, and the edge.
   - **Depends on:** DS-22, DS-23, DS-24
-  - **Files:** whatever fails, plus `SPEC-design-system.md` (tick the boxes)
+  - **Files:** whatever fails, plus `SPEC-design-system.md` (tick the boxes). In the event, `src/design-system/components/ReleaseFilter/ReleaseFilter.tsx` and `listbox.ts`, `tests/release-filter-ui.test.ts`, `tests/tokens.test.ts`, and the three `/system` section files with stale captions
   - **Size:** S–M
 
 ### Checkpoint 9: design-system complete

@@ -287,14 +287,25 @@ There's no working React 19 setup in the repo, and Chakra 2 won't come along, so
 
 ## Acceptance criteria
 
-- [ ] `tokens.css` defines every token in this spec. A test fails if a hex colour, `rgb()` value or font-family name appears in any `.css` or `.tsx` file under `src/` other than `tokens.css` and `textures.css`.
-- [ ] A test parses `tokens.css` and confirms every pair in the contrast table meets its requirement.
-- [ ] Subset fonts total 90 KB or less. `font-display: swap`. Only two preloads.
-- [ ] `/system` renders every token, texture, asset and component state in this spec, with no console errors, at 360, 768 and 1280 px, and no horizontal scroll.
-- [ ] Every interactive element is reachable by keyboard and shows a visible `--dg-focus` ring. Touch targets are 44 px or larger.
-- [ ] With `prefers-reduced-motion: reduce`, nothing animates (no grain jitter, star twinkle, flicker or tape motion).
-- [ ] `npm run build` produces `out/` with no server output. `/` loads no code from `/system`.
-- [ ] `npm run typecheck`, `npm run lint` and `npm test` pass.
+Ticked in DS-25 (4 Nov 2026), against `npm run build` served locally and checked in headless Brave 1.98 (Chromium 156). The full notes are under DS-25 in `tasks/todo.md`.
+
+- [x] `tokens.css` defines every token in this spec. A test fails if a hex colour, `rgb()` value or font-family name appears in any `.css` or `.tsx` file under `src/` other than `tokens.css` and `textures.css`.
+  - *Evidence:* `tests/tokens.test.ts` reads this file and finds all 93 token names it gives in `tokens.css`. Until DS-25 it checked a copy that was missing three of them. `tests/no-raw-values.test.ts` passes.
+- [x] A test parses `tokens.css` and confirms every pair in the contrast table meets its requirement.
+  - *Evidence:* `tests/tokens.test.ts` checks all 17 pairs at 360 and 1280 px. Each computed ratio rounds to the table's figure.
+- [x] Subset fonts total 90 KB or less. `font-display: swap`. Only two preloads.
+  - *Evidence:* 43,260 bytes in all (Aero 11,240, Chakra Petch 400 7,760 and 600 7,988, VT323 16,272). All four `@font-face` rules are `swap`. `out/index.html` and `out/system.html` each preload Aero and Chakra Petch 400 only.
+- [x] `/system` renders every token, texture, asset and component state in this spec, with no console errors, at 360, 768 and 1280 px, and no horizontal scroll.
+  - *Evidence:* every state in the Components table has a sample, and the tokens and textures tests cover the rest. Both asset files are shown. At 360, 768, 1280, 390 and 1440 px there were no console errors or warnings and no page scroll. Only the desktop filter row scrolls sideways, as designed.
+- [x] Every interactive element is reachable by keyboard and shows a visible `--dg-focus` ring. Touch targets are 44 px or larger.
+  - *Evidence:* Tab made 317 stops at 360 px and 348 at 1280 px. It reached every focusable element, and each showed the 2 px `--dg-focus` ring 2 px out. DS-25 fixed the desktop filter row, which left a focused button out of view.
+  - Every visible control is 44 px or larger. The two `/system` checkboxes are 20 px, inside 44 px labels.
+- [x] With `prefers-reduced-motion: reduce`, nothing animates (no grain jitter, star twinkle, flicker or tape motion).
+  - *Evidence:* emulated, there were 0 running animations or transitions at rest and 0 while clicking through 60 controls. Without emulation there were 18, among them the drift, the twinkle and the tape's glide.
+- [x] `npm run build` produces `out/` with no server output. `/` loads no code from `/system`.
+  - *Evidence:* every route is static (`○`). `/system`'s only extra files are its own JS and CSS chunks, and `out/index.html` references neither. `/`'s one stylesheet holds only `Screen`, the fonts and the textures.
+- [x] `npm run typecheck`, `npm run lint` and `npm test` pass.
+  - *Evidence:* `npm run ci` passes with 450 tests.
 
 ## Out of scope for this module
 
