@@ -1093,10 +1093,15 @@ Review round 3 (3 Nov 2026):
   - **Size:** M
 
 ### Checkpoint 8: Reno reviews every component
-- [ ] Pushed to the preview (🔒 push), with the URL shared
-- [ ] The list of remaining drift from the canvas is shared with it
-- [ ] Reno has checked `/system` on a real phone
-- [ ] Changes are either done or recorded in the spec
+- [x] Pushed to the preview (🔒 push), with the URL shared. **CF-4 isn't done, so nothing was pushed.** The build (`d9f8f36`) was served from the laptop at `192.168.10.100:8098` (`python3 -m http.server`, bound to the LAN address), and the server was stopped after review.
+- [x] The list of remaining drift from the canvas is shared with it: `checkpoint-8-drift-2026-11-04.md` in the session notes, with the drift under each task's **Canvas drift** line.
+- [x] Reno has checked `/system`, from the LAN build meant for his phone. **He approved it on 4 Nov 2026,** with these calls:
+  - the desktop now-playing bar keeps two rows, the links under the track, over a full-width bar or 13 px links (DS-24)
+  - the bar's loading look (DS-24), "Show fewer tracks" (DS-23), and the hero's playing state per G7 (DS-23). The spec no longer calls them proposals
+  - the hero's lead note truncating rather than wrapping (DS-23)
+- [x] Changes are either done or recorded in the spec. Drift from the canvas is listed under DS-23's and DS-24's **Canvas drift** lines, and Reno accepted it as it stands. What carries forward:
+  - **`site` inherits:** `scroll-padding-bottom: var(--dg-bar-h)` on its root, beside `scroll-padding-top`, with `NowPlayingBar` placed at the end of the page. It also decides where focus goes when Stop or Close removes the bar.
+  - **Before public launch:** Amazon Music's stand-in, as before.
 
 ---
 
