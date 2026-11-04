@@ -1,0 +1,27 @@
+/* The bar boards' strip: a 3 px --dg-line track, and an amber fill with its
+   glow. The fill keeps the track's width and is scaled to --progress from
+   the left edge, so it's flush at 0 and 1, and it moves on transform alone,
+   so it never causes layout. tests/progress-tape.test.ts holds the values. */
+
+.tape {
+  height: 3px;
+  background-color: var(--dg-line);
+}
+
+/* timeupdate lands about every 250 ms. A linear --dg-dur-2 glide carries the
+   fill across each gap at a steady rate, where the boards step once a second. */
+.fill {
+  height: 100%;
+  background-color: var(--dg-accent);
+  box-shadow: var(--dg-glow-accent-box);
+  transform: scaleX(var(--progress, 0));
+  transform-origin: left;
+  transition: transform var(--dg-dur-2) linear;
+}
+
+/* Under reduced motion the fill jumps to each new value. */
+@media (prefers-reduced-motion: reduce) {
+  .fill {
+    transition: none;
+  }
+}

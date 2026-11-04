@@ -447,6 +447,12 @@
   background-color: var(--dg-surface-raised);
 }
 
+/* Tape: the tape along the top edge of the bar's surface, over the readout
+   it goes with, as on the bar boards. */
+.tapeStrip {
+  background-color: var(--dg-surface-raised);
+}
+
 @media (min-width: 768px) {
   .page {
     padding: var(--dg-space-7) var(--dg-space-8) var(--dg-space-9);

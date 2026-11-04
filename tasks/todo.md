@@ -522,7 +522,7 @@ Review round 3 (3 Nov 2026):
   - **Files:** `src/design-system/components/VhsReadout/*`, `src/app/system/sections/ReadoutSection.tsx`. Also `src/app/system/system.module.css`, `tests/vhs-readout.test.ts` and the spec edits above
   - **Size:** S
 
-- [ ] **DS-13: `ProgressTape`**
+- [x] **DS-13: `ProgressTape`**
   - The 3 px strip at the top of the player bar: an amber fill with its glow, on a `--dg-line` track. It's driven by the `--progress` custom property through `transform: scaleX()`, so it causes no layout.
   - **Acceptance:**
     - it's `aria-hidden`
@@ -531,8 +531,28 @@ Review round 3 (3 Nov 2026):
   - **Verify:**
     - a visual check at 0, 0.5 and 1
     - **Canvas:** the strip in `PhonePlaying.dc.html` at 390 px and `HomeDesktop.dc.html` at 1440 px
+  - **Done 4 Nov 2026.** `ProgressTape` renders two `<div>`s: an `aria-hidden` track that sets `--progress` inline (the one inline style SPEC.md allows), and the fill inside it. `progress.ts` holds `tapeProgress()`, which holds a ratio to 0–1 and reads NaN as 0, so the tests can import it. Without it, NaN before the audio knows its length would make `scaleX()` invalid, and the fill would show the whole track. The CSS draws the boards' strip: a 3 px `--dg-line` track, and an `--dg-accent` fill with `--dg-glow-accent-box` that keeps the track's width and is scaled by `scaleX(var(--progress))` from the left edge, so 0 and 1 sit flush. `/system`'s section is now "Readout and tape". Its Progress tape block sits beside the VHS readout, with the tape along the top of the bar's surface over the readout it goes with: 0 over load, 0.4 over "PLAY 00:12" (the boards' 12 of 30) and 1 over "END". `RunningTape` adds a "Run the tape" checkbox that runs a 30 s snippet on a 250 ms clock, as `timeupdate` does, then holds for a second and rewinds. `tests/progress-tape.test.ts` (14 tests) checks the clamp, `aria-hidden` on the root and no role or live region, that the only inline style is `--progress` through `tapeProgress`, the height and colours, the scale and its origin with no width, margin or position set, the transition and its reduced-motion stop, and 3:1 for the fill on its track. Seven mutations each failed the right test: no `aria-hidden`, `width` in place of `scaleX`, no reduced-motion rule, no NaN guard, an eased transition, the raw ratio inline, and a centre origin. Decisions:
+    - **The glide is DS-13's proposal, for Checkpoint 5.** The boards step the fill once a second with no motion. The built fill moves on a linear `--dg-dur-2` transition on `transform`, close to the 250 ms between `timeupdate` events, so it doesn't jump 3 px (phone) to 12 px (desktop) four times a second. A jump back, such as replay or a new track, rewinds in the same 240 ms. Under reduced motion it jumps to each value. The spec now describes it.
+    - **`scaleX`, as planned, over `translateX`.** A prototype in headless Brave compared three builds against the board's `width` sizing. `scaleX` is pixel-identical at 0 and 1. A full-width fill slid by `translateX` under `overflow-x: clip` matches the tip's glow but leaks glow in at the left edge at 0, so it isn't flush. A `drop-shadow` on an unscaled parent draws a wider, softer glow than the board's box-shadow.
+    - **`linear`, not `--dg-ease-tape`,** because the fill follows a steady clock. An eased curve would make it surge at every update.
+    - **The bench's running tape is a client component in `/system` only** (`RunningTape.tsx`). Nothing else exercises the transition, and `ProgressTape` itself holds no state.
+    - **No `className` or position prop.** `NowPlayingBar` (DS-24) places the tape.
+  - **Checks.** These ran against `npm run build` served locally: in headless Brave over the protocol (`ds-13/tools/` in the session notes), and in headed Brave through the DevTools MCP.
+    - **360, 768, 1280, 390 and 1440 px:** each track is 3 px tall, the strip's width and on its top edge. Its drawn fill is 0, 0.4 and 1 of the track's width, starting at its left edge, and the full one ends at its right edge. The computed colours are `rgb(42, 48, 80)` and `rgb(255, 178, 63)`, with the glow and `transform 0.24s linear`. No horizontal scroll, and no console problems.
+    - **Drawn, at 0, 0.5 and 1:** read from 390 px screenshots along the strip's middle row, the lit run is 0, 179 and 358 of 358 px (and 143 at 0.4), exactly the expected widths.
+    - **No layout:** setting `--progress` 30 times, a frame apart, caused 0 layouts (67 style recalcs).
+    - **Accessibility tree:** no tape or fill node, and no progressbar, meter or slider on the page. The toggle is a checkbox named "RUN THE TAPE" (Brave puts the `text-transform` capitals in the name, as DS-11 found).
+    - **Motion:** while it runs, the fill took 106 different scales over 121 frames, 98 of them between the 250 ms steps, so it glides. With reduced motion emulated, it took 9, all on the steps, with no transition and no running animation. At rest, the page has 0 animations reduced and 5 without, as before. Headed Brave at 390 px gave the same results (287 different scales in 3 s, and 9 on the steps when reduced).
+    - **Keyboard:** Tab now makes 9 stops at 360 and 1280 px. The new one is the "Run the tape" checkbox, with the `--dg-focus` ring, and Space starts the run.
+    - **`/`:** none of its six files holds a tape class, "Run the tape" or `--progress`, and its CSS chunk is still `0jh8-bqbyvw1l.css`.
+    - **Canvas:** the strip from `Main`'s bar at 390 px and `HomeDesktop`'s at 1440 px was rebuilt from the board source in headless Brave, across the width on the bar's surface, with ours beneath. Over the strip and 12 px either side, 0 pixels differ at 0 and 1. At 0.4, 29 differ, by at most 10 of 255: the tip's glow and the left end's corner (see below).
+    - **Not checked:** Safari, Windows and a real phone, and real audio. A real `timeupdate` cadence is DS-24's to check. The board wasn't opened in the built-in pane.
+  - **Canvas drift, for Checkpoint 5:**
+    - **The glow past the tip is shorter.** It's scaled with the fill, so it reaches 8 × ratio px (3.2 px at 0.4) where the board's reaches 8 px. Above and below the tape it's the same.
+    - **The glow spills past the track's ends,** as on the board: past the left end whenever there's a fill, and past the right end at 1. In the bar the track spans the screen, so it falls off-screen. On `/system` it shows past the strip.
+    - The motion has no canvas reference (see the decision above).
   - **Depends on:** DS-12 (they share a section)
-  - **Files:** `src/design-system/components/ProgressTape/*`, `src/app/system/sections/ReadoutSection.tsx`
+  - **Files:** `src/design-system/components/ProgressTape/*`, `src/app/system/sections/ReadoutSection.tsx`. Also `src/app/system/sections/RunningTape.tsx`, `src/app/system/system.module.css`, `tests/progress-tape.test.ts` and the spec edits above
   - **Size:** S
 
 ### Checkpoint 5: Primitives
