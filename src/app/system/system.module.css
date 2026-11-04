@@ -572,6 +572,28 @@
   padding: 0 var(--dg-space-5);
 }
 
+/* Hero: each hero at the width a page gives it, one under another. On a
+   phone the stage sits 20 px from the screen's edges, as the boards' does
+   (the page's padding plus 4 px). From 768 px it's the desktop boards'
+   1120 px container. */
+.heroes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dg-space-8);
+  margin: 0;
+  padding: 0 var(--dg-space-1);
+  list-style: none;
+}
+
+.heroItem {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dg-space-3);
+  max-width: 1120px;
+  padding-bottom: var(--dg-space-8);
+  border-bottom: 1px solid var(--dg-line);
+}
+
 /* Each live filter in its own box, so its sticky box can't stick across the
    bench. The open one leaves room for its list. */
 .filterBench {
@@ -606,6 +628,10 @@
   }
 
   .stackDiscography {
+    padding-inline: 0;
+  }
+
+  .heroes {
     padding-inline: 0;
   }
 }

@@ -1,0 +1,205 @@
+/* The hero, as the boards draw it. Below 768 px one column: the label, the
+   cover across the column, then the title, the main button and the rest.
+   From 768 px two columns, the cover on the left: a single's column is
+   centred beside its cover (HomeDesktop.dc.html), an EP's or album's starts
+   at its top (DesktopHeroes.dc.html). The column widths are the boards' at
+   their 1120 px container, and share the space evenly below it.
+
+   Nothing is drawn over the cover: its frame holds the image alone, with the
+   hairline and the glow outside it. Sizes are the boards'; gaps are the
+   nearest space tokens. States snap, with no transition. tests/release-hero
+   .test.ts holds this to the spec. */
+
+.hero {
+  display: grid;
+  color: var(--dg-fg);
+}
+
+.label {
+  --dg-star: var(--dg-accent);
+  display: flex;
+  align-items: center;
+  gap: var(--dg-space-2);
+  margin: 0 0 var(--dg-space-2);
+  color: var(--dg-accent);
+  font-size: var(--dg-text-label);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.cover {
+  box-sizing: border-box;
+  aspect-ratio: 1;
+  margin-bottom: var(--dg-space-4);
+  overflow: hidden;
+  border: 1px solid var(--dg-line);
+  border-radius: var(--dg-radius-l);
+  box-shadow: var(--dg-glow-cover);
+}
+
+.coverImage {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dg-space-4);
+  min-width: 0;
+}
+
+/* Aero has one weight, so the heading's bold would fake one. A title with
+   no spaces still wraps, rather than running off a 360 px screen. */
+.title {
+  margin: 0;
+  font-family: var(--dg-font-display);
+  font-size: var(--dg-text-display-xl);
+  font-weight: 400;
+  line-height: 1.05;
+  overflow-wrap: anywhere;
+}
+
+/* One line, whatever the button says. "Stop snippet" is narrower than
+   "Play lead track", so a note that wrapped under the idle button would rise
+   beside the playing one and move everything below it. It truncates instead:
+   the tracklist names the lead in full. */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--dg-space-3);
+}
+
+.leadNote {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--dg-fg-subtle);
+  font-family: var(--dg-font-readout);
+  font-size: var(--dg-text-readout-s);
+  line-height: 1;
+}
+
+.tracklist,
+.streams {
+  margin-top: var(--dg-space-2);
+}
+
+.listLabel {
+  margin: 0 0 var(--dg-space-1);
+  color: var(--dg-fg-muted);
+  font-size: var(--dg-text-label);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.list {
+  border-top: 1px solid var(--dg-line);
+}
+
+/* The board outlines it in --dg-line, which can't be a control's only
+   boundary, so it takes the outline every other button has. */
+.showAll {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--dg-space-1);
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 44px;
+  margin: var(--dg-space-2) 0 0;
+  padding: 0 var(--dg-space-4);
+  border: 1px solid var(--dg-outline);
+  border-radius: var(--dg-radius-s);
+  background-color: transparent;
+  color: var(--dg-fg-muted);
+  font-family: var(--dg-font-ui);
+  font-size: var(--dg-text-label);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.showAll:focus-visible {
+  outline: 2px solid var(--dg-focus);
+  outline-offset: 2px;
+}
+
+.chevron {
+  flex: none;
+}
+
+.open {
+  transform: rotate(180deg);
+}
+
+@media (min-width: 768px) {
+  .hero {
+    justify-content: start;
+    column-gap: clamp(var(--dg-space-6), 5vw, var(--dg-space-8));
+  }
+
+  .single {
+    grid-template-columns: minmax(0, 480px) minmax(0, 576px);
+    grid-template-rows: 1fr auto auto 1fr;
+    grid-template-areas: "cover ." "cover label" "cover body" "cover .";
+  }
+
+  .group {
+    grid-template-columns: minmax(0, 440px) minmax(0, 616px);
+    grid-template-rows: auto auto 1fr;
+    grid-template-areas: "cover label" "cover body" "cover .";
+  }
+
+  .label {
+    grid-area: label;
+  }
+
+  .single .label {
+    margin-bottom: var(--dg-space-5);
+  }
+
+  .group .label {
+    margin-bottom: var(--dg-space-4);
+  }
+
+  .cover {
+    grid-area: cover;
+    align-self: start;
+    margin-bottom: 0;
+  }
+
+  .body {
+    grid-area: body;
+  }
+
+  .single .body {
+    gap: var(--dg-space-5);
+  }
+
+  .tracklist,
+  .streams {
+    margin-top: 0;
+  }
+
+  .showAll {
+    display: inline-flex;
+    width: auto;
+  }
+}
+
+@media (hover: hover) {
+  .showAll:hover {
+    border-color: var(--dg-accent);
+    color: var(--dg-accent);
+  }
+}

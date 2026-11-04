@@ -6,13 +6,15 @@ import { GLYPHS, GLYPH_VIEWBOX, type ButtonIcon } from "./glyphs";
 // name on hardware. No button can be nameless.
 export type ButtonProps = {
   label: string;
+  /** Makes it a toggle: aria-pressed, as the hero's Stop snippet is (G7). */
+  pressed?: boolean;
   disabled?: boolean;
   onClick?: () => void;
 } & ({ variant: "primary" | "ghost"; icon?: ButtonIcon } | { variant: "hardware"; icon: ButtonIcon });
 
 // No "use client": it holds no state, and a client parent that passes
 // onClick brings it into the client bundle.
-export function Button({ variant, icon, label, disabled = false, onClick }: ButtonProps) {
+export function Button({ variant, icon, label, pressed, disabled = false, onClick }: ButtonProps) {
   const iconOnly = variant === "hardware";
 
   return (
@@ -20,6 +22,7 @@ export function Button({ variant, icon, label, disabled = false, onClick }: Butt
       type="button"
       className={`${styles.button} ${styles[variant]}`}
       disabled={disabled}
+      aria-pressed={pressed}
       onClick={onClick}
       aria-label={iconOnly ? label : undefined}
     >

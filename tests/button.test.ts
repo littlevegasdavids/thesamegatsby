@@ -62,6 +62,14 @@ describe("ButtonProps", () => {
     const iconOnly: ButtonProps = { variant: "primary", icon: "play" };
     assert.deepEqual([play, ghost, iconOnly].map((props) => props.variant), ["primary", "ghost", "primary"]);
   });
+
+  test("a toggle carries pressed as aria-pressed, and a plain button carries none", () => {
+    const stop: ButtonProps = { variant: "primary", icon: "stop", label: "Stop snippet", pressed: true };
+    assert.equal(stop.pressed, true);
+    const tsx = read("components/Button/Button.tsx");
+    assert.match(tsx, /pressed\?: boolean/);
+    assert.match(tsx, /aria-pressed=\{pressed\}/);
+  });
 });
 
 describe("Button.module.css", () => {
