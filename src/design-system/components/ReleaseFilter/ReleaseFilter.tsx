@@ -3,7 +3,7 @@
 import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
 import type { FilterKey, FilterOption } from "../../release-filter";
 import styles from "./ReleaseFilter.module.css";
-import { filterLabel, moveActive } from "./listbox";
+import { filterLabel, moveActive, revealOffset } from "./listbox";
 
 type ReleaseFilterProps = {
   /** From releaseFilterOptions: All first, empty types already left out. */
@@ -33,6 +33,7 @@ export function ReleaseFilter({ options, selected, onSelect, defaultOpen = false
   const boxRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
+  const rowRef = useRef<HTMLDivElement>(null);
   // Focus moves into the list only when someone opens it, never on mount.
   const focusList = useRef(false);
 
@@ -50,6 +51,15 @@ export function ReleaseFilter({ options, selected, onSelect, defaultOpen = false
     document.addEventListener("pointerdown", close);
     return () => document.removeEventListener("pointerdown", close);
   }, [open]);
+
+  // Where the desktop row scrolls sideways, a focused button is scrolled
+  // whole into view, with room for the ring (2 px out, 2 px wide).
+  const reveal = (button: HTMLElement) => {
+    const row = rowRef.current;
+    if (!row) return;
+    const start = button.getBoundingClientRect().left - row.getBoundingClientRect().left - row.clientLeft + row.scrollLeft;
+    row.scrollLeft = revealOffset(row.scrollLeft, row.clientWidth, start, button.offsetWidth, 4);
+  };
 
   const show = () => {
     setActive(selectedIndex);
@@ -161,13 +171,14 @@ export function ReleaseFilter({ options, selected, onSelect, defaultOpen = false
         </div>
         <div className={styles.buttons}>
           {heading(styles.innerHeading, `${id}-heading-wide`)}
-          <div role="group" aria-label="Filter releases" className={styles.group}>
+          <div role="group" aria-label="Filter releases" className={styles.group} ref={rowRef}>
             {options.map((option) => (
               <button
                 key={option.key}
                 type="button"
                 className={styles.button}
                 aria-pressed={option.key === selected}
+                onFocus={(event) => reveal(event.currentTarget)}
                 onClick={() => onSelect?.(option.key)}
               >
                 {filterLabel(option, "buttons")}

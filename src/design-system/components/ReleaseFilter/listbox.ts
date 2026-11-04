@@ -25,3 +25,14 @@ export function moveActive(current: number, key: string, length: number): number
       return null;
   }
 }
+
+// The desktop row's scrollLeft that shows a focused button whole, with
+// `margin` px clear either side for its focus ring. Chromium scrolls a
+// focused element into view only when none of it shows, so a button cut by
+// the row's edge would keep focus out of sight. `start` is the button's
+// left edge from the row's scroll origin.
+export function revealOffset(scrollLeft: number, viewWidth: number, start: number, size: number, margin: number): number {
+  if (start - margin < scrollLeft) return Math.max(start - margin, 0);
+  if (start + size + margin > scrollLeft + viewWidth) return start + size + margin - viewWidth;
+  return scrollLeft;
+}

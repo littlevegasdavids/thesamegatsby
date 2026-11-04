@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { describe, test } from "node:test";
 import { parseTokens, tokenContrast } from "../src/design-system/contrast.ts";
-import { filterLabel, moveActive } from "../src/design-system/components/ReleaseFilter/listbox.ts";
+import { filterLabel, moveActive, revealOffset } from "../src/design-system/components/ReleaseFilter/listbox.ts";
 import type { FilterOption } from "../src/design-system/release-filter.ts";
 
 const read = (path: string) =>
@@ -64,6 +64,27 @@ describe("ReleaseFilter's words and keys", () => {
   });
 });
 
+describe("revealOffset, which keeps a focused desktop button in its row's view", () => {
+  // A 412 px row, as at 768 px, with the focus ring reaching 4 px out.
+  test("leaves the row alone when the button and its ring already show", () => {
+    assert.equal(revealOffset(0, 412, 293, 110, 4), 0);
+  });
+
+  test("scrolls a button cut by the right edge in, ring and all", () => {
+    // "Remixes & edits" at 411–586 shows 1 px. Browsers leave a partly
+    // shown element where it is on focus, so the row has to move itself.
+    assert.equal(revealOffset(0, 412, 411, 175, 4), 178);
+  });
+
+  test("scrolls a button cut by the left edge back in, ring and all", () => {
+    assert.equal(revealOffset(178, 412, 88, 112, 4), 84);
+  });
+
+  test("never asks for a scroll before the row's start", () => {
+    assert.equal(revealOffset(178, 412, 2, 76, 4), 0);
+  });
+});
+
 describe("ReleaseFilter's markup", () => {
   test("is a client component, for the open list and the active option", () => {
     assert.match(tsx, /^\s*"use client";/);
@@ -92,6 +113,12 @@ describe("ReleaseFilter's markup", () => {
   test("makes the desktop row a group of pressed buttons", () => {
     assert.match(tsx, /role="group"/);
     assert.match(tsx, /aria-pressed=\{option\.key === selected\}/);
+  });
+
+  test("scrolls a focused desktop button into the row's view", () => {
+    const button = /<button\b[^>]*className=\{styles\.button\}[^>]*>/s.exec(tsx)?.[0] ?? "";
+    assert.match(button, /onFocus=\{/);
+    assert.match(tsx, /revealOffset\(/);
   });
 
   test("hides every glyph from assistive tech, and is no live region", () => {
