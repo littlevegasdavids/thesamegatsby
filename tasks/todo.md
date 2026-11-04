@@ -1150,7 +1150,14 @@ Review round 3 (3 Nov 2026):
   - **Size:** S–M
 
 ### Checkpoint 9: design-system complete
-- [ ] SPEC-design-system.md's acceptance criteria are all met, with evidence
+- [x] SPEC-design-system.md's acceptance criteria are all met, with evidence. **Reno approved it on 4 Nov 2026,** from DS-25's results and measured numbers, with these calls:
+  - **The focus ring's 4 px goes into `scroll-padding-bottom`**, now `calc(var(--dg-bar-h) + var(--dg-space-1))` (`124201b`). After the change, Tab cut no ring at 360 or 1280 px, against 36 before. With the bar up, every ring cleared the bar's top edge, at 390 and 1440 px.
+  - **The row buttons keep the spec's names** ("Play {title} snippet"), which Lighthouse's label-in-name check flags.
+
+  What carries forward:
+  - **`site` inherits:** `scroll-padding-bottom: calc(var(--dg-bar-h) + var(--dg-space-1))` on its root, replacing Checkpoint 8's `var(--dg-bar-h)`, beside `scroll-padding-top: var(--dg-sticky-clear)`.
+  - **CF-4:** re-run Lighthouse and the traces on the preview URL. DS-25's numbers are from a local server with no compression or caching.
+  - **Before public launch:** Amazon Music's stand-in, and the Aero licence (SPEC.md open question 1), as before.
 - [ ] Next step: write `SPEC-media-pipeline.md` for review
 
 ---
