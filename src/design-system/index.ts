@@ -2,6 +2,7 @@ export { PlatformIcon } from "./assets/icons";
 export type { IconName } from "./assets/icon-paths";
 export { Button } from "./components/Button/Button";
 export { ProgressTape } from "./components/ProgressTape/ProgressTape";
+export { ReleaseFilter } from "./components/ReleaseFilter/ReleaseFilter";
 export { ReleaseRow } from "./components/ReleaseRow/ReleaseRow";
 export type { PlayState } from "./components/ReleaseRow/view";
 export { Screen } from "./components/Screen/Screen";

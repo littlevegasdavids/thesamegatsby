@@ -887,7 +887,7 @@ Review round 3 (3 Nov 2026):
   - **Files:** `src/design-system/components/ReleaseRow/*`, `src/app/system/sections/DiscographySection.tsx`. Also `tests/release-row.test.ts`, `src/design-system/index.ts` and the spec edit above
   - **Size:** M
 
-- [ ] **DS-21: `ReleaseFilter`**
+- [x] **DS-21: `ReleaseFilter`**
   - **Below 768 px:**
     - "Show" plus a trigger reading "All releases 8 ▾", with `aria-haspopup="listbox"` and `aria-expanded`
     - it opens a `listbox` of 48 px `option`s with counts, the selected one ticked in amber
@@ -907,8 +907,32 @@ Review round 3 (3 Nov 2026):
     - a keyboard-only pass in the built-in browser
     - a check at 768 px
     - **Canvas:** `PhoneFilter.dc.html` (open) and `Main.dc.html` (closed) at 390 px. The filter row on `HomeDesktop.dc.html` at 1440 px
+  - **Done 4 Nov 2026.** `ReleaseFilter` is a client component taking `options` (from `releaseFilterOptions`), `selected`, `onSelect?` and `defaultOpen?`. It returns the heading and the box as siblings, with no wrapper, so the box's sticky parent is the discography itself. The box is `.dg-glass` with a 1 px `--dg-line` border, `--dg-radius-l` and `--dg-shadow-float`, sticky at `var(--dg-sticky-filter)`, `var(--dg-filter-h)` tall (border-box), with a `--dg-sticky-gap` margin below, on `calc(var(--dg-z-bar) - 1)`, so it sits under the header and over the release rows. **Below 768 px** the "Discography" heading and "30 SEC SNIPPETS" sit above the box, and the box holds "Show" and a trigger reading "All releases 8 ▾". The trigger is a button with `aria-haspopup="listbox"`, `aria-expanded`, `aria-controls` and `aria-labelledby` ("Show" plus the value), as the board marks it. It opens a `listbox` of 48 px options, the selected one on `--dg-accent-wash` in amber with the tick. **From 768 px** the heading moves inside the box, and a `role="group"` row of 44 px `aria-pressed` buttons takes the dropdown's place, the selected one filled amber with its count in `--dg-on-accent`. `listbox.ts` holds `filterLabel()` ("All releases" in the dropdown, "All" on the buttons) and `moveActive()`, so the tests can import them. `/system` › Discography has a Release filter block of four live benches (`FilterBench.tsx`, a client component that holds the selection and says how many releases it leaves): closed, open with Singles ticked, EPs selected, and the fixture without its album. `tests/release-filter-ui.test.ts` (26 tests) checks the labels, the keys, the client state, the trigger's and list's roles and attributes, the keys handled and focus returned, the group of pressed buttons, `aria-hidden` glyphs and no live region, the sibling return, the box's stickiness and look, its layer, which shape shows at each width, the 44 and 48 px targets, the one-line row, the list's surface and shadow, the selected looks, the open trigger's amber border, the rings, hover only inside `hover: hover`, no transition, and contrast on the glass, the list and the wash. Decisions:
+    - **The list keeps focus and points at the active option** with `aria-activedescendant`. Up or Down on the trigger opens it at the selected option, the arrows stop at the ends, Home and End jump, Enter or Space picks, Escape closes, and both return focus to the trigger. Tab closes it and moves on. A tap or click outside the box closes it without moving focus. The spec now says so.
+    - **The active option takes the 2 px `--dg-focus` ring inset, on keyboard focus only.** That's DS-21's proposal, for Checkpoint 7, since the boards draw no keyboard state. A mouse or a tap that opens the list shows no ring.
+    - **The phone box is the 60 px token, by spec-wins.** The board's 8 px padding sits outside its 44 px trigger, so it draws 62 px, and its release row sticks at 144 px against our 142. The trigger is centred in the token height.
+    - **"All" shows its count on the desktop buttons too, by spec-wins** ("buttons with counts"). The spec now says so.
+    - **The row scrolls sideways where it doesn't fit,** as plan.md's risk row planned, keeping the box at 70 px. The group carries 4 px of padding inside the scroller, so the focus rings aren't clipped.
+    - **Tracking is the boards' 0.06em** on the trigger, options and buttons. The spec's 0.12em is for `Button` text, and the type tokens leave tracking to each use.
+    - **The heading's words are fixed in the component** ("Discography", "30 SEC SNIPPETS", "Show"), as the boards set them. Snippets are 30 s (SPEC.md, confirmed assumption 1).
+    - `ReleaseFilter` is exported from `index.ts`.
+  - **Checks.** These ran in headless Brave over the protocol (`phase-7/tools/ds21-interact.mjs` and `ds21-wide.mjs` in the session notes), against `npm run build` served locally:
+    - **Keyboard, at 390 px:** focus the trigger, then Enter opens the list with focus on it and All active. Down twice makes EPs active, and End then Down holds at Remixes & edits. Home then Up holds at All. Enter picks EPs: the list closes, focus is back on the trigger, it reads "EPs 1", and the bench shows 1 of 8. Down on the trigger reopens it at EPs, and Escape closes it with nothing changed. Up opens it, Up moves, and Space picks Singles (4 of 8). Tab from the list closes it and moves on.
+    - **Mouse:** a click on the trigger opens it, a click on Remixes & edits picks it and returns focus, and a click outside closes it.
+    - **Touch** (emulated): a tap on the trigger opens it, and a tap on All releases picks it.
+    - **The open list,** at 390 px on a fresh load: 356 × 250 on `rgb(23, 27, 48)`, 5 px below the box, as on the board. Five 48 px options, Singles selected on the wash with the tick, and the trigger's border amber. Without the album, the options are All releases 7, Singles 4, EPs 1, and Remixes & edits 2, so Albums is left out.
+    - **768, 1024 and 1280 px:** the box is 70 px tall, the heading is inside it, the dropdown is hidden, and the five buttons are 44 px in one row. At 1024 px they fit. In `/system`'s column (640 px at 768, 552 at 1280) they scroll sideways, 590 px of buttons in a 348 or 260 px scroller, and the box keeps its height. A click on Remixes & edits presses it and filters the bench. The pressed button is `rgb(255, 178, 63)` with its count `rgb(7, 8, 13)`.
+    - **360 px:** the box is 358 × 60 with the 44 px trigger, the heading 12 px above it, and the buttons hidden. No console problems at any width.
+    - Screenshots at 390 and 1440 px are `ds21-390.png` and `ds21-1440.png` in the session scratchpad.
+    - **Not checked:** headed Brave, Safari, a real phone and a real screen reader. Sticking under the header mid-scroll is DS-22's.
+  - **Canvas drift, for Checkpoint 7:**
+    - **The phone box is 60 px, against the board's 62 px** drawn, so the stuck release row sits 2 px higher (142 against 144 px).
+    - **The desktop buttons are 44 px, against 40,** set in 14 px, not 13. "All" has a count.
+    - **For Reno: the desktop row needs about 860 px with its heading.** On a real screen from 768 up to about 1000 px, and in `/system`'s column, the last buttons sit beyond a sideways scroll with no visual cue. Two ways out, either a spec change: drop "30 SEC SNIPPETS" inside the box, which saves about 160 px, or keep the dropdown until the row fits, with a container query on the box rather than a second breakpoint.
+    - The gaps and paddings are space tokens: 8 px (the boards' 6 and 10), and 4 px list padding (6).
+    - The keyboard ring on the active option has no canvas reference.
   - **Depends on:** DS-14
-  - **Files:** `src/design-system/components/ReleaseFilter/*`, `src/app/system/sections/DiscographySection.tsx`
+  - **Files:** `src/design-system/components/ReleaseFilter/*`, `src/app/system/sections/DiscographySection.tsx`. Also `src/app/system/sections/FilterBench.tsx`, `tests/release-filter-ui.test.ts`, `src/app/system/system.module.css`, `src/design-system/index.ts` and the spec edits above
   - **Size:** M
 
 - [ ] **DS-22: The sticky stack, assembled on `/system`**

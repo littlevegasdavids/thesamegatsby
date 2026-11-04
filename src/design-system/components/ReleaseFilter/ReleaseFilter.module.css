@@ -1,0 +1,276 @@
+/* The discography's filter, as Main.dc.html, PhoneFilter.dc.html and
+   HomeDesktop.dc.html draw it. The box is contained like the header (glass,
+   hairline, 12 px radius, the floating shadow) and sticks one gap below it,
+   at the token height, so the expanded release row's offset below it holds.
+   It spans its parent: the page places it. Sizes are the boards' except the
+   44 px desktop buttons; padding and gaps are the nearest space tokens.
+
+   Below 768 px the heading sits above the box and the box holds the "Show"
+   dropdown. From 768 px the heading moves inside and the buttons take the
+   dropdown's place, on one line that scrolls sideways if it must, so the
+   box never grows. States snap; hover is for a real pointer only.
+   tests/release-filter-ui.test.ts holds this to the spec. */
+
+.outerHeading,
+.innerHeading {
+  align-items: baseline;
+  gap: var(--dg-space-4);
+}
+
+.outerHeading {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: var(--dg-space-3);
+  padding-inline: var(--dg-space-3);
+}
+
+.innerHeading {
+  display: none;
+  flex: none;
+}
+
+.title {
+  margin: 0;
+  color: var(--dg-fg-muted);
+  font-size: var(--dg-text-label);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.note {
+  color: var(--dg-fg-subtle);
+  font-family: var(--dg-font-readout);
+  font-size: var(--dg-text-readout);
+  line-height: 1;
+}
+
+.box {
+  position: sticky;
+  top: var(--dg-sticky-filter);
+  z-index: calc(var(--dg-z-bar) - 1);
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  height: var(--dg-filter-h);
+  margin-bottom: var(--dg-sticky-gap);
+  padding: 0 var(--dg-space-2);
+  border: 1px solid var(--dg-line);
+  border-radius: var(--dg-radius-l);
+  box-shadow: var(--dg-shadow-float);
+}
+
+.menu {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  gap: var(--dg-space-2);
+  min-width: 0;
+}
+
+.show {
+  flex: none;
+  padding-left: var(--dg-space-2);
+  color: var(--dg-fg-muted);
+  font-size: var(--dg-text-label);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.trigger,
+.option,
+.button {
+  font-family: var(--dg-font-ui);
+  font-size: var(--dg-text-small);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.trigger {
+  appearance: none;
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--dg-space-2);
+  box-sizing: border-box;
+  height: 44px;
+  margin: 0;
+  padding: 0 var(--dg-space-3);
+  border: 1px solid var(--dg-outline);
+  border-radius: var(--dg-radius-m);
+  background-color: var(--dg-field);
+  color: var(--dg-fg);
+  cursor: pointer;
+}
+
+.trigger[aria-expanded="true"] {
+  border-color: var(--dg-accent);
+}
+
+.trigger:focus-visible,
+.button:focus-visible {
+  outline: 2px solid var(--dg-focus);
+  outline-offset: 2px;
+}
+
+.value {
+  display: flex;
+  align-items: center;
+  gap: var(--dg-space-2);
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.count {
+  color: var(--dg-fg-subtle);
+  font-family: var(--dg-font-readout);
+  font-size: var(--dg-text-readout-s);
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1;
+}
+
+.chevron {
+  flex: none;
+}
+
+.open {
+  transform: rotate(180deg);
+}
+
+.listbox {
+  position: absolute;
+  top: calc(100% + var(--dg-sticky-gap));
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: var(--dg-space-1);
+  border: 1px solid var(--dg-line);
+  border-radius: var(--dg-radius-l);
+  background-color: var(--dg-surface-raised);
+  box-shadow: var(--dg-shadow-menu);
+  list-style: none;
+}
+
+.listbox[hidden] {
+  display: none;
+}
+
+.listbox:focus {
+  outline: none;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: var(--dg-space-2);
+  box-sizing: border-box;
+  height: 48px;
+  padding: 0 var(--dg-space-3);
+  border-radius: var(--dg-radius-m);
+  color: var(--dg-fg);
+  cursor: pointer;
+}
+
+.option[aria-selected="true"] {
+  background-color: var(--dg-accent-wash);
+  color: var(--dg-accent);
+}
+
+/* The list keeps focus and points at the active option, so the ring goes on
+   the option, inside it, on keyboard focus only. */
+.listbox:focus-visible .active {
+  outline: 2px solid var(--dg-focus);
+  outline-offset: -2px;
+}
+
+.tick {
+  flex: none;
+  display: flex;
+  width: 16px;
+}
+
+.optionLabel {
+  flex: 1 1 auto;
+}
+
+.buttons {
+  display: none;
+}
+
+.group {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: var(--dg-space-2);
+  min-width: 0;
+  margin: calc(var(--dg-space-1) * -1);
+  padding: var(--dg-space-1);
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.button {
+  appearance: none;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--dg-space-2);
+  box-sizing: border-box;
+  height: 44px;
+  margin: 0;
+  padding: 0 var(--dg-space-4);
+  border: 1px solid var(--dg-outline);
+  border-radius: var(--dg-radius-s);
+  background-color: transparent;
+  color: var(--dg-fg);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.button[aria-pressed="true"] {
+  border-color: var(--dg-accent);
+  background-color: var(--dg-accent);
+  color: var(--dg-on-accent);
+}
+
+.button[aria-pressed="true"] .count {
+  color: var(--dg-on-accent);
+}
+
+@media (min-width: 768px) {
+  .outerHeading {
+    display: none;
+  }
+
+  .innerHeading {
+    display: flex;
+  }
+
+  .box {
+    padding: 0 var(--dg-space-3) 0 var(--dg-space-5);
+  }
+
+  .menu {
+    display: none;
+  }
+
+  .buttons {
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--dg-space-4);
+    min-width: 0;
+  }
+}
+
+@media (hover: hover) {
+  .trigger:hover,
+  .button:hover {
+    border-color: var(--dg-accent);
+  }
+}

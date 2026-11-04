@@ -7,6 +7,7 @@ import type { TrackRowState } from "../../../design-system/components/TrackRow/s
 import type { Release } from "../../../design-system/types";
 import { FIXTURE_RELEASES } from "../fixtures";
 import styles from "../system.module.css";
+import { FilterBench } from "./FilterBench";
 
 const release = (id: string): Release => {
   const found = FIXTURE_RELEASES.find((r) => r.id === id);
@@ -15,6 +16,7 @@ const release = (id: string): Release => {
 };
 
 const ALBUM = release("album-x");
+const NO_ALBUMS = FIXTURE_RELEASES.filter(({ type }) => type !== "album");
 
 // The boards' 12 of 30 while playing, and the full 30 once played.
 const ELAPSED: Record<TrackRowState, number> = { idle: 0, loading: 0, playing: 12, played: 30 };
@@ -67,6 +69,15 @@ export function DiscographySection() {
     <section className={styles.section} aria-labelledby="discography">
       <h2 id="discography" className={styles.heading}>Discography</h2>
       <div className={styles.blocks}>
+        <section aria-labelledby="discography-filter">
+          <h3 id="discography-filter" className={`${styles.label} ${styles.blockHeading}`}>Release filter</h3>
+          <div className={styles.rows}>
+            <FilterBench releases={FIXTURE_RELEASES} caption="Closed · All releases" />
+            <FilterBench releases={FIXTURE_RELEASES} initial="single" defaultOpen caption="Open · Singles ticked (phone)" />
+            <FilterBench releases={FIXTURE_RELEASES} initial="ep" caption="One type selected · EPs" />
+            <FilterBench releases={NO_ALBUMS} caption="No albums · Albums left out" />
+          </div>
+        </section>
         <section aria-labelledby="discography-releases">
           <h3 id="discography-releases" className={`${styles.label} ${styles.blockHeading}`}>Release rows</h3>
           <ul className={styles.rows}>
