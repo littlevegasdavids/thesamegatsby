@@ -215,7 +215,7 @@ The fixture covers are made with macOS's built-in `sips` and `qlmanage`, so they
 | A `position: sticky` layer stops sticking because an ancestor sets `overflow: hidden` | Medium | `Screen` uses `overflow-x: clip`. DS-22 checks all three layers at three widths |
 | The desktop filter row wraps between 768 and 1023 px, changing its height and breaking the offsets below it | Medium | The row has a fixed height, and its buttons scroll sideways inside the box if they must. DS-21 checks at 768 px |
 | The canvas can't be opened in the built-in browser (a claude.ai sign-in) | Low | Compare against the board sources' sizes and colours, read with the Artifact tool. Reno checks by eye at the checkpoints |
-| Simple Icons doesn't carry every platform, Amazon Music in particular | Low | Check its list before downloading. If one is missing, the brand's own press-kit mark is a separate ask |
+| Simple Icons doesn't carry every platform, Amazon Music in particular | Low | Check its list before downloading. If one is missing, the brand's own press-kit mark is a separate ask. **DS-15 found Amazon Music missing from 16.36.0. It uses the canvas's stand-in until Amazon's mark is sourced, before launch** |
 | Bring That Change's cover is an SVG, which `sips` can't read | Low | Render it with `qlmanage`, then convert it with `sips`. UKG 333 has no cover of its own, so it uses the EP's |
 | Fonts go over the 90 KB budget | Medium | Subset tighter, or swap Chakra Petch 600 for 500 and check how titles look |
 | VT323 lacks `▶■◌` | Low | Draw them as SVG glyphs, as the spec already allows (the canvas does this too) |

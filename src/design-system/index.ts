@@ -1,3 +1,5 @@
+export { PlatformIcon } from "./assets/icons";
+export type { IconName } from "./assets/icon-paths";
 export { Button } from "./components/Button/Button";
 export { ProgressTape } from "./components/ProgressTape/ProgressTape";
 export { Screen } from "./components/Screen/Screen";
@@ -7,3 +9,4 @@ export { Wordmark } from "./components/Wordmark/Wordmark";
 export { releaseCategory, releaseFilterOptions } from "./release-filter";
 export type { FilterKey, FilterOption, ReleaseCategory } from "./release-filter";
 export type * from "./types";
+export { MAIN_PLATFORMS, MORE_PLATFORMS, PLATFORMS, splitLinks } from "./platforms";

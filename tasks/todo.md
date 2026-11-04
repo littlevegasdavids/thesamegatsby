@@ -614,7 +614,7 @@ Review round 3 (3 Nov 2026):
   - **Files:** `src/design-system/types.ts`, `src/design-system/release-filter.ts`, `tests/release-filter.test.ts`, `src/app/system/fixtures.ts`, `public/system-fixtures/*`. Also `tests/system-fixture.test.ts`, `src/app/system/sections/FixtureSection.tsx`, `src/app/system/sections/MarksSection.tsx`, `src/app/system/system.module.css`, `src/design-system/index.ts` and `src/app/system/page.tsx`
   - **Size:** M
 
-- [ ] **DS-15: Platform and social icons** 🔒 *(Simple Icons download)*
+- [x] **DS-15: Platform and social icons** 🔒 *(Simple Icons download)*
   - The eight platform icons and two social icons as monochrome inline SVG, in one `PlatformIcon` component filled with `currentColor`. `platforms.ts` holds:
     - the ids
     - full and short labels (the bar at 360 px uses "YouTube" and "Amazon")
@@ -627,8 +627,27 @@ Review round 3 (3 Nov 2026):
   - **Verify:**
     - `npm test`
     - **Canvas:** `PhoneMore.dc.html` at 390 px. Icon size and stroke weight sit like the stand-ins (20–22 px). The shapes change to the real brand marks, as intended
+  - **Done 4 Nov 2026.** Reno approved the download on 4 Nov 2026. Nine files came from Simple Icons 16.36.0 on jsDelivr: Spotify, Apple Music, YouTube Music, SoundCloud, Bandcamp, Deezer, Tidal, Instagram and TikTok. 16.36.0 has no Amazon Music. `assets/icon-paths.ts` holds each mark's path data, and `assets/icons.tsx` holds `PlatformIcon` (`icon`, `size` in px), which paints it in `currentColor` and is always `aria-hidden`. `assets/icons-source.md` lists each file with its size and SHA-256, the CC0 1.0 licence, the brands' guideline links, and the Amazon stand-in. `platforms.ts` holds the ids in the fixed order (`MAIN_PLATFORMS`, `MORE_PLATFORMS`), each platform's full and short label, and `splitLinks()`. `/system` has an Icons section: the eight platforms and two socials at 22 and 20 px in `--dg-fg`, and at 20 px in the accent. `tests/platforms.test.ts` (18 tests) checks the order, the labels, `splitLinks` (any input order, a missing main platform left out, an empty `more`, only the extras the release has, the first of two links kept, URLs untouched), that every platform and social has a path, the viewBoxes, the one stroked stand-in, `currentColor` with no hex, `aria-hidden` with no title or role, and the source note. Four mutations each failed the right test: the last duplicate winning, no `aria-hidden`, a baked hex fill, and Deezer before Amazon Music. Decisions:
+    - **Amazon Music uses the canvas's stand-in**, Reno's pick on 4 Nov 2026: its smile and note, stroked at 1.8 units as drawn. It must be replaced before public launch, and fetching Amazon's mark is a separate ask. The spec, plan.md's risk row and the source note say so.
+    - **The marks get 2 units of air** (`viewBox="-2 -2 28 28"`). Simple Icons draws edge to edge on 24 units, while the canvas's line icons leave about 2 units inside the box. Edge to edge, the marks read about 15% larger than the stand-ins at the same size. With the air, a 22 px Spotify ring is 18.9 px across, where the stand-in's is 19.1. The stand-in keeps its own `0 0 24 24`.
+    - **The licence was re-checked at download.** None of the nine entries in 16.36.0's `data/simple-icons.json` has a `license` field, so all are under the project's CC0. The downloaded files themselves aren't committed, only their path data.
+    - **Path data sits in `icon-paths.ts`, beside `icons.tsx`.** Node's runner can't import `.tsx`, and the tests need the paths. `IconName` covers the eight platforms and the two socials, so `SocialLinks` uses the same component.
+    - **Labels follow the canvas:** "Tidal", not the brand's "TIDAL". The short labels are "YouTube" and "Amazon", the rest as the full label.
+    - `PlatformIcon`, `IconName`, the platform lists and `splitLinks` are exported from `index.ts`.
+  - **Checks.** These ran in headless Brave over the protocol (`phase-6/tools/page-check.mjs` and `ds15-canvas.mjs` in the session notes), against `npm run build` served locally:
+    - **360, 768, 1280, 390 and 1440 px:** 30 icons at 22 and 20 px, inside the column. The filled marks compute to `rgb(242, 235, 218)` and the amber ones to `rgb(255, 178, 63)`, and the stand-in's stroke follows the same two colours. No horizontal scroll, and no console problems.
+    - **Accessibility tree:** the Icons section shows its headings, lists and items only. No icon is exposed.
+    - **`/`:** none of the 11 files it loads holds an icon path or an Icons class.
+    - **Keyboard:** Tab still makes 9 stops. DS-15 adds no focusable element.
+    - **Reduced motion:** 0 animations, against 5 without it, as before.
+    - **Canvas:** the stand-ins from `Main.dc.html`'s bar, More row and header (the same drawings as `PhoneMore.dc.html`) were set beside the built marks at 22 px, at 390 px wide. Ink boxes, built against canvas: Spotify and YouTube Music 18.9 against 19.1 px, SoundCloud 18.9 × 8.4 against 18.3 × 10.8, Bandcamp 18.9 × 10.6 against 17.2 × 10.8, Tidal 18.9 × 12.6 against 18.1 × 12.6, Instagram 18.9 against 17.2. The side-by-side is `ds15-strip.png` in the session scratchpad.
+    - **Not checked:** headed Brave, Safari and a real phone. The board itself wasn't opened in the built-in pane: its markup was rebuilt from the source.
+  - **Canvas drift, for Checkpoint 6:**
+    - **The real marks are filled,** so they read heavier than the canvas's 1.8-unit line drawings. That's the intended change of shape.
+    - **Apple Music, Deezer and TikTok stand taller** than their stand-ins: 18.9 px against 15.9, 11.6 and 14.9. Apple's mark is a rounded square, Deezer's is now a heart, and TikTok's note is tall.
+    - Amazon Music is still the stand-in.
   - **Depends on:** DS-14
-  - **Files:** `src/design-system/assets/icons.tsx`, `src/design-system/assets/icons-source.md`, `src/design-system/platforms.ts`, `tests/platforms.test.ts`, `src/app/system/sections/IconsSection.tsx`
+  - **Files:** `src/design-system/assets/icons.tsx`, `src/design-system/assets/icons-source.md`, `src/design-system/platforms.ts`, `tests/platforms.test.ts`, `src/app/system/sections/IconsSection.tsx`. Also `src/design-system/assets/icon-paths.ts`, `src/app/system/system.module.css`, `src/design-system/index.ts`, `src/app/system/page.tsx` and plan.md's risk row
   - **Size:** M
 
 - [ ] **DS-16: `StreamLinks`**

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ButtonSection } from "./sections/ButtonSection";
 import { FixtureSection } from "./sections/FixtureSection";
+import { IconsSection } from "./sections/IconsSection";
 import { MarksSection } from "./sections/MarksSection";
 import { ReadoutSection } from "./sections/ReadoutSection";
 import { TexturesSection } from "./sections/TexturesSection";
@@ -30,6 +31,7 @@ export default function System() {
       <ButtonSection />
       <ReadoutSection />
       <FixtureSection />
+      <IconsSection />
     </main>
   );
 }
