@@ -179,7 +179,8 @@ The page-level layers (grain and vignette) are one fixed element with `pointer-e
 
 - `sparkle-star.svg`: an original four-point star path on a 24 × 24 viewBox, drawn for this system. It's the signature mark. The file bakes in `--dg-star`'s signal yellow, so it shows up as an image outside the page, and a test keeps the two in step. `SparkleStar` draws the same path inline.
 - `wordmark.svg`: "Déjà Gatsby" set in Aero and outlined, so the logo doesn't depend on the font loading. The `Wordmark` component draws both tones below from tokens, and the file is exported in the screen tone. Bone-white with the V5 "stacked tape" shadows: `0.03em 0.04em 0 #2B3BFF, 0.06em 0.08em 0 rgba(255,75,31,0.55)`. No chrome and no gloss. On artwork it's white with a `0.045em 0.06em` black drop. The file is one path drawn by three `<use>`s, under 6 KB. Its viewBox holds the whole mark, shadows included, and its size is the mark at a 100 px em (619 × 91). A test keeps its path, offsets and colours equal to the component's and the tokens'.
-- Platform icons as inline SVG: the five main platforms (Spotify, Apple Music, YouTube Music, SoundCloud, Bandcamp) and the three under "More" (Amazon Music, Deezer, Tidal). The two social icons (Instagram, TikTok) are inline SVG too. Source: Simple Icons (CC0). Each brand's own trademark guidelines still apply, so keep brand icons monochrome in `--dg-fg`. Downloading them is an ask-first step.
+- Platform icons as inline SVG: the five main platforms (Spotify, Apple Music, YouTube Music, SoundCloud, Bandcamp) and the three under "More" (Amazon Music, Deezer, Tidal). The two social icons (Instagram, TikTok) are inline SVG too. Source: Simple Icons 16.36.0 (CC0), which Reno approved downloading on 4 Nov 2026. Each brand's own trademark guidelines still apply, so keep brand icons monochrome in `--dg-fg`.
+  - **Amazon Music isn't in Simple Icons** (16.36.0 has no file for it). Until its own mark is sourced, it uses the canvas's hand-drawn stand-in, Reno's pick on 4 Nov 2026. It must be replaced before public launch, and fetching Amazon's mark is a separate ask.
 
 ## Components
 
@@ -235,7 +236,12 @@ Every component is presentational. It renders from props and raises callbacks, a
   - the five stream buttons fill amber
 - `StreamLinks` shows Spotify, Apple Music, YouTube Music, SoundCloud and Bandcamp as five equal buttons, in that fixed order. The `heading` sits on the same row as the "More" toggle. There are two variants:
   - `bar` (the now-playing bar): each button has an icon plus a visible label
-  - `chips` (the hero): wrapping text chips, 44 px tall, with "More" as the last chip Amazon Music, Deezer and Tidal sit behind a "More" disclosure (a `<button>` with `aria-expanded`, no popover library), in that order. "More" only renders when the song has at least one of them. A platform the song isn't on is left out, not shown disabled. Links open in a new tab with `rel="noopener"`.
+  - `chips` (the hero): wrapping text chips, 44 px tall, with "More" as the last chip
+
+  Amazon Music, Deezer and Tidal sit behind a "More" disclosure (a `<button>` with `aria-expanded`, no popover library), in that order. "More" only renders when the song has at least one of them. A platform the song isn't on is left out, not shown disabled. Links open in a new tab with `rel="noopener"`.
+  - **The toggle reads "More" while closed and "Less" while open,** with its chevron flipped, as `Main.dc.html` draws it. `aria-expanded` carries the state. Reno chose this on 4 Nov 2026.
+  - **In `chips`, the extras follow the toggle** in the same wrapping row when it's open. The canvas doesn't draw this, so it's DS-16's proposal for Checkpoint 6.
+- **Hover on links, as the desktop boards draw it** (Reno chose it on 4 Nov 2026). A stream chip, a bar button, the "More" toggle and a footer social button turn their border and text `--dg-accent`. A header social link turns its text `--dg-accent`. An emphasised bar button, already amber, takes `--dg-glow-accent-box` instead, like the primary button. As on `Button`, hover applies only where there's a real pointer (`hover: hover`), and each change is a snap with no transition. Keyboard focus shows the 2 px `--dg-focus` ring, 2 px out.
 - On a 360 px screen, `NowPlayingBar` uses two rows. Row one holds the cover, title, readout and stop button. Row two holds "STREAM FULL TRACK" and the five buttons, each 44 px or larger (about 62 px wide at 360 px).
 - The progress shown by `ProgressTape` is visual only (`aria-hidden`). The readout carries the time as text.
 
