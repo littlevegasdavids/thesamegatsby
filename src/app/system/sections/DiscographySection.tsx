@@ -1,5 +1,7 @@
 // From its own file, not index.ts: through the barrel, the build put
 // /system's CSS in the chunk / loads.
+import { ReleaseRow } from "../../../design-system/components/ReleaseRow/ReleaseRow";
+import type { PlayState } from "../../../design-system/components/ReleaseRow/view";
 import { TrackRow } from "../../../design-system/components/TrackRow/TrackRow";
 import type { TrackRowState } from "../../../design-system/components/TrackRow/states";
 import type { Release } from "../../../design-system/types";
@@ -23,6 +25,38 @@ const STATES: readonly TrackRowState[] = ["idle", "loading", "playing", "played"
 // time and ring.
 const LONG_TITLE = "You who could be Forever (Extended Night Drive Version)";
 
+// Every release-row state the spec lists, one row each: what's playing is
+// set per row, so the states sit side by side.
+const RELEASE_STATES: readonly {
+  release: Release;
+  caption: string;
+  expanded?: boolean;
+  playing?: { trackId: string; state: PlayState; elapsed: number };
+}[] = [
+  { release: release("vapor-city"), caption: "Single · idle" },
+  { release: release("kaizen"), caption: "Single · playing", playing: { trackId: "kaizen", state: "playing", elapsed: 9 } },
+  { release: release("forever"), caption: "Single · played", playing: { trackId: "forever", state: "played", elapsed: 30 } },
+  {
+    release: release("bring-that-change"),
+    caption: "Single · loading (proposal)",
+    playing: { trackId: "bring-that-change", state: "loading", elapsed: 0 },
+  },
+  { release: release("edit-x"), caption: "Edit single · EDIT tag" },
+  { release: release("remix-x"), caption: "Remix single · REMIX tag, playing", playing: { trackId: "remix-x", state: "playing", elapsed: 21 } },
+  { release: release("cant-you-see-ep"), caption: "EP · collapsed" },
+  {
+    release: release("cant-you-see-ep"),
+    caption: "EP · expanded, UKG 333 playing",
+    expanded: true,
+    playing: { trackId: "ukg-333", state: "playing", elapsed: 12 },
+  },
+  { release: ALBUM, caption: "Album · collapsed" },
+  {
+    release: { ...release("forever"), id: "long", title: "You who could be Forever (Extended Night Drive Version)" },
+    caption: "Single · a long title",
+  },
+];
+
 // Each variant in its four states, on the surface it sits on: nested rows
 // under an expanded release, on the page's backdrop, and the hero's list
 // rows under their hairline, with LEAD on the lead track.
@@ -33,6 +67,25 @@ export function DiscographySection() {
     <section className={styles.section} aria-labelledby="discography">
       <h2 id="discography" className={styles.heading}>Discography</h2>
       <div className={styles.blocks}>
+        <section aria-labelledby="discography-releases">
+          <h3 id="discography-releases" className={`${styles.label} ${styles.blockHeading}`}>Release rows</h3>
+          <ul className={styles.rows}>
+            {RELEASE_STATES.map(({ release: r, caption, expanded, playing }) => (
+              <li key={caption} className={styles.stack}>
+                <div className={styles.trackGroup}>
+                  <ReleaseRow
+                    release={r}
+                    expanded={expanded}
+                    playingTrackId={playing?.trackId}
+                    playState={playing?.state}
+                    elapsed={playing?.elapsed}
+                  />
+                </div>
+                <span className={styles.cap}>{caption}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
         <section aria-labelledby="discography-nested">
           <h3 id="discography-nested" className={`${styles.label} ${styles.blockHeading}`}>Track rows · nested</h3>
           <div className={styles.stack}>

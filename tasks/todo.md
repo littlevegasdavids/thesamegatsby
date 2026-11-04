@@ -839,7 +839,7 @@ Review round 3 (3 Nov 2026):
   - **Files:** `src/design-system/components/TrackRow/*`, `src/app/system/sections/DiscographySection.tsx`. Also `src/design-system/format.ts`, `tests/track-row.test.ts`, `tests/format.test.ts`, `src/app/system/system.module.css`, `src/design-system/index.ts`, `src/app/system/page.tsx` and the spec edits above
   - **Size:** M
 
-- [ ] **DS-20: `ReleaseRow`**
+- [x] **DS-20: `ReleaseRow`**
   - **A single** is one `<button aria-pressed>` that plays. It holds:
     - the cover at a fixed 56 px (60 px on desktop)
     - the title
@@ -858,8 +858,33 @@ Review round 3 (3 Nov 2026):
     - the `/system` states at 360 px
     - Lighthouse CLS on `/system`
     - **Canvas:** the full discography on `Main.dc.html` at 390 px (EP expanded, plus `PhonePlaying.dc.html` for a playing single). The discography on `HomeDesktop.dc.html` at 1440 px
+  - **Done 4 Nov 2026.** `ReleaseRow` takes `release`, `expanded?`, `playingTrackId?`, `playState?` (loading, playing or played), `elapsed?`, `onToggle?` and `onPlay?(trackId)`. It holds no state, and renders a plain wrapper (the release group) round its row. **A single** is one `<button aria-pressed>`, labelled as `TrackRow` labels it: the cover at 56 px (60 px from 768 px) through `next/image` with fixed `width` and `height`, the title, the meta line, "0:30", and a 40 px ring. Its meta reads "SINGLE", "PLAYING 00:09", "PLAYED" or "LOADING", and a remix or edit single adds its hazard tag. Lit, it takes the raised surface with an 8 px radius, an amber title and cover outline, and the sparkle in the meta. **An EP or album** is one `<button aria-expanded aria-controls>`, labelled "Show/Hide {title} tracks", with "EP · 2 TRACKS" meta, "Show tracks" / "Hide tracks" from 768 px, and a chevron ring. Its nested `TrackRow`s follow in the group, `hidden` while collapsed, so `aria-controls` always points at them. The playing track takes `playState`, and the rest are idle. Expanded, the row is sticky at `var(--dg-sticky-release)` on opaque `--dg-surface`, at z-index 1 over its tracks. `view.ts` holds `releaseRowView()`, so the tests can import it. `/system` › Discography has a Release rows block: single idle, playing, played and loading, the EDIT and REMIX tags (the remix one playing), the EP collapsed and expanded with UKG 333 playing, the album collapsed, and a long title. `tests/release-row.test.ts` (32 tests) checks the view for every single state, the length, the tags, the group label, meta, words and track states, no client state, the two buttons and their attributes, no link, the cover's fixed size and empty alt, the hidden tracks, the sparkle, the heights, the padding and gap shared with `TrackRow`, the cover sizes, the ellipsis, the sticky rule and that nothing else sticks, that only the title clips, the type tokens, the desktop words, the lit looks, the meta colours, the running ring, the tags, focus, hover and no transition, and six contrast pairs. Decisions:
+    - **The padding and gap are `TrackRow`'s:** 12 px on a phone and 16 px from 768 px, where the boards have 10/14 and 14/18. That puts a nested track's number exactly under the release title: measured at 0.0 px apart at every width.
+    - **The chevron's ring is a `--dg-line` hairline, as both boards draw it.** The spec keeps `--dg-line` off a control's only boundary, but here the whole row is the control, and the chevron and the words carry the state. The play ring stays `--dg-outline`.
+    - **Loading on a single extends DS-19's proposal:** lit and pressed, with "LOADING" muted beside the sparkle. The spec now says so.
+    - **The meta is written in capitals,** as the readout is, so Brave's names match what's shown.
+    - **The tag follows `releaseCategory`,** so only a remix or edit single gets one, and an EP holding a remix doesn't.
+    - **The nested tracks' `elapsed` is passed only to the track playing.**
+    - `ReleaseRow` and `PlayState` are exported from `index.ts`.
+  - **Checks.** These ran in headless Brave over the protocol (`phase-7/tools/page-check.mjs`, `ds20-probe.js`, `cls.mjs` and `hover.mjs` in the session notes), against `npm run build` served locally:
+    - **360, 768, 1280, 390 and 1440 px:** rows are 72 px tall below 768 px and 80 px from it, with every cover loaded at 56 or 60 px. The ring stays inside the row, and the long title truncates. At 360 and 390 px, "Welcome to Vapor_City", "You who could be Forever" and the remix title truncate too. The computed colours are the tokens, and the expanded EP computes `position: sticky` on `rgb(14, 17, 32)`. No horizontal scroll, and no console problems.
+    - **Keyboard:** Tab makes 99 stops on `/system`. The twelve new ones are the ten rows and the expanded EP's two tracks, each with the 2 px ring 2 px out. The collapsed releases' hidden tracks take none.
+    - **Accessibility tree:** singles are buttons named "Play …" or "Stop …", pressed only while running. The EPs and album are "Show/Hide … tracks" with `expanded` false or true. The expanded EP's two tracks follow it, "Stop UKG 333 snippet" pressed.
+    - **CLS:** with a layout-shift observer over a cold load and a scroll to the bottom, `/system` shifts 0.0012 at 360 px and 0.0081 at 1280 px. Every source is in the Tokens section's type samples, where VT323 swaps in (DS-7 found the same). Nothing in the discography or its covers shifts. Lighthouse itself wasn't run.
+    - **Hover, forced:** an idle single and a collapsed EP go from transparent to `rgb(14, 17, 32)`, and a lit single stays raised, each with a 0 s transition.
+    - **Reduced motion:** 0 animations, against 9 without it.
+    - **`/`:** none of its 11 files holds a ReleaseRow class or the long title.
+    - **Canvas:** the boxes were compared with the declared values on `Main.dc.html` at 390 px (EP expanded, and KaiZen playing in its playing mode) and `HomeDesktop.dc.html` at 1440 px. Heights, cover and ring sizes, type sizes, the colours of every state and the expanded row's surface match. The rest is listed below. A 390 px screenshot is `ds20-390.png` in the session scratchpad.
+    - **Not checked:** the board markup rebuilt beside ours, headed Brave, Safari, a real phone, Lighthouse, and the row sticking under a real filter (DS-22).
+  - **Canvas drift, for Checkpoint 7:**
+    - **Padding and gap are the space tokens shared with `TrackRow`:** 12 and 12 px on a phone (the board's 10 and 14), 16 and 16 px from 768 px (14 and 18).
+    - **The desktop meta is 18 px,** the readout-s floor, where `HomeDesktop` draws 19 px.
+    - **The tags are 12 px label type** with 4 px padding and a 4 px radius, against the boards' 10 px, 6 px and 3 px.
+    - **The meta's line gap is 4 px** at every width (the phone board's is 3).
+    - **On `/system` the rows bleed 12 px past the 16 px page padding** on a phone. The board bleeds 10 px past 20 px. `site` sets the page's own padding.
+    - **A collapsed EP or album with a track playing shows no mark.** The boards don't draw that case, so the sparkle appears only once it's opened.
   - **Depends on:** DS-19
-  - **Files:** `src/design-system/components/ReleaseRow/*`, `src/app/system/sections/DiscographySection.tsx`
+  - **Files:** `src/design-system/components/ReleaseRow/*`, `src/app/system/sections/DiscographySection.tsx`. Also `tests/release-row.test.ts`, `src/design-system/index.ts` and the spec edit above
   - **Size:** M
 
 - [ ] **DS-21: `ReleaseFilter`**
