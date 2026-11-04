@@ -1,0 +1,249 @@
+/* The two layouts G3 settled. The bar, on the now-playing bar: below 768 px
+   a heading row with "More" on it, five equal columns with each icon over
+   its short name, and the extras in three columns underneath. From 768 px,
+   one wrapping row of icon-and-name buttons. The chips, in the hero: one
+   wrapping row of text chips, "More" the last of them.
+
+   Every target is 44 px or more, where the canvas draws the chips at 36 px
+   and the phone toggle at 32. States snap, with no transition, as tape does.
+   tests/stream-links.test.ts holds the sizes, states and contrast. */
+
+.heading {
+  display: flex;
+  align-items: center;
+  gap: var(--dg-space-2);
+  margin: 0;
+  color: var(--dg-fg-muted);
+  font-size: var(--dg-text-label);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.emphasis .heading {
+  color: var(--dg-accent);
+}
+
+.main,
+.more,
+.chipList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--dg-space-2);
+  box-sizing: border-box;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 var(--dg-space-3);
+  border: 1px solid var(--dg-outline);
+  border-radius: var(--dg-radius-s);
+  color: var(--dg-fg);
+  font-size: var(--dg-text-small);
+  font-weight: 400;
+  line-height: 1.2;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.link svg {
+  flex: none;
+}
+
+.link:focus-visible {
+  outline: 2px solid var(--dg-focus);
+  outline-offset: 2px;
+}
+
+.full {
+  display: none;
+}
+
+.toggle {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--dg-space-1);
+  box-sizing: border-box;
+  min-height: 44px;
+  margin: 0;
+  padding: 0 var(--dg-space-1);
+  border: 0;
+  background-color: transparent;
+  color: var(--dg-fg-muted);
+  font-family: var(--dg-font-ui);
+  font-size: var(--dg-text-label);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.toggle:focus-visible {
+  outline: 2px solid var(--dg-focus);
+  outline-offset: 2px;
+}
+
+.chevron {
+  flex: none;
+}
+
+.open {
+  transform: rotate(180deg);
+}
+
+/* The bar, below 768 px. The toggle comes after the five in the source and
+   sits on the heading row here. Its negative margin keeps that row as tall
+   as the canvas's 32 px toggle, while the target stays 44 px. */
+.bar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  row-gap: var(--dg-space-3);
+}
+
+.bar .heading {
+  grid-row: 1;
+  grid-column: 1;
+}
+
+.bar .toggle {
+  grid-row: 1;
+  grid-column: 2;
+  margin-block: calc(var(--dg-space-3) / -2);
+}
+
+.main {
+  grid-row: 2;
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--dg-space-1);
+}
+
+.more {
+  grid-row: 3;
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--dg-space-1);
+}
+
+/* The grid would otherwise override the hidden attribute. */
+.more[hidden] {
+  display: none;
+}
+
+/* The board's buttons are 56 and 48 px tall plus their borders, since its
+   links size their content box, so they draw at 58 and 50. */
+.main .link {
+  flex-direction: column;
+  gap: var(--dg-space-1);
+  height: 58px;
+  padding: 0;
+  font-size: var(--dg-text-micro);
+}
+
+.more .link {
+  height: 50px;
+  padding: 0 var(--dg-space-2);
+}
+
+.emphasis .main .link {
+  border-color: var(--dg-accent);
+  background-color: var(--dg-accent);
+  color: var(--dg-on-accent);
+}
+
+/* The chips: "More" is a chip itself, in the muted colour, as drawn. */
+.chips {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dg-space-2);
+}
+
+.chipList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--dg-space-2);
+}
+
+.chipList .toggle {
+  padding: 0 var(--dg-space-3);
+  border: 1px solid var(--dg-outline);
+  border-radius: var(--dg-radius-s);
+  font-size: var(--dg-text-small);
+  font-weight: 400;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+@media (min-width: 768px) {
+  .bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--dg-space-2);
+  }
+
+  .bar .heading {
+    margin-inline-end: var(--dg-space-1);
+  }
+
+  .bar .toggle {
+    margin-block: 0;
+    padding: 0 var(--dg-space-2);
+  }
+
+  .main,
+  .more {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--dg-space-2);
+  }
+
+  .main .link,
+  .more .link {
+    flex-direction: row;
+    gap: var(--dg-space-2);
+    height: 44px;
+    padding: 0 var(--dg-space-3);
+    font-size: var(--dg-text-small);
+  }
+
+  .link svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .short {
+    display: none;
+  }
+
+  .full {
+    display: inline;
+  }
+}
+
+/* Hover follows the desktop boards: border and text turn amber. A button
+   that's already amber takes the primary button's glow instead. */
+@media (hover: hover) {
+  .link:hover,
+  .toggle:hover {
+    border-color: var(--dg-accent);
+    color: var(--dg-accent);
+  }
+
+  .emphasis .main .link:hover {
+    border-color: var(--dg-accent);
+    color: var(--dg-on-accent);
+    box-shadow: var(--dg-glow-accent-box);
+  }
+}

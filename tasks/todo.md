@@ -650,7 +650,7 @@ Review round 3 (3 Nov 2026):
   - **Files:** `src/design-system/assets/icons.tsx`, `src/design-system/assets/icons-source.md`, `src/design-system/platforms.ts`, `tests/platforms.test.ts`, `src/app/system/sections/IconsSection.tsx`. Also `src/design-system/assets/icon-paths.ts`, `src/app/system/system.module.css`, `src/design-system/index.ts`, `src/app/system/page.tsx` and plan.md's risk row
   - **Size:** M
 
-- [ ] **DS-16: `StreamLinks`**
+- [x] **DS-16: `StreamLinks`**
   - The five main platforms as equal buttons in the fixed order, and Amazon Music, Deezer and Tidal behind "More". "More" is a `<button aria-expanded>` with `defaultOpen`, and only renders when there's an extra. It takes a `heading` ("Stream full track", "Stream it on", …), so the "More" toggle can sit on the heading row, as on the canvas.
   - Layouts, as settled by G3:
     - `bar`, below 768 px: a 5-column grid, each button with the icon over the short label, and the extras in a 3-column row underneath
@@ -666,8 +666,36 @@ Review round 3 (3 Nov 2026):
     - the `/system` states: the five only, all eight with "More" closed and open, one of the five missing, emphasised
     - a keyboard check of the disclosure
     - **Canvas:** the bar layout against `PhonePlaying.dc.html`, `PhoneEnded.dc.html` and `PhoneMore.dc.html` at 390 px, and `HomeDesktop.dc.html` at 1440 px. The chips against the hero on `Main.dc.html` and `PhoneHeroEP.dc.html` at 390 px, and `DesktopHeroes.dc.html` at 1440 px. The chips are 44 px, not the canvas's 36 px
+  - **Done 4 Nov 2026.** `StreamLinks` is a client component taking `links`, `heading`, `variant` (`bar` or `chips`), `emphasis?` (bar only, by the types) and `defaultOpen?`. It puts the links in the fixed order through `splitLinks`, and renders nothing when there are none. It's a `role="group"` labelled by its heading. The bar has the heading, a list of the five, the toggle, and a list of the extras. The chips are one list, with the toggle as the item after the five and the extras after it. Each link opens in a new tab with `rel="noopener"` and is named with the platform's full name. The toggle is a `<button>` with `aria-expanded` and `aria-controls`, reads "More" or "Less", and flips its chevron. It renders only when there are extras. Emphasis fills the five bar buttons amber and adds the 12 px sparkle to the heading. Hover is amber, pointer-only, and snaps, per the spec. `/system` has a Links section with every state the spec lists: the bar with the five only, all eight closed and open, YouTube Music missing, and emphasised, then the chips with the five only, all eight closed, and open. `tests/stream-links.test.ts` (26 tests) checks `"use client"`, `splitLinks`, every link's target, rel and name, the toggle's attributes and words, the extras' `hidden` and the rule that keeps it working, the group's label, no live region, emphasis on the bar only, the five and three columns, every target 44 px or more, micro text in the phone bar only, the short and full labels, both layouts, the focus ring, the emphasised fill, hover only inside `hover: hover`, no transition, and the contrast of every label and border on the bar's surface and the page. Five mutations each failed the right test: no `[hidden]` rule, no `rel`, a hover outside the media query, a 40 px phone button, and a toggle that always reads More. Decisions:
+    - **The toggle comes after the five in the source,** so the extras it opens are the very next Tab stops, and a screen reader meets it after the five. CSS lifts it onto the heading row in the phone bar. From 768 px the source order is the board's order.
+    - **The extras stay in the page, `hidden` while closed,** so `aria-controls` always points at something. The bar's extras list is a grid, which would override `hidden`, so a `.more[hidden]` rule puts it back.
+    - **Every link is named with the platform's full name.** The phone bar shows "YouTube" and "Amazon", which read as "YouTube Music" and "Amazon Music", so the name still contains the visible label.
+    - **The phone bar's buttons are 58 px and the extras 50 px.** The board sets 56 and 48 px on links that size their content box, so its 1 px borders draw them at 58 and 50. At those heights the bar matches the board to the pixel: 358 × 102 closed and 358 × 164 open. The desktop bar and the chips stay at the 44 px this task fixes.
+    - **The phone toggle is 44 px, with a −6 px block margin,** so the heading row stays as tall as the board's 32 px toggle.
+    - **The chips' "More" is a chip,** in `--dg-fg-muted`, sentence case, with the chevron. The open chips show the extras after it, the DS-16 proposal the spec records.
+    - **The extras' gap is `--dg-space-1` (4 px),** the five's gap, where the board uses 6 px.
+    - **The heading inherits the page's line-height of 1.5,** as the boards' does, which keeps the chips' heading row at the board's height.
+    - `StreamLinks` is exported from `index.ts`.
+  - **Checks.** These ran in headless Brave over the protocol (`phase-6/tools/page-check.mjs`, `ds16-interact.mjs` and `ds16-canvas.mjs` in the session notes), against `npm run build` served locally:
+    - **360 px:** the five bar buttons are 62.4 × 58 each, in one row, with no label overflowing. The extras are 106.7 × 50. At 390 px the buttons are 68.4 px wide.
+    - **360, 768, 1280, 390 and 1440 px:** every state renders inside the page, with no horizontal scroll and no console problems. From 768 px the bar is one wrapping row of 44 px buttons with full names. In `/system`'s 640 px column at 768 px, it wraps onto a second row. Inside the real bar it shares the row with the track, which DS-24 checks. The emphasised buttons compute to `rgb(255, 178, 63)` with `rgb(7, 8, 13)` text.
+    - **Keyboard,** at 360 and 1280 px: Enter opens More, the label turns to "Less", the chevron flips, focus stays on the toggle, and the next Tab is Amazon Music. Space closes it, and the next Tab skips the extras. Tab makes 59 stops on `/system`, every link and toggle with the 2 px `rgb(244, 228, 9)` ring 2 px out.
+    - **Accessibility tree:** each state is a group named for its heading, with a list of links named Spotify, Apple Music, YouTube Music, SoundCloud and Bandcamp. The toggle is a button with `expanded` false or true. Closed extras aren't in the tree. Brave names the transformed text in capitals ("MORE", "STREAM FULL TRACK"), as DS-11 found.
+    - **Hover, forced through `CSS.forcePseudoState`:** a link's text and border go from `rgb(242, 235, 218)` and `rgb(138, 133, 120)` to `rgb(255, 178, 63)`. Both toggles' text turns amber, and the chip toggle's border too. An emphasised button keeps its fill and takes the 8 px glow. Each has a 0 s transition.
+    - **Reduced motion:** 0 animations, against 5 without it.
+    - **`/`:** none of its 11 files holds a StreamLinks class or the chevron path.
+    - **Canvas:** the boards' markup (`Main.dc.html`'s bar in its playing, ended and More modes, which are the `PhonePlaying`, `PhoneEnded` and `PhoneMore` views, the hero chips on `Main` and `PhoneHeroEP` at 390 px, and `HomeDesktop`'s bar and `DesktopHeroes`' chips at 1440 px) was rebuilt from the source in our fonts, in the same containers as ours. The phone bar matches exactly, in all three modes: the same 358 × 102 and 358 × 164 boxes, 68.4 × 58 buttons, and rows at the same offsets. The extras are 116.7 px wide against 115.3. The rest is listed below.
+    - **Not checked:** headed Brave, Safari, a real phone, a real mouse (hover was forced), and a real screen reader.
+  - **Canvas drift, for Checkpoint 6:**
+    - **The chips are 44 px tall, against the boards' 38 px** (36 declared, plus borders), and set in 14 px, not 13 px, so each is 3–7 px wider. Both are plan.md's known cases. The phone hero's chips still wrap 3 and 3, and the phone block is 122 px tall against 110.
+    - **The desktop bar's buttons are 44 px, against 46 px** (44 plus borders), and 3–7 px wider from the 14 px text. The desktop chips are 44 against 46, and their heading's gap is 8 px against 10.
+    - **The phone toggle's target is 44 px, against 32,** though the row it sits in is the board's height.
+    - **The chips' "More" has a chevron,** where the hero boards draw none. The open chips have no board.
+    - **The desktop bar's chevron points down when closed,** where `HomeDesktop` draws it pointing up. One chevron, flipped when open, serves every layout.
+    - **The phone extras are 1.4 px wider** each, from the 4 px gap.
+    - The boards draw hover on desktop only. It's built for any real pointer.
   - **Depends on:** DS-15, and G3 answered
-  - **Files:** `src/design-system/components/StreamLinks/*`, `src/app/system/sections/LinksSection.tsx`
+  - **Files:** `src/design-system/components/StreamLinks/*`, `src/app/system/sections/LinksSection.tsx`. Also `tests/stream-links.test.ts`, `src/app/system/system.module.css`, `src/design-system/index.ts` and `src/app/system/page.tsx`
   - **Size:** M
 
 - [ ] **DS-17: `SocialLinks`**
