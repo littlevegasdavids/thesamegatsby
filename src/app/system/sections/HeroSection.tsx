@@ -46,7 +46,7 @@ const HEROES: readonly {
   { release: ALBUM, caption: "Album · first five, Show all 8 tracks" },
   {
     release: ALBUM,
-    caption: "Album · Show all open (proposal: Show fewer tracks), track 7 loading",
+    caption: "Album · Show all open, reading Show fewer tracks, track 7 loading",
     showAll: true,
     playing: { trackId: "album-x-7", state: "loading", elapsed: 0 },
   },

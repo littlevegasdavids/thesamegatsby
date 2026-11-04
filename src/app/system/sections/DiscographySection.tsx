@@ -40,7 +40,7 @@ const RELEASE_STATES: readonly {
   { release: release("forever"), caption: "Single · played", playing: { trackId: "forever", state: "played", elapsed: 30 } },
   {
     release: release("bring-that-change"),
-    caption: "Single · loading (proposal)",
+    caption: "Single · loading",
     playing: { trackId: "bring-that-change", state: "loading", elapsed: 0 },
   },
   { release: release("edit-x"), caption: "Edit single · EDIT tag" },

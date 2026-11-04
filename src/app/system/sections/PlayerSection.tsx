@@ -36,7 +36,7 @@ const STATES: readonly {
   title?: string;
   caption: string;
 }[] = [
-  { state: "loading", elapsed: 0, links: KAIZEN.links, caption: "Loading (proposal) · LOAD, the tape at 0, Stop" },
+  { state: "loading", elapsed: 0, links: KAIZEN.links, caption: "Loading · LOAD, the tape at 0, Stop" },
   { state: "playing", elapsed: 12, links: KAIZEN.links, caption: "Playing · PLAY 00:12, the tape at 0.4" },
   { state: "ended", elapsed: 30, links: KAIZEN.links, caption: "Ended · END, Replay and Close, Hear the full track, emphasised" },
   { state: "playing", elapsed: 18, links: WITH_MORE, moreOpen: true, caption: "More open · the three extras under the five" },
