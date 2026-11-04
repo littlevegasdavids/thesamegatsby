@@ -1,0 +1,173 @@
+/* One track, in the two layouts G4 settled. nested sits under an expanded
+   ReleaseRow, on the translucent surface the release row scrolls over, and
+   is indented to the release title's edge (the release row's padding, its
+   cover and its gap). list is the hero tracklist, flush with its column.
+   Heights and sizes are the boards'; padding and gaps are the nearest space
+   tokens. Every height is border-box, the hairline included.
+
+   States snap, with no transition. A lit row (loading, playing or played)
+   takes the raised surface and an amber title and time. A running row
+   (loading or playing) fills its ring amber with the stop square. Hover is
+   the desktop boards', for a real pointer only. tests/track-row.test.ts
+   holds this to the spec. */
+
+.row {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  gap: var(--dg-space-3);
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0;
+  border: 0;
+  border-bottom: 1px solid var(--dg-line);
+  border-radius: var(--dg-radius-0);
+  background-color: transparent;
+  color: var(--dg-fg);
+  font-family: var(--dg-font-ui);
+  line-height: normal;
+  text-align: left;
+  cursor: pointer;
+}
+
+.row:focus-visible {
+  outline: 2px solid var(--dg-focus);
+  outline-offset: 2px;
+}
+
+.nested {
+  height: 56px;
+  padding: 0 var(--dg-space-3) 0 calc(var(--dg-space-3) + 56px + var(--dg-space-3));
+  background-color: var(--dg-surface-translucent);
+}
+
+.list {
+  height: 52px;
+  padding: 0;
+}
+
+.lit {
+  background-color: var(--dg-surface-raised);
+}
+
+.index {
+  flex: none;
+  display: flex;
+  align-items: center;
+  width: 24px;
+  color: var(--dg-fg-subtle);
+  font-family: var(--dg-font-readout);
+  font-size: var(--dg-text-readout);
+  line-height: 1;
+}
+
+.nested .index {
+  justify-content: center;
+}
+
+.title {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--dg-space-2);
+  font-size: var(--dg-text-title-s);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.titleText {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lit .title {
+  color: var(--dg-accent);
+}
+
+.lead {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  box-sizing: border-box;
+  height: 20px;
+  padding: 0 var(--dg-space-1);
+  border: 1px solid var(--dg-accent);
+  border-radius: var(--dg-radius-s);
+  color: var(--dg-accent);
+  font-size: var(--dg-text-label);
+  letter-spacing: 0.12em;
+}
+
+/* Five VT323 cells hold "00:12", the widest the column gets. */
+.time {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 5ch;
+  color: var(--dg-fg-subtle);
+  font-family: var(--dg-font-readout);
+  font-size: var(--dg-text-readout);
+  line-height: 1;
+}
+
+.lit .time {
+  color: var(--dg-accent);
+}
+
+.loadGlyph {
+  color: var(--dg-fg-muted);
+}
+
+.ring {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--dg-outline);
+  border-radius: 50%;
+  color: var(--dg-fg);
+}
+
+.running .ring {
+  border-color: var(--dg-accent);
+  background-color: var(--dg-accent);
+  color: var(--dg-on-accent);
+}
+
+@media (min-width: 768px) {
+  .row {
+    gap: var(--dg-space-4);
+  }
+
+  .nested {
+    height: 60px;
+    padding: 0 var(--dg-space-4) 0 calc(var(--dg-space-4) + 60px + var(--dg-space-4));
+  }
+
+  .list {
+    height: 56px;
+    padding: 0 var(--dg-space-2);
+  }
+
+  .index {
+    width: 28px;
+  }
+}
+
+@media (hover: hover) {
+  .list:not(.lit):hover {
+    background-color: var(--dg-surface);
+  }
+
+  .nested:hover {
+    background-color: var(--dg-surface-raised);
+  }
+}

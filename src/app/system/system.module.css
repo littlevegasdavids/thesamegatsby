@@ -541,6 +541,17 @@
   border-radius: var(--dg-radius-m);
 }
 
+/* Track rows on the surfaces they sit on: nested rows under an expanded
+   release, which bleeds past the page's padding on a phone as the boards'
+   rows do, and the hero's list under its hairline. */
+.trackGroup {
+  margin-inline: calc(var(--dg-space-3) * -1);
+}
+
+.trackList {
+  border-top: 1px solid var(--dg-line);
+}
+
 @media (min-width: 768px) {
   .page {
     padding: var(--dg-space-7) var(--dg-space-8) var(--dg-space-9);
@@ -557,6 +568,10 @@
   }
 
   .barStrip {
+    margin-inline: 0;
+  }
+
+  .trackGroup {
     margin-inline: 0;
   }
 }

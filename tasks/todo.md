@@ -798,7 +798,7 @@ Review round 3 (3 Nov 2026):
 
 ## Phase 7: Discography
 
-- [ ] **DS-19: `TrackRow`**
+- [x] **DS-19: `TrackRow`**
   - The whole row is one `<button>` with `aria-pressed`, labelled "Play {title} snippet" or "Stop {title} snippet". The states are idle, loading, playing and played.
   - When playing, the number becomes the sparkle, the time column shows the elapsed time ("00:12") from `elapsed`, and the ring fills amber with a stop square. When played, the time reads "END". Loading isn't drawn on the canvas, so it uses the readout's load glyph in the time column.
   - Variants, as settled by G4:
@@ -812,8 +812,31 @@ Review round 3 (3 Nov 2026):
   - **Verify:**
     - the `/system` states for both variants at 360 px
     - **Canvas:** nested rows in the expanded EP on `Main.dc.html` at 390 px and `HomeDesktop.dc.html` at 1440 px. List rows on `PhoneHeroEP.dc.html` and `PhoneHeroAlbum.dc.html` at 390 px, and `DesktopHeroes.dc.html` at 1440 px
+  - **Done 4 Nov 2026.** Before writing it, Reno answered two things the boards draw and the spec didn't cover, and the spec now records both. **Rows hover as the desktop boards draw them,** and **a played row stays lit.** `TrackRow` renders one `<button type="button">` with `aria-pressed` and an `aria-label` of "Play {title} snippet" or "Stop {title} snippet", holding four columns: the number, the title (with LEAD), the time and the ring. `states.ts` holds `TRACK_ROW_STATES`, `trackRowLook()` (lit in every state but idle, running while loading or playing), `trackRowLabel()`, `trackNumber()` and `trackRowTime()`, so the tests can import them. `format.ts` gains `formatLength()`, which gives the rows' "0:30". Lit rows take `--dg-surface-raised`, the sparkle in place of the number, and an amber title and time. Running rows fill the ring amber with the stop square. `/system` has a Discography section: nested rows on the backdrop, and list rows under their hairline, each in the four states plus a long title, with LEAD on the lead track. `tests/track-row.test.ts` (30 tests) and two `formatLength` tests check the states, the label, the time per state, the one button with no link in it, no client state, the glyph swaps, `aria-hidden` glyphs and no live region, LEAD, the heights, the nested indent, the surfaces, the fixed columns, the ellipsis, the type tokens, the lit and running looks, the muted load glyph, the ring, hover only inside `hover: hover`, no transition, and every text and outline pair's contrast. Decisions:
+    - **Loading is DS-19's proposal, for Checkpoint 7.** It looks like playing, but the time column shows the readout's dotted circle, muted and still. The spec describes it.
+    - **The row is pressed only while it runs.** A played row is lit but not pressed, and reads "Play …", since a tap plays it again.
+    - **The time column is a fixed 5ch,** the width of "00:12" in VT323, so the title never moves between states. The boards size it to its text.
+    - **The nested indent is the release row's padding, its cover and its gap:** 12 + 56 + 12 = 80 px on a phone and 16 + 60 + 16 = 92 px from 768 px, both the boards' indents, built from space tokens. DS-20 uses the same padding and gap, so the titles line up.
+    - **The glyphs are reused:** the ring's play and stop from `Button`'s `glyphs.ts`, the load glyph from `VhsReadout`'s `modes.ts`, and the sparkle at 14 px.
+    - **`onToggle` is optional,** as `Button`'s `onClick` is, so `/system`'s server sections can show the states. `site` always passes it.
+    - **The aria-label leaves out LEAD,** as the spec words the label.
+    - `TrackRow` and its state and variant types are exported from `index.ts`.
+  - **Checks.** These ran in headless Brave over the protocol (`phase-7/tools/page-check.mjs`, `ds19-probe.js` and `hover.mjs` in the session notes), against `npm run build` served locally:
+    - **360, 768, 1280, 390 and 1440 px:** nested rows are 56 px tall below 768 px and 60 px from it, list rows 52 and 56, every one 44 px or more. The number column is 24, then 28, px, the time 40, then 44, px, and the ring 36 × 36. In each variant the title is the same width in all four states, so nothing shifts. The long title truncates with an ellipsis, with the time and ring inside the row. The colours compute to the tokens. No horizontal scroll, and no console problems.
+    - **Keyboard:** Tab now makes 87 stops on `/system`. The ten new ones are the rows, each with the 2 px `rgb(244, 228, 9)` ring 2 px out.
+    - **Accessibility tree:** each row is a button named "Play …" or "Stop …", pressed only while loading or playing. No glyph, number or time is exposed.
+    - **Hover, forced:** an idle nested row goes from the translucent surface to `rgb(23, 27, 48)`, an idle list row from transparent to `rgb(14, 17, 32)`, and lit rows stay raised, each with a 0 s transition.
+    - **Reduced motion:** 0 animations, against 9 without it, as before.
+    - **`/`:** none of its 11 files holds a TrackRow class or the long title.
+    - **Canvas:** the boxes were compared with the boards' declared values: `Main.dc.html`'s nested rows at 390 px, `HomeDesktop.dc.html`'s at 1440 px, and the list rows on `PhoneHeroAlbum.dc.html` and `DesktopHeroes.dc.html`. Row heights, the nested indent, the list padding, the column widths of the number and ring, and the type sizes match. The rest is listed below. A screenshot at 390 px is `ds19-390.png` in the session scratchpad.
+    - **Not checked:** the board markup rebuilt in the browser beside ours, as earlier tasks did, plus headed Brave, Safari, a real phone and a real screen reader. Clicking a row does nothing on `/system` yet. DS-22's stack plays and stops rows.
+  - **Canvas drift, for Checkpoint 7:**
+    - **The gaps are the space tokens:** 12 px between columns on a phone (the board has 14) and 16 px from 768 px (18). So the title starts 2 px further left, and the ring sits 12 px (16 px) from the right edge, against 10 (14).
+    - **The time column is 40 px (44 px) wide at every state,** where the board's "0:30" takes 32 px (35 px), so an idle title has 8 px less room.
+    - **LEAD is 12 px label type,** against the boards' 9 and 10 px, with 4 px padding and a 4 px radius (the boards have 5–6 px and 3 px).
+    - Loading has no canvas reference. The dotted circle is faint at 11 px, as DS-12 found.
   - **Depends on:** DS-9, DS-12, DS-14, and G4 answered
-  - **Files:** `src/design-system/components/TrackRow/*`, `src/app/system/sections/DiscographySection.tsx`
+  - **Files:** `src/design-system/components/TrackRow/*`, `src/app/system/sections/DiscographySection.tsx`. Also `src/design-system/format.ts`, `tests/track-row.test.ts`, `tests/format.test.ts`, `src/app/system/system.module.css`, `src/design-system/index.ts`, `src/app/system/page.tsx` and the spec edits above
   - **Size:** M
 
 - [ ] **DS-20: `ReleaseRow`**

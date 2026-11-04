@@ -7,6 +7,8 @@ export { SiteHeader } from "./components/SiteHeader/SiteHeader";
 export { SocialLinks } from "./components/SocialLinks/SocialLinks";
 export { SparkleStar } from "./components/SparkleStar/SparkleStar";
 export { StreamLinks } from "./components/StreamLinks/StreamLinks";
+export { TrackRow } from "./components/TrackRow/TrackRow";
+export type { TrackRowState, TrackRowVariant } from "./components/TrackRow/states";
 export { VhsReadout } from "./components/VhsReadout/VhsReadout";
 export { Wordmark } from "./components/Wordmark/Wordmark";
 export { releaseCategory, releaseFilterOptions } from "./release-filter";

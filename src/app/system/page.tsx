@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ButtonSection } from "./sections/ButtonSection";
+import { DiscographySection } from "./sections/DiscographySection";
 import { FixtureSection } from "./sections/FixtureSection";
 import { HeaderSection } from "./sections/HeaderSection";
 import { IconsSection } from "./sections/IconsSection";
@@ -36,6 +37,7 @@ export default function System() {
       <IconsSection />
       <LinksSection />
       <HeaderSection />
+      <DiscographySection />
     </main>
   );
 }

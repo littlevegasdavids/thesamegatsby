@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, test } from "node:test";
-import { formatTime } from "../src/design-system/format.ts";
+import { formatLength, formatTime } from "../src/design-system/format.ts";
 
 describe("formatTime", () => {
   test("shows zero as 00:00", () => {
@@ -24,5 +24,19 @@ describe("formatTime", () => {
     assert.equal(formatTime(Number.NaN), "--:--");
     assert.equal(formatTime(-1), "--:--");
     assert.equal(formatTime(Number.POSITIVE_INFINITY), "--:--");
+  });
+});
+
+describe("formatLength", () => {
+  test("shows a snippet's length as m:ss, as the rows draw it", () => {
+    assert.equal(formatLength(30), "0:30");
+    assert.equal(formatLength(0), "0:00");
+    assert.equal(formatLength(75.9), "1:15");
+  });
+
+  test("shows -:-- for NaN, negative or infinite input", () => {
+    assert.equal(formatLength(Number.NaN), "-:--");
+    assert.equal(formatLength(-1), "-:--");
+    assert.equal(formatLength(Number.POSITIVE_INFINITY), "-:--");
   });
 });
