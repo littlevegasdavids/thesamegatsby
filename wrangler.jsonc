@@ -5,9 +5,13 @@
   // Assets only, with no `main` script: every request is a free static-asset
   // request, served from the `next build` export.
   "assets": { "directory": "./out", "not_found_handling": "404-page" },
-  // Branch pushes upload a version with its own preview URL (CF-4). Wrangler
-  // defaults this to false.
-  "preview_urls": true
+  // Branch pushes upload a version with its own preview URL (CF-4), such as
+  // redesign-thesamegatsby.renodavids8.workers.dev. Wrangler defaults this to
+  // false.
+  "preview_urls": true,
+  // Keep the production workers.dev address off. Previews work without it, and
+  // Wrangler's default (true) would switch it back on at a production deploy.
+  "workers_dev": false
   // No `routes` yet. www.thesamegatsby.com stays unattached until the site is
   // ready, and the custom-domain route is added at cutover (CF-5).
 }

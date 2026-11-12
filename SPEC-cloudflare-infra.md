@@ -41,9 +41,10 @@ visitor ──► www.thesamegatsby.com ──► Worker "thesamegatsby" (static
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "thesamegatsby",
-  "compatibility_date": "<date of setup>",
+  "compatibility_date": "2026-10-26",
   "assets": { "directory": "./out", "not_found_handling": "404-page" },
-  "preview_urls": true
+  "preview_urls": true,
+  "workers_dev": false
 }
 ```
 
@@ -155,7 +156,7 @@ Encoding and uploading the real media (`media-pipeline`), the page itself (`site
 
 ## Open questions
 
-1. **Workers Builds details to confirm at setup:** that it reads `.node-version`, and that build results show as status checks on GitHub commits and pull requests. If either doesn't hold, the fallback is a `NODE_VERSION` build variable and the Cloudflare dashboard's build log.
+1. **Workers Builds details to confirm at setup:** **Both hold, checked on 12 Nov 2026.** The build log reads `.node-version` and installs Node 24.22.2. Each build posts a "Workers Builds: thesamegatsby" check on the GitHub commit, with a link to its log.
 2. **Does the Transform Rule's static header apply to R2 custom-domain responses served from cache?** **Yes, checked on 4 Nov 2026.** A copy cached without `Origin` comes back as a `HIT` with `access-control-allow-origin: *`. R2 sends `Vary: Origin`, so a request with `Origin` can have its own cache entry, and the header is on that too. No R2 CORS policy is needed.
 3. **Content-Security-Policy.** The App Router's static export inlines its bootstrap scripts, so a strict `script-src` breaks hydration. Whether to ship a CSP, and with which hashes or `'unsafe-inline'`, gets decided against the real `out/` build in `site`.
-4. **Do branch preview URLs need `workers_dev` left on?** Wrangler 4.153's schema answers half of it: `preview_urls` defaults to `false`, so `wrangler.jsonc` sets it to `true`. `workers_dev` stays at its default (`true`). Whether previews still work with it off gets checked at CF-4. If they do, it's turned off at launch.
+4. **Do branch preview URLs need `workers_dev` left on?** **No, checked on 12 Nov 2026.** The Worker's dashboard has two switches, one for the production `workers.dev` address and one for previews. With production off and previews on, `redesign-thesamegatsby.renodavids8.workers.dev` serves the branch, and the production address returns error 1042. `wrangler.jsonc` sets `preview_urls: true` (Wrangler's default is `false`) and `workers_dev: false`, so a production deploy can't switch the public address back on.

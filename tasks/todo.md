@@ -277,7 +277,7 @@ Review round 3 (3 Nov 2026):
   - **Size:** S
   - **Note:** the probe stays in the bucket. Deleting R2 objects is something Reno does, not me.
 
-- [ ] **CF-4: Workers Builds connected to GitHub, with a preview URL for `redesign`** 👤 🔒 *(push)*
+- [x] **CF-4: Workers Builds connected to GitHub, with a preview URL for `redesign`** 👤 🔒 *(push)*
   - Reno connects the repo in Workers Builds with these settings:
     - production branch `main`
     - build command `npm run ci`
@@ -290,14 +290,26 @@ Review round 3 (3 Nov 2026):
     - the build log shows Node 24 and the lint, typecheck and test steps running
     - `main` and `www` are untouched: `www` still resolves to nothing
   - **Verify:** the build log, then `curl` and the built-in browser on the preview URL. Note whether a GitHub status check appears.
+  - **Done 12 Nov 2026.**
+    - **Reno connected the repo** with these settings. The import also deployed a starter Worker as production (`710954b8`). It isn't on any domain or public address, and the first good `main` deploy replaces it at launch.
+    - **The first `redesign` push came before the connection,** so an empty commit (`aab4326`) triggered the first build. It failed at `tsc`: `next-env.d.ts` is gitignored and only written by `next dev`, `next build` or `next typegen`, so a fresh clone had no types for the `.svg` imports. `9350483` runs `next typegen` before `tsc`. A fresh clone then passed lint, typecheck, 450 tests and the build.
+    - **The build of `9350483` passed** in 1 m 18 s on Node 24.22.2, read from `.node-version`, and uploaded version `b36921b6` with the alias `redesign`. The `main` build failed, as expected: `main` is still the old site.
+    - **No preview URL at first.** Both `workers.dev` switches on the Worker's Domains tab were off. Reno switched on Preview only. `workers_dev: false` now keeps the production address off in config too.
+    - **The build uses a token named "kerdo-site build token",** an account token Cloudflare reused from another project. Reno is replacing it with one for this site.
+  - **Checks:**
+    - `https://redesign-thesamegatsby.renodavids8.workers.dev`: `/` and `/system` return `200` with `max-age=0, must-revalidate`, a `/_next/static/` chunk is `immutable`, and an unknown path is `404` with Next's 404 page. Every response has `nosniff` and the referrer policy.
+    - `/system` loads in the built-in browser with no console errors.
+    - The production address, `thesamegatsby.renodavids8.workers.dev`, returns error 1042, and `www` still resolves to nothing.
+    - GitHub shows a "Workers Builds: thesamegatsby" check on each commit: failure on `aab4326`, success on `9350483`.
+  - **Not checked:** a build with `workers_dev: false` in `wrangler.jsonc`. It runs on the next push.
   - **Depends on:** CF-2, DS-2
   - **Files:** `wrangler.jsonc` (if the previews setting needs changing), `SPEC-cloudflare-infra.md` (answer its open questions 1 and 4)
   - **Size:** S
 
 ### Checkpoint 3
-- [ ] The preview URL serves the latest `redesign` push
+- [x] The preview URL serves the latest `redesign` push (CF-4, 12 Nov 2026)
 - [x] `scripts/check-edge.sh media` passes (CF-3, 4 Nov 2026)
-- [ ] `www` still points at nothing, as Reno chose
+- [x] `www` still points at nothing, as Reno chose (12 Nov 2026)
 
 ---
 
