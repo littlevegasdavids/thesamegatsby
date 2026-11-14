@@ -147,6 +147,15 @@ describe("parseCatalogue()", () => {
       rejects(/releases\[0\]\.tracks/, (d) => (single(d).tracks = []));
     });
 
+    test("an EP or album may hold one track only while add-song builds it", () => {
+      const data = valid();
+      ep(data).tracks.pop();
+      assert.throws(() => parseCatalogue(data), /two or more tracks.*--release/);
+      assert.doesNotThrow(() => parseCatalogue(data, { allowShortReleases: true }));
+      ep(data).tracks.pop();
+      assert.throws(() => parseCatalogue(data, { allowShortReleases: true }), /releases\[1\]\.tracks/);
+    });
+
     test("an EP or album has two or more", () => {
       const data = valid();
       ep(data).type = "album";

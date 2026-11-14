@@ -180,7 +180,7 @@ export const coverSrcSet = (cover: Cover, format: CoverFormat) =>
 
 `parseCatalogue()` and `tests/catalogue.test.ts` check:
 - Ids are kebab-case. Release ids are unique, and **track ids are unique across the whole catalogue**, since `audio-engine` plays by track id.
-- A single has exactly one track. An EP or album has two or more.
+- A single has exactly one track. An EP or album has two or more. `add-song` alone accepts an EP or album with one track, because it adds a track per run, so `songs.json` holds a one-track EP between the first and second runs. The site build stays strict, so an unfinished EP fails `next build` until its second track joins.
 - `leadTrackId` names one of the release's own tracks. At most one release is `featured`.
 - Dates are real ISO dates, and releases run newest first.
 - Every key matches its pattern, with the track's or release's own id in it.

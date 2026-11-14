@@ -1369,7 +1369,17 @@ Plan: [plan.md, media-pipeline](plan.md#implementation-plan-media-pipeline). Spe
   - **Files:** `scripts/media/covers.ts`, `tests/media-covers.mac.test.ts`
   - **Size:** M
 
-- [ ] **MP-7: Arguments and the catalogue merge**
+- [x] **MP-7: Arguments and the catalogue merge**
+  - **Done 14 Nov 2026.** 27 tests in `tests/media-args-merge.test.ts`, plus one more in `tests/catalogue.test.ts`. All 610 pass. `npm run ci` passes.
+    - **Two checks before any work:** `planMerge()` runs before anything is built and catches every clash that needs the catalogue. `parseAddSongArgs()` catches everything that doesn't. `applyMerge()` runs the plan again after the build, so the two can't drift.
+    - **Spec contradiction resolved: a one-track EP.** The spec's commands add an EP's tracks one run at a time, but its validation said an EP has two or more tracks, so the first run could never write a valid `songs.json`.
+      - **The fix:** `parseCatalogue()` takes `allowShortReleases`, which only `add-song` passes.
+      - **The site stays strict:** an unfinished EP fails `next build` until its second track joins.
+      - **Recorded in the spec:** the Validation section now says so.
+    - **`--kind` stays unset unless given,** so `--replace` keeps a remix a remix. A new track defaults to `original`.
+    - **Release-level flags on an existing release are refused:** `--date`, `--type`, `--release-title` and `--release-id` only set up a new release, so on an existing one they say "edit songs.json to change it" rather than being ignored. `--cover` on an existing release needs `--replace`.
+    - **Shared rules:** `isRealDate()` and `linkProblem()` are now exported from `src/catalogue/validate.ts`, so the flags and the catalogue use one set of rules. A bad link is refused as, for example, `--spotify: music.apple.com isn't a spotify host`.
+    - **Links:** each one sets or replaces its platform and keeps the others, written in the fixed platform order.
   - `scripts/media/args.ts` parses every flag in the spec's table, refusing unknown flags and missing required ones before any work. `merge.ts` adds the result to a catalogue:
     - a new single
     - a new EP or album

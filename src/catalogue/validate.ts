@@ -83,12 +83,34 @@ function number(value: unknown, path: string, { min, integer = false, above = fa
 }
 
 // A real calendar day in YYYY-MM-DD, so 2023-02-29 and 2024-13-01 are refused.
-function isoDate(value: unknown, path: string): string {
-  const s = text(value, path);
+// Exported so add-song checks --date with the same rule.
+export function isRealDate(s: string): boolean {
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
   const day = match && new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3])));
-  if (!day || day.toISOString().slice(0, 10) !== s) throw new CatalogueError(path, `"${s}" must be a real date, written YYYY-MM-DD`);
+  return !!day && day.toISOString().slice(0, 10) === s;
+}
+
+function isoDate(value: unknown, path: string): string {
+  const s = text(value, path);
+  if (!isRealDate(s)) throw new CatalogueError(path, `"${s}" must be a real date, written YYYY-MM-DD`);
   return s;
+}
+
+// What's wrong with a platform link, or undefined if nothing is. Exported so
+// add-song refuses a bad --<platform> flag before any work.
+export function linkProblem(platform: PlatformId, raw: string): string | undefined {
+  let url: URL;
+  try {
+    url = new URL(raw);
+  } catch {
+    return `"${raw}" isn't a URL`;
+  }
+  if (url.protocol !== "https:") return "must be https";
+  if (!HOSTS[platform](url.hostname)) return `${url.hostname} isn't a ${platform} host`;
+  for (const param of url.searchParams.keys()) {
+    if (isTracking(param)) return `carries the tracking parameter ${param}`;
+  }
+  return undefined;
 }
 
 function link(value: unknown, path: string, seen: Set<string>) {
@@ -96,19 +118,8 @@ function link(value: unknown, path: string, seen: Set<string>) {
   const platform = oneOf(l.platform, PLATFORM_IDS, `${path}.platform`);
   if (seen.has(platform)) throw new CatalogueError(`${path}.platform`, `${platform} is listed more than once`);
   seen.add(platform);
-
-  const raw = text(l.url, `${path}.url`);
-  let url: URL;
-  try {
-    url = new URL(raw);
-  } catch {
-    throw new CatalogueError(`${path}.url`, `"${raw}" isn't a URL`);
-  }
-  if (url.protocol !== "https:") throw new CatalogueError(`${path}.url`, "must be https");
-  if (!HOSTS[platform](url.hostname)) throw new CatalogueError(`${path}.url`, `${url.hostname} isn't a ${platform} host`);
-  for (const param of url.searchParams.keys()) {
-    if (isTracking(param)) throw new CatalogueError(`${path}.url`, `carries the tracking parameter ${param}`);
-  }
+  const problem = linkProblem(platform, text(l.url, `${path}.url`));
+  if (problem) throw new CatalogueError(`${path}.url`, problem);
 }
 
 function snippet(value: unknown, path: string, trackId: string) {
@@ -151,7 +162,11 @@ function* strings(value: unknown, path: string): Generator<[string, string]> {
   else if (typeof value === "object" && value !== null) for (const [k, v] of Object.entries(value)) yield* strings(v, `${path}.${k}`);
 }
 
-export function parseCatalogue(data: unknown): Catalogue {
+// allowShortReleases lets an EP or album hold a single track. add-song builds
+// one a track per run, so between its first and second runs songs.json holds
+// a one-track EP. Only add-song passes it: the site build stays strict, so an
+// unfinished EP fails `next build` until its second track joins.
+export function parseCatalogue(data: unknown, { allowShortReleases = false }: { allowShortReleases?: boolean } = {}): Catalogue {
   if (typeof data !== "object" || data === null || Array.isArray(data)) {
     throw new CatalogueError("(root)", "the catalogue must be an object");
   }
@@ -189,8 +204,10 @@ export function parseCatalogue(data: unknown): Catalogue {
     cover(release.cover, `${path}.cover`, releaseId);
 
     const tracks = array(release.tracks, `${path}.tracks`);
-    if (type === "single" ? tracks.length !== 1 : tracks.length < 2) {
-      throw new CatalogueError(`${path}.tracks`, `a ${type} has ${type === "single" ? "exactly one track" : "two or more tracks"}, not ${tracks.length}`);
+    const fewest = type === "single" || allowShortReleases ? 1 : 2;
+    if (type === "single" ? tracks.length !== 1 : tracks.length < fewest) {
+      const rule = type === "single" ? "exactly one track" : "two or more tracks: add the next with add-song --release";
+      throw new CatalogueError(`${path}.tracks`, `a ${type} has ${rule}, not ${tracks.length}`);
     }
     const ownTrackIds = tracks.map((value, t) => {
       const trackPath = `${path}.tracks[${t}]`;
