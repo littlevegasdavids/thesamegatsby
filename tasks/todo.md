@@ -1212,7 +1212,12 @@ Review round 3 (3 Nov 2026):
 
 Plan: [plan.md, media-pipeline](plan.md#implementation-plan-media-pipeline). Spec: [SPEC-media-pipeline.md](../SPEC-media-pipeline.md). Every task is test-first. Tests that need `afconvert`, `sips` or `cwebp` skip where `process.platform !== "darwin"`, and each Done note says whether they ran.
 
-- [ ] **MP-1: Catalogue types, validation and URL helpers**
+- [x] **MP-1: Catalogue types, validation and URL helpers**
+  - **Done 14 Nov 2026.** 36 tests in `tests/catalogue.test.ts`, and all 486 pass. `npm run ci` passes.
+    - **Beyond the spec:** unknown fields are refused, so a misspelt hand edit such as `featurd` fails instead of being ignored. The r2.dev check runs over every string in the file.
+    - **Runtime lists:** the ids are `as const` lists (`PLATFORM_IDS`, `RELEASE_TYPES`, `TRACK_KINDS`, `COVER_FORMATS`) with the spec's types taken from them, because validation needs them at runtime.
+    - **Drift check:** a type-level equality check means drift fails `npm run typecheck`. Adding a fourth track kind was tried, the check failed, and the change was reverted.
+    - **Not yet run through `next build`:** `index.ts` imports `songs.json` with `with { type: "json" }`, which Node needs. Nothing on the site imports the catalogue yet, so `next build` hasn't compiled it. MP-11 is the first to do that.
   - `src/catalogue/types.ts`, `validate.ts` (`parseCatalogue()`), `media.ts` (`MEDIA_ORIGIN`, `snippetUrl`, `coverUrl`, `coverSrcSet`) and `index.ts`, as the spec writes them. `songs.json` starts as `{ "releases": [] }`, so nothing reads it yet.
   - **Acceptance:**
     - `parseCatalogue()` throws, naming the field, for each rule in the spec's Validation section:
