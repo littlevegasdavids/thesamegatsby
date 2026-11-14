@@ -5,7 +5,7 @@ import type { Catalogue, PlatformId } from "./types.ts";
 // throws on the first problem, naming the field, so a bad hand edit fails
 // `next build` and the tests with a message saying what to fix.
 
-const KEBAB = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+export const KEBAB = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const HASH = "[0-9a-f]{8}";
 const SNIPPET_LENGTH = 30;
 const SNIPPET_TOLERANCE = 0.05;

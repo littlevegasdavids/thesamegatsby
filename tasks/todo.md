@@ -1240,7 +1240,12 @@ Plan: [plan.md, media-pipeline](plan.md#implementation-plan-media-pipeline). Spe
   - **Files:** `src/catalogue/*`, `tests/catalogue.test.ts`
   - **Size:** M
 
-- [ ] **MP-2: Ids, keys and link cleaning**
+- [x] **MP-2: Ids, keys and link cleaning**
+  - **Done 14 Nov 2026.** 16 tests in `tests/media-ids-keys.test.ts`, and all 502 pass. `npm run ci` passes.
+    - **YouTube video links keep only `v`**, beyond the `si`/`utm_*` rule, because that's how the `/system` fixture hand-cleaned KaiZen's and Can't You See's links (`list` and `index` tie a video to the playlist it was shared from). `music.youtube.com/playlist?list=…` keeps its `list`.
+    - **The query is filtered as written, not re-encoded,** so SoundCloud's `in=artist/sets/x` keeps its slashes.
+    - **Each cover file is hashed with its slot and length,** so bytes can't shift between files and give the same hash.
+    - **Generated keys pass MP-1's validation**, checked in the same test file. `KEBAB` is now exported from `src/catalogue/validate.ts` so both use one pattern.
   - `scripts/media/ids.ts`: kebab-case ASCII from a title, with `-ep` and `-album` release ids. `keys.ts`: the 8-hex SHA-256 prefix, and snippet and cover keys, the cover hash taken over its eight files in a fixed order. `links.ts`: strips `si` and `utm_*`, and maps each `--<platform>` flag to a platform id.
   - **Acceptance:**
     - "Welcome to Vapor_City" gives `welcome-to-vapor-city` and "Can't You See" gives `cant-you-see`, with the EP id `cant-you-see-ep`
