@@ -1271,11 +1271,24 @@ Plan: [plan.md, media-pipeline](plan.md#implementation-plan-media-pipeline). Spe
   - **Files:** `scripts/media/wav.ts`, `scripts/media/fade.ts`, `tests/media-wav-fade.test.ts`
   - **Size:** M
 
-- [ ] **MP-3b: Loudness meter and match**
+- [x] **MP-3b: Loudness meter and match**
+  - **Done 14 Nov 2026.** 16 tests in `tests/media-loudness.test.ts`, and all 539 pass. `npm run ci` passes. The file adds about 4 s to `npm test`.
+    - **Gating case corrected:** the plan first gave EBU 3341's gating case as three 10 s parts. It's 10 s at −36, 60 s at −23 and 10 s at −36 dBFS. With equal thirds, the −36 parts sit only 8.6 LU under the average, so the −10 LU gate rightly keeps them. EBU's case 4, with −72 at each end, is tested too.
+    - **Coefficients checked:** the 48 kHz K-weighting matches BS.1770-4's published values to 1e-8.
+    - **Mono masters:** counted as played through both speakers (+3 dB against one channel), so a mono master is matched like a stereo one.
+    - **True peak:** uses 4× oversampling with a 32-tap Blackman-windowed sinc. It isn't BS.1770's own Annex 2 filter, but the quarter-sample-rate test reads 0 dBTP where the sample peak reads −3.01.
+    - **Not checked against another meter:** none is installed (no ffmpeg). The EBU signals are the proof.
+    - **The old 15 s snippets as measured,** for scale only, since the masters get measured in MP-10:
+      - Can't You See −26.4 LUFS
+      - Vapor_City −16.5
+      - Bring That Change −15.8
+      - KaiZen −14.7
+      - Forever −12.7, with a true peak of +0.2 dBTP
+      - UKG 333 −10.9
   - `scripts/media/loudness.ts` measures integrated loudness to ITU-R BS.1770-4: K-weighting with the coefficients worked out for the file's sample rate, 400 ms blocks with 75% overlap, an absolute gate at −70 LUFS and a relative gate at −10 LU. It also measures the 4× oversampled true peak, and works out the gain to −14 LUFS, capped so the true peak stays at or below −1 dBTP. It's applied to the 30 s cut before the fades, as the spec's Snippet table says.
   - **Acceptance,** on signals generated as EBU Tech 3341 describes them:
     - a 20 s, 1 kHz stereo sine at −23 dBFS measures −23.0 ± 0.1 LUFS at 44.1 and 48 kHz, and at −33 dBFS measures −33.0 ± 0.1
-    - 10 s at −36, 10 s at −23 and 10 s at −36 dBFS measures −23.0 ± 0.1, which proves the gating
+    - 10 s at −36, 60 s at −23 and 10 s at −36 dBFS measures −23.0 ± 0.1, and so does the same with 10 s at −72 dBFS at each end, which proves both gates
     - a full-scale sine at a quarter of the sample rate, offset 45°, has a sample peak near −3 dBFS but a true peak of 0 ± 0.5 dBTP
     - a loud cut is turned down to −14. A quiet cut is raised only as far as −1 dBTP, and the result reports the shortfall in LU
     - silence gives no gain and is reported, rather than raised without limit
