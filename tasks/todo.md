@@ -1339,7 +1339,26 @@ Plan: [plan.md, media-pipeline](plan.md#implementation-plan-media-pipeline). Spe
   - **Files:** `scripts/media/encode.ts`, `scripts/media/snippet.ts`, `tests/media-snippet.mac.test.ts`
   - **Size:** M
 
-- [ ] **MP-6: Covers, on the Mac**
+- [x] **MP-6: Covers, on the Mac**
+  - **Done 14 Nov 2026.** 9 tests in `tests/media-covers.mac.test.ts`, which ran on the Mac and passed, and 14 in `tests/media-png.test.ts`, which run anywhere. All 582 pass, none skipped. `npm run ci` passes, with lint clean.
+    - **Alpha is flattened in Node,** in the new `scripts/media/png.ts`, because `sips` has no flatten. Its JavaScript canvas was tried first and shifts colours: pure (200, 50, 30) came back as (184, 63, 43). Instead, `sips` writes an sRGB PNG, Node composites it onto black and writes a plain RGB PNG, and that drops every source chunk, EXIF and GPS included. The background is black, `--dg-black`. None of the five current covers has any transparent pixel, which settles the spec's open check, but `add-song` reports the count.
+    - **AVIF colour is tagged "unspecified":** `sips` writes primaries 2 and transfer 2 whatever the input, even with an sRGB profile embedded. Browsers draw that as sRGB, and `sips` reports the files as sRGB IEC61966-2.1, which the test checks. Patching the bytes wasn't worth the risk.
+    - **`sips` adds a small Exif item** to the smaller AVIFs, holding only the colour space and pixel size. The test allows only those tags and never a GPS pointer, and checks the parser does find GPS when it's there.
+    - **WebP quality is 75**, cwebp's default, because the spec only fixes AVIF's. `--cover-quality` sets AVIF.
+    - **The five real covers built in 0.9–2.0 s each:**
+
+      | Cover | 192 | 384 | 768 | 1080 | WebP 1080 |
+      |---|---|---|---|---|---|
+      | Vapor_City | 3.7 | 9.4 | 23.9 | 39.2 KB | 63.9 KB |
+      | Bring That Change | 5.2 | 13.7 | 30.8 | 47.0 KB | 64.7 KB |
+      | KaiZen, cropped to 1457 | 5.3 | 15.1 | 42.6 | 73.3 KB | 118.4 KB |
+      | Forever | 8.1 | 20.8 | 50.9 | 83.3 KB | 117.4 KB |
+      | Can't You See | 5.2 | 11.7 | 42.9 | 128.7 KB | 194.2 KB |
+
+      Can't You See's 1080 is close to the spec's 133 KB estimate at quality 50.
+    - **Looked at by eye** (a 360 px JPEG of each 1080 AVIF; Quick Look wasn't used):
+      - **KaiZen:** the crop loses nothing visible.
+      - **Bring That Change:** the SVG's 1600² frame cuts the sign's last letters. That's the SVG's own clip, which is why I-6 asks for the original art.
   - `scripts/media/covers.ts` checks the source is square and at least 1080 px with `sips` (`--crop` centre-crops), writes a full-size sRGB PNG with alpha flattened, then AVIF at 192, 384, 768 and 1080 through `sips` (quality 50, or `--cover-quality`) and WebP through `cwebp`, and hashes the eight files. It checks `cwebp` exists first, and stops with `brew install webp` if it doesn't.
   - **Acceptance,** on a generated 1200² test pattern (Mac only):
     - eight square files at the four widths, sRGB, with no EXIF or GPS
