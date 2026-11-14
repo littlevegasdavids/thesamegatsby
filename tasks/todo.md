@@ -1297,7 +1297,16 @@ Plan: [plan.md, media-pipeline](plan.md#implementation-plan-media-pipeline). Spe
   - **Files:** `scripts/media/loudness.ts`, `tests/media-loudness.test.ts`
   - **Size:** M
 
-- [ ] **MP-4: MP4 box walk and timestamp zeroing**
+- [x] **MP-4: MP4 box walk and timestamp zeroing**
+  - **Done 14 Nov 2026.** 13 tests in `tests/media-mp4.test.ts`, and all 552 pass. `npm run ci` passes.
+    - **Checked on real `afconvert` output,** encoding an old snippet's decode twice, 1.2 s apart, with the spec's arguments:
+      - **Box order:** `ftyp moov free mdat`.
+      - **Audio start:** the first audio is at byte 8,192.
+      - **Bit rate:** 164 kbps.
+      - **Repeatability:** the two raw encodes differ in exactly 6 bytes and are byte-identical once zeroed.
+      - **Still plays:** the zeroed file still decodes with `afconvert`.
+    - **The old layout is refused:** the old site's `ukg_333/audio.m4a` (`ftyp free mdat moov`) is refused with "mdat comes before moov".
+    - **Every track is zeroed,** not just the first. If `mvhd`, `tkhd` or `mdhd` is missing, the file is refused rather than staged with times still in it.
   - `scripts/media/mp4.ts` walks the top-level boxes and reports their order, finds the first `mdat` byte, and zeroes the creation and modification times in `mvhd`, `tkhd` and `mdhd` (versions 0 and 1).
   - **Acceptance:**
     - on a hand-built byte fixture: the order is reported, `moov` before `mdat` passes and the reverse is refused, and the six timestamp fields are zero while every other byte is unchanged
