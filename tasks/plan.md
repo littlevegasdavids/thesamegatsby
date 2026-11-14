@@ -236,3 +236,108 @@ That's many sessions of work, roughly two or three tasks per session. I stop at 
 - Checkpoint 2, the style tile
 - Checkpoint 7, the sticky stack on a phone
 - Checkpoint 8, everything on a phone
+
+---
+
+# Implementation Plan: media-pipeline
+
+Planned on 12 Nov 2026 from [SPEC-media-pipeline.md](../SPEC-media-pipeline.md), the next step in SPEC.md's build order. The tasks are MP-1 to MP-11, plus MP-3b for the loudness match added on 14 Nov, in [todo.md](todo.md), Phases 10 and 11. `cloudflare-infra` is done up to launch (CF-1 to CF-4), so the plan doesn't stop for the bucket, as the spec's open question 7 expected it might.
+
+## Overview
+
+By the end of this plan:
+- `npm run add-song` turns a WAV master and a cover into a 30 s fast-start snippet and eight cover files, names them by content hash, uploads them, checks the media domain serves them, and only then writes `src/catalogue/songs.json`
+- `--dry-run` does everything up to the upload, so Reno can listen and look before anything leaves the Mac
+- the five current releases (six tracks) are re-cut from their masters and live on `media.thesamegatsby.com`
+- `songs/index.ts` and the 21 MB `public/music/` are gone
+
+## Architecture decisions
+
+- **Pure functions first, tools last.** WAV parsing, the cut, the loudness meter and fades, the MP4 box walk, ids, keys, argument parsing, the catalogue merge and validation are plain `.ts`, tested on Linux in `npm run ci`. `afconvert`, `sips`, `cwebp` and Wrangler sit behind thin wrappers, tested only on the Mac (skipped where `process.platform !== "darwin"`), because Workers Builds has none of them.
+- **The risky encode comes early.** MP-5, the real `afconvert` round trip, is the fifth task. If Apple's encoder doesn't give `moov` first and byte-identical output on this Mac as the spec found on 4 Nov, the plan learns that before the CLI is built on it.
+- **The orchestrator takes its tools as arguments.** `add-song`'s build → upload → verify → write order is one function that's given its encoder, uploader and checker. The tests pass fakes that fail at each step and check `songs.json` is untouched. Only the entry script wires in the real ones.
+- **Fixtures are generated, not committed.** The tests build their WAVs, MP4 boxes and PNGs in code: a 40 s tone and a 1200² test pattern. No audio or art enters the repo.
+- **`src/catalogue` stays independent of `design-system`.** It repeats the platform, release-type and track-kind ids, as the spec says. A test checks the two lists match, so they can't drift apart.
+- **The old placeholder `/` keeps working throughout.** It moves from `songs/index.ts` to `src/catalogue` only in MP-11, once the catalogue holds the real releases.
+
+## Dependency graph
+
+```
+MP-1 catalogue types, validation, URLs ─┬─────────────────────────────┐
+MP-2 ids, keys, links ──────────────────┤                             │
+MP-3 WAV, cut, fades ──┐                │                             │
+MP-3b loudness match ──┤                │                             │
+MP-4 MP4 boxes ────────┴─ MP-5 snippet encode (Mac) ─┐                │
+                          MP-6 covers (Mac) ─────────┤                │
+                          MP-7 arguments, merge ─────┴─ MP-8 add-song --dry-run
+                                                              │
+                                     MP-9 upload, verify, write, check-media 🔒
+                                                              │
+                                     MP-10 re-cut the five releases 🔒 👤
+                                                              │
+                                     MP-11 retire songs/index.ts and public/music/
+```
+
+MP-1 to MP-4 don't depend on each other, and MP-6 needs only MP-2. They could run in parallel sessions. In practice they go one at a time, as Phases 5–8 did.
+
+## Task list
+
+### Phase 10: To `--dry-run`
+- MP-1: Catalogue types, validation and URL helpers
+- MP-2: Ids, keys and link cleaning
+- MP-3: WAV read and write, the cut and the fades
+- MP-3b: Loudness meter and match, to −14 LUFS with a −1 dBTP cap
+- MP-4: MP4 box walk and timestamp zeroing
+- MP-5: The snippet encode, on the Mac
+- MP-6: Covers, on the Mac
+- MP-7: Arguments and the catalogue merge
+- MP-8: `add-song --dry-run`, end to end
+
+**Checkpoint 10:** Reno runs `--dry-run` on one real master and cover, listens with `afplay` and looks at the covers in Quick Look.
+
+### Phase 11: Live
+- MP-9: Upload, verify, write, and `check-media` 🔒 (the first real upload)
+- MP-10: Re-cut the five releases 🔒 👤
+- MP-11: Retire `songs/index.ts` and `public/music/`
+
+**Checkpoint 11:** every acceptance box in SPEC-media-pipeline.md is ticked, and Reno has heard every snippet.
+
+## Inputs from Reno
+
+None of these block Phase 10. MP-10 needs them all, and MP-8's checkpoint needs one master and one cover.
+
+| | Input | Needed by |
+|---|---|---|
+| I-1 | Where the six WAV masters are on the Mac. They never enter the repo | Checkpoint 10 (one), MP-10 (all) |
+| I-2 | A start second for each track, auditioned with `--dry-run` | MP-10 |
+| I-3 | Each release's date | MP-10 |
+| I-4 | The links for all eight platforms per release. I can read them off the public platform pages for him to check | MP-10 |
+| I-5 | Give me that KaiZen's real type and tracklist | MP-10 |
+| I-6 | Square source art for Give me that KaiZen and Bring That Change, if he has it (otherwise `--crop`, and `sips`'s SVG render) | MP-10 |
+
+## Approvals I'll ask for
+
+| When | What |
+|---|---|
+| MP-9 | The first real upload: one release, to prove the whole path |
+| MP-10 | Each batch of uploads, after Reno has heard the `--dry-run` snippets and seen the covers |
+
+`--dry-run`, the tests and deleting `public/music/` from the repo need no ask. Nothing is installed: `afconvert`, `afinfo` and `sips` ship with macOS, `cwebp` is already installed through Homebrew, and Wrangler came with CF-2.
+
+## Risks and mitigations
+
+| Risk | Impact | Mitigation |
+|---|---|---|
+| A macOS update changes `afconvert`'s or `sips`'s output, so the same inputs hash differently | Medium: re-runs would make new keys | MP-5 and MP-6 test byte-identical output on two runs. Keys never overwrite, so the worst case is a few orphaned objects. Re-cuts happen rarely, and on purpose |
+| `afconvert` stops writing `moov` first | High: slow start, the module's whole point | MP-5 checks it on every Mac test run, and the box walk refuses to stage a file with `mdat` first |
+| The first audio frame lands past 16 KB | Medium: the infra spec's range check, and a slower first byte | MP-5 measures it on the test tone, and MP-8 on a real master |
+| The home-made loudness meter reads wrong | Medium: songs still mismatched, and at the wrong level beside Spotify | MP-3b checks it against EBU Tech 3341's test signals at 44.1 and 48 kHz, and MP-5 re-measures the decoded snippet. Checkpoint 10 is Reno's ears on a real master |
+| Masters at an odd sample rate or bit depth | Low | `afconvert` turns every master into 32-bit float WAV first, so MP-3 only ever reads one format |
+| An upload half succeeds | Low | The catalogue is written last. Keys are immutable, so a re-run uploads the same bytes to the same keys |
+| Can't You See's grain makes its 1080 AVIF heavy | Medium: the 350 KB first-load budget | AVIF at 50 by default, and `--cover-quality` per release. Reno checks by eye in MP-10 |
+| Give me that KaiZen turns out to be several tracks | Low: more tracks to cut | I-5 settles it before MP-10. The catalogue already models EPs and albums |
+| The Mac-only tests rot because CI never runs them | Medium | They run in every local `npm test` on the Mac, and each Done note says they ran |
+
+## Size and cost
+
+There are 12 tasks: seven small or medium pure-code tasks, two Mac integration tasks, the CLI, the upload step and the re-cut. At the pace of Phases 5–8, that's two or three sessions plus the re-cut, which mostly waits on Reno's inputs and listening. Each task runs the test-first loop and ends in its own commit on `redesign`.

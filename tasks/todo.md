@@ -1,4 +1,4 @@
-# Tasks: design-system + cloudflare-infra
+# Tasks: design-system, cloudflare-infra and media-pipeline
 
 Plan: [plan.md](plan.md). Specs: [SPEC.md](../SPEC.md), [SPEC-design-system.md](../SPEC-design-system.md), [SPEC-cloudflare-infra.md](../SPEC-cloudflare-infra.md). Visual reference: the approved canvas ["Déjà Gatsby Screens"](https://claude.ai/artifact/WSB4B7NtCYipXV3GSXmmSo).
 
@@ -1205,6 +1205,179 @@ Review round 3 (3 Nov 2026):
   - **CF-4:** re-run Lighthouse and the traces on the preview URL. DS-25's numbers are from a local server with no compression or caching.
   - **Before public launch:** Amazon Music's stand-in, and the Aero licence (SPEC.md open question 1), as before.
 - [x] Next step: write `SPEC-media-pipeline.md` for review. **Reno approved it as drafted on 4 Nov 2026.** Its seven open questions are still open
+
+---
+
+## Phase 10: media-pipeline, to `--dry-run`
+
+Plan: [plan.md, media-pipeline](plan.md#implementation-plan-media-pipeline). Spec: [SPEC-media-pipeline.md](../SPEC-media-pipeline.md). Every task is test-first. Tests that need `afconvert`, `sips` or `cwebp` skip where `process.platform !== "darwin"`, and each Done note says whether they ran.
+
+- [ ] **MP-1: Catalogue types, validation and URL helpers**
+  - `src/catalogue/types.ts`, `validate.ts` (`parseCatalogue()`), `media.ts` (`MEDIA_ORIGIN`, `snippetUrl`, `coverUrl`, `coverSrcSet`) and `index.ts`, as the spec writes them. `songs.json` starts as `{ "releases": [] }`, so nothing reads it yet.
+  - **Acceptance:**
+    - `parseCatalogue()` throws, naming the field, for each rule in the spec's Validation section:
+      - ids
+      - single and EP track counts
+      - `leadTrackId`
+      - at most one `featured`
+      - real ISO dates, newest first
+      - key patterns
+      - duration 30 s ± 0.05
+      - link hosts, `https`, one per platform
+      - tracking parameters
+      - `r2.dev`
+
+      Each rule gets one passing and one failing case.
+    - the URL helpers build the spec's example URLs exactly
+    - a test checks the catalogue's platform, release-type and track-kind ids equal `src/design-system/types.ts`'s
+  - **Verify:** `npm test`, `npm run typecheck`
+  - **Depends on:** none
+  - **Files:** `src/catalogue/*`, `tests/catalogue.test.ts`
+  - **Size:** M
+
+- [ ] **MP-2: Ids, keys and link cleaning**
+  - `scripts/media/ids.ts`: kebab-case ASCII from a title, with `-ep` and `-album` release ids. `keys.ts`: the 8-hex SHA-256 prefix, and snippet and cover keys, the cover hash taken over its eight files in a fixed order. `links.ts`: strips `si` and `utm_*`, and maps each `--<platform>` flag to a platform id.
+  - **Acceptance:**
+    - "Welcome to Vapor_City" gives `welcome-to-vapor-city` and "Can't You See" gives `cant-you-see`, with the EP id `cant-you-see-ep`
+    - the same bytes give the same key, and any changed byte or reordered cover file gives a different one
+    - the stored `songs/index.ts` links come out clean, matching the `/system` fixture's hand-cleaned ones
+  - **Verify:** `npm test`
+  - **Depends on:** none (the key patterns match MP-1's validation)
+  - **Files:** `scripts/media/ids.ts`, `scripts/media/keys.ts`, `scripts/media/links.ts`, `tests/media-ids-keys.test.ts`
+  - **Size:** S
+
+- [ ] **MP-3: WAV read and write, the cut and the fades**
+  - `scripts/media/wav.ts` reads and writes 32-bit float WAV, mono or stereo. `fade.ts` cuts `[start, start + 30)` and bakes a raised-cosine fade-in and fade-out. `--start` parses seconds or `m:ss.s`. Peak level comes out in dBFS.
+  - **Acceptance:**
+    - a write then read round trip is lossless
+    - the cut is exactly 30 s of frames at 44.1 and 48 kHz. A master shorter than start + 30 s is refused with the shortfall in the message
+    - the fade gain is 0 at the first sample and at the last, 1 between the fades, and follows the raised cosine at the half-way points. The 0.15 s and 2 s defaults and the overrides apply
+  - **Verify:** `npm test` on generated buffers
+  - **Depends on:** none
+  - **Files:** `scripts/media/wav.ts`, `scripts/media/fade.ts`, `tests/media-wav-fade.test.ts`
+  - **Size:** M
+
+- [ ] **MP-3b: Loudness meter and match**
+  - `scripts/media/loudness.ts` measures integrated loudness to ITU-R BS.1770-4: K-weighting with the coefficients worked out for the file's sample rate, 400 ms blocks with 75% overlap, an absolute gate at −70 LUFS and a relative gate at −10 LU. It also measures the 4× oversampled true peak, and works out the gain to −14 LUFS, capped so the true peak stays at or below −1 dBTP. It's applied to the 30 s cut before the fades, as the spec's Snippet table says.
+  - **Acceptance,** on signals generated as EBU Tech 3341 describes them:
+    - a 20 s, 1 kHz stereo sine at −23 dBFS measures −23.0 ± 0.1 LUFS at 44.1 and 48 kHz, and at −33 dBFS measures −33.0 ± 0.1
+    - 10 s at −36, 10 s at −23 and 10 s at −36 dBFS measures −23.0 ± 0.1, which proves the gating
+    - a full-scale sine at a quarter of the sample rate, offset 45°, has a sample peak near −3 dBFS but a true peak of 0 ± 0.5 dBTP
+    - a loud cut is turned down to −14. A quiet cut is raised only as far as −1 dBTP, and the result reports the shortfall in LU
+    - silence gives no gain and is reported, rather than raised without limit
+  - **Verify:** `npm test` on generated buffers
+  - **Depends on:** MP-3 (its WAV buffers)
+  - **Files:** `scripts/media/loudness.ts`, `tests/media-loudness.test.ts`
+  - **Size:** M
+
+- [ ] **MP-4: MP4 box walk and timestamp zeroing**
+  - `scripts/media/mp4.ts` walks the top-level boxes and reports their order, finds the first `mdat` byte, and zeroes the creation and modification times in `mvhd`, `tkhd` and `mdhd` (versions 0 and 1).
+  - **Acceptance:**
+    - on a hand-built byte fixture: the order is reported, `moov` before `mdat` passes and the reverse is refused, and the six timestamp fields are zero while every other byte is unchanged
+    - a truncated or malformed box is refused, not read past
+  - **Verify:** `npm test`
+  - **Depends on:** none
+  - **Files:** `scripts/media/mp4.ts`, `tests/media-mp4.test.ts`
+  - **Size:** S
+
+- [ ] **MP-5: The snippet encode, on the Mac**
+  - `scripts/media/encode.ts` wraps `afconvert` (any master to float WAV, then float WAV to AAC with the spec's arguments) and `afinfo`, through `execFile` with argument arrays. `snippet.ts` chains decode → cut (MP-3) → loudness match (MP-3b) → fades (MP-3) → encode → zero timestamps (MP-4) → hash, and resamples to 48 kHz only when the master isn't 44.1 or 48 kHz.
+  - **Acceptance,** on a generated 40 s tone through the real tools (Mac only):
+    - AAC-LC at 150–170 kbps by `afinfo`, 30 s ± 0.05 s
+    - `moov` before `mdat`, with the first audio frame inside the first 16 KB
+    - decoded back, the first and last 10 ms are below −60 dBFS
+    - decoded back, the snippet measures −14 ± 0.5 LUFS with its true peak at or below −0.5 dBTP
+    - two runs give byte-identical files and the same key
+  - **Verify:** `npm test` on the Mac, with the Done note recording the measured bit rate, duration, first-frame offset, size, loudness and true peak
+  - **Depends on:** MP-2, MP-3, MP-3b, MP-4
+  - **Files:** `scripts/media/encode.ts`, `scripts/media/snippet.ts`, `tests/media-snippet.mac.test.ts`
+  - **Size:** M
+
+- [ ] **MP-6: Covers, on the Mac**
+  - `scripts/media/covers.ts` checks the source is square and at least 1080 px with `sips` (`--crop` centre-crops), writes a full-size sRGB PNG with alpha flattened, then AVIF at 192, 384, 768 and 1080 through `sips` (quality 50, or `--cover-quality`) and WebP through `cwebp`, and hashes the eight files. It checks `cwebp` exists first, and stops with `brew install webp` if it doesn't.
+  - **Acceptance,** on a generated 1200² test pattern (Mac only):
+    - eight square files at the four widths, sRGB, with no EXIF or GPS
+    - byte-identical on a second run
+    - a 1200 × 1180 source is refused without `--crop` and accepted with it, and a 1000² source is refused
+  - **Verify:** `npm test` on the Mac. Also one real cover, Vapor_City's PNG, staged and opened in Quick Look, with the sizes against the spec's table at quality 50
+  - **Depends on:** MP-2
+  - **Files:** `scripts/media/covers.ts`, `tests/media-covers.mac.test.ts`
+  - **Size:** M
+
+- [ ] **MP-7: Arguments and the catalogue merge**
+  - `scripts/media/args.ts` parses every flag in the spec's table, refusing unknown flags and missing required ones before any work. `merge.ts` adds the result to a catalogue:
+    - a new single
+    - a new EP or album
+    - joining an existing release with `--release`
+    - `--replace`
+    - `--lead`
+    - `--featured`, which clears any other flag
+
+    It keeps the releases newest first and returns the new `songs.json` text (2-space indent, trailing newline).
+  - **Acceptance:**
+    - each merge case gives the expected catalogue, and the result passes `parseCatalogue()`
+    - an existing id without `--replace`, `--release` with an unknown id, a missing `--date` or `--cover` for a new release, and a link on the wrong host are each refused with what to fix
+    - the same merge twice gives byte-identical text
+  - **Verify:** `npm test`
+  - **Depends on:** MP-1, MP-2
+  - **Files:** `scripts/media/args.ts`, `scripts/media/merge.ts`, `tests/media-args-merge.test.ts`
+  - **Size:** M
+
+- [ ] **MP-8: `add-song --dry-run`, end to end**
+  - `scripts/add-song.ts` wires MP-5 to MP-7 into one run that stages every file under `.media/<key>`. It prints the keys, sizes, the snippet's measured loudness, true peak and applied gain, and the `songs.json` diff, then stops. The upload step is MP-9's. Also adds the `add-song` script to `package.json` and `.media/` to `.gitignore`.
+  - **Acceptance:**
+    - a dry run on the generated tone and test pattern stages one `.m4a` and eight covers, and leaves `songs.json` byte-identical
+    - a bad argument or input stops it before anything is built, with exit code 1
+    - a real run without `--dry-run` refuses, saying uploads come with MP-9
+  - **Verify:** `npm test`, then a real dry run on the Mac with `afplay` on the staged snippet
+  - **Depends on:** MP-5, MP-6, MP-7
+  - **Files:** `scripts/add-song.ts`, `package.json`, `.gitignore`, `tests/media-add-song.test.ts`
+  - **Size:** M
+
+### Checkpoint 10: Reno hears a dry run
+- [ ] Reno runs `npm run add-song -- --dry-run` on one real master and its cover (I-1), and listens with `afplay`
+- [ ] The covers look right at every width in Quick Look
+- [ ] The fade lengths and cover quality hold, or change in the spec before Phase 11
+
+---
+
+## Phase 11: media-pipeline, live
+
+- [ ] **MP-9: Upload, verify, write, and `check-media`** 🔒 *(first real upload)*
+  - `scripts/media/upload.ts` checks `npx wrangler whoami`, runs `wrangler r2 object put` per file with its `Content-Type` and immutable `Cache-Control`, and sends a `HEAD` per key to `media.thesamegatsby.com`, expecting `200`, the type, the cache-control and the staged size. `add-song` runs build → upload → verify → write, and writes `songs.json` only when every check passes. `scripts/check-media.ts` HEADs every key in the catalogue, and `npm run check-media` runs it.
+  - **Acceptance:**
+    - with fake uploaders and checkers that fail at each step, `songs.json` stays byte-identical, and the exit code is 1
+    - the first real run, one release with Reno's OK, uploads every file and passes its checks. `check-media` passes, and `scripts/check-edge.sh media <its snippet key>` passes
+  - **Verify:** `npm test`, the real run, `npm run check-media`, `scripts/check-edge.sh media <key>`
+  - **Depends on:** MP-8, CF-3
+  - **Files:** `scripts/media/upload.ts`, `scripts/add-song.ts`, `scripts/check-media.ts`, `package.json`, `tests/media-upload.test.ts`, and `src/catalogue/songs.json` from the run
+  - **Size:** M
+
+- [ ] **MP-10: Re-cut the five releases** 🔒 👤
+  - The five releases and six tracks from the spec's table, with Reno's inputs I-1 to I-6. Each one goes through `--dry-run` first, and Reno listens to every snippet and checks every cover. The uploads go in batches he approves.
+  - **Acceptance:**
+    - `songs.json` holds every release, track, date and platform link Reno has given, and passes validation
+    - `npm run check-media` passes on every key
+    - Reno has heard every snippet
+  - **Verify:** `npm test`, `npm run check-media`, and Reno listening
+  - **Depends on:** MP-9, and Reno's inputs I-1 to I-6
+  - **Files:** `src/catalogue/songs.json`
+  - **Size:** S of code. Most of the time goes on Reno's inputs and listening
+
+- [ ] **MP-11: Retire `songs/index.ts` and `public/music/`**
+  - The placeholder `src/app/page.tsx` lists the catalogue's releases from `src/catalogue`. Its comment, which still says production is served from `main`, is replaced. `songs/index.ts` and `public/music/` are deleted.
+  - **Acceptance:**
+    - nothing in `src/`, `scripts/` or `tests/` references `songs/` or `/music/`
+    - `out/` is about 21 MB smaller, with the before and after recorded
+    - `npm run ci` passes, and the `redesign` preview lists the releases after the push
+  - **Verify:** `npm run ci`, `du -sh out` before and after, `grep -r "/music/"`
+  - **Depends on:** MP-10
+  - **Files:** `src/app/page.tsx`, `songs/index.ts`, `public/music/`
+  - **Size:** S
+
+### Checkpoint 11: media-pipeline complete
+- [ ] Every acceptance box in SPEC-media-pipeline.md is ticked, with its evidence
+- [ ] Next step: write `SPEC-audio-engine.md` for review
 
 ---
 

@@ -2,7 +2,7 @@
 
 Module of the [Déjà Gatsby rebuild](SPEC.md). Depends on `cloudflare-infra` for the R2 bucket, the media domain and Wrangler. `audio-engine`, `site` and `release-kit` read the catalogue it writes.
 
-Approved by Reno on 4 Nov 2026, as drafted, and its seven open questions answered the same day.
+Approved by Reno on 4 Nov 2026, as drafted, and its seven open questions answered the same day. On 14 Nov he reversed open question 5: snippets are now matched in loudness.
 
 ## Objective
 
@@ -40,7 +40,7 @@ Neither `afconvert` nor `sips` can cut a time range or fade, so that part is Nod
 ## How `add-song` works
 
 ```
-master.wav ─► afconvert → float WAV ─► Node: cut at --start, 30 s, bake fades ─► afconvert → AAC .m4a ─► zero timestamps ─► hash ┐
+master.wav ─► afconvert → float WAV ─► Node: cut at --start, 30 s, match loudness, bake fades ─► afconvert → AAC .m4a ─► zero timestamps ─► hash ┐
 cover.png  ─► sips: check square, ≥ 1080 px ─► sips → sRGB PNG ─► sips → AVIF ×4, cwebp → WebP ×4 ────────────────────────► hash ┤
                                                                                                                                ▼
                                      .media/<key> (staged) ─► wrangler r2 object put ×9 ─► HEAD each key on media.thesamegatsby.com ─► write songs.json
@@ -55,13 +55,13 @@ The order is fixed: **build, then upload, then verify, then write**. The catalog
 | Input | Anything Core Audio reads (WAV, AIFF, FLAC), 1 or 2 channels | Masters stay outside the repo. `add-song` reads them from the path it's given |
 | Length | **30 s**, cut from `--start` | Confirmed assumption 1. A master shorter than start + 30 s is refused, not padded |
 | Fades | Baked into the samples: **0.15 s in, 2 s out**, on a raised-cosine curve. `--fade-in` and `--fade-out` override them per song | SPEC.md's decision to bake fades in at encode time. Reno chose the values (open question 1) |
-| Gain | None. The master's level is kept, and `add-song` prints the snippet's peak level | Open question 5 |
+| Loudness | **Matched to −14 LUFS integrated**, the level Spotify and YouTube play at, by one fixed gain over the whole cut. It's measured on the 30 s cut before the fades, to ITU-R BS.1770-4: K-weighting, 400 ms blocks with 75% overlap, an absolute gate at −70 LUFS and a relative gate at −10 LU. The gain is `−14 − measured`, but never more than would take the 4× oversampled true peak above **−1 dBTP**. When that cap stops a quiet master short of −14, the snippet comes out quieter and `add-song` prints by how much. `add-song` always prints the measured loudness, the true peak and the gain it applied | Open question 5. The target is a fixed number, not the other songs' level, so a new song matches the old ones without re-cutting them |
 | Codec | AAC-LC, Apple's encoder through `afconvert -d aac -b 160000 -s 2 -q 127` (constrained VBR, best encoder quality) | SPEC.md's lean: about 160 kbps, Apple's encoder |
 | Sample rate | The master's when it's 44.1 or 48 kHz. Anything else is resampled to 48 kHz | Avoids resampling the usual masters |
 | Container | `.m4a`, `moov` first, timestamps zeroed | Fast start, and deterministic bytes for the hash |
 | Size | About 600 KB for 30 s | 160 kbps × 30 s |
 
-The cut and the fades are plain `.ts`: parsing a float WAV, slicing it, multiplying by the fade curve and writing it back. `afconvert` first turns any master into 32-bit float WAV, so the Node code only ever reads one format.
+The cut, the loudness match and the fades are plain `.ts`: parsing a float WAV, slicing it, measuring it, multiplying by the gain and the fade curve, and writing it back. The meter is written here rather than installed, so it needs no tool or dependency. `afconvert` first turns any master into 32-bit float WAV, so the Node code only ever reads one format.
 
 ### Covers
 
@@ -288,7 +288,7 @@ Workers Builds runs `npm run ci` on Linux, with no `afconvert` or `sips`. So the
 
 | Level | What | How |
 |---|---|---|
-| Unit | WAV read and write, the cut, the fade curve's endpoints and shape, the MP4 box walk (`moov` before `mdat`) and timestamp zeroing on a small hand-built byte fixture, ids, hashes and keys, argument parsing, the catalogue merge (new release, joining an EP, `--replace`, `--featured`), link host checks and tracking-parameter stripping, the validation rules, URL helpers | `npm test` |
+| Unit | WAV read and write, the cut, the loudness meter against EBU Tech 3341's generated test signals and the true-peak cap, the fade curve's endpoints and shape, the MP4 box walk (`moov` before `mdat`) and timestamp zeroing on a small hand-built byte fixture, ids, hashes and keys, argument parsing, the catalogue merge (new release, joining an EP, `--replace`, `--featured`), link host checks and tracking-parameter stripping, the validation rules, URL helpers | `npm test` |
 | Catalogue | The committed `songs.json` passes `parseCatalogue()` | `npm test` |
 | Integration (Mac only) | A generated 40 s test tone goes through the real `afconvert` and `sips`. The result is 30 s, `moov` first, byte-identical on a second run, with near-silent first and last samples | `npm test`, skipped where `process.platform !== "darwin"` |
 | Edge | Every catalogue key is live with the right headers. Cache `HIT`, `206` on a range and CORS on a real snippet | `npm run check-media`, and the media checks in `scripts/check-edge.sh` |
@@ -321,6 +321,7 @@ Workers Builds runs `npm run ci` on Linux, with no `afconvert` or `sips`. So the
   - is 30 s ± 0.05 s long
   - has `moov` before `mdat`, with its first audio frame inside the first 16 KB (the infra spec's range check fetches `bytes=0-16383`)
   - decodes back with its first and last 10 ms below −60 dBFS, and the fades at their set lengths
+  - decodes back at −14 ± 0.5 LUFS with its true peak at or below −0.5 dBTP, or quieter by the shortfall `add-song` printed. The AAC encode can add about half a dB of peak, which is why the after-encode limit is looser than the −1 dBTP cap
 - [ ] Two runs on the same inputs give byte-identical files and the same keys.
 - [ ] The covers come out at 192, 384, 768 and 1080 px, square, in AVIF and WebP, sRGB, with no EXIF or GPS. A non-square cover is refused without `--crop`, and a cover under 1080 px is refused.
 - [ ] A run that fails at any step leaves `songs.json` byte-identical. A bad argument or input stops it before anything uploads.
@@ -337,17 +338,17 @@ Workers Builds runs `npm run ci` on Linux, with no `afconvert` or `sips`. So the
 - `/system`'s fixture covers, which stay local (open question 4).
 - The old site's `public/background.webp` and `public/profile_pic.jpg` (3.8 MB), which `site` keeps or removes.
 - Deleting objects that a re-cut or new cover leaves behind in R2. They're small, immutable and unreferenced.
-- Full-length audio, loudness normalisation (open question 5), waveform data, ISRCs, credits beyond the title, and lyrics.
+- Full-length audio, compression or limiting (the loudness match is one gain, never dynamics processing), waveform data, ISRCs, credits beyond the title, and lyrics.
 - A web upload page or CMS (SPEC.md, out of scope).
 
 ## Open questions
 
-All seven were answered on 4 Nov 2026: Reno accepted every recommendation. They stay here as the record of why the spec reads as it does.
+All seven were answered on 4 Nov 2026: Reno accepted every recommendation, and reversed question 5 on 14 Nov. They stay here as the record of why the spec reads as it does.
 
 1. **Fade lengths. Decided: 0.15 s in, 2 s out**, overridable per song. The cut usually lands on a beat or a drop, so a long fade-in would blunt it and work against "play feels instant". 0.15 s removes the click without being heard as a fade, and two seconds out lets the snippet end gently rather than stop.
 2. **The cover fallback. Decided: WebP through `cwebp`**, which keeps the infra spec's AVIF + WebP keys. AVIF covers almost every browser, and WebP catches the rest at about AVIF's size: at 1080 px, 65 KB against 58 KB for Vapor_City. `cwebp` is installed through Homebrew but isn't part of macOS, so `add-song` checks for it and stops with `brew install webp` if it's missing. It never installs anything itself. JPEG through `sips` (2–4× bigger: Can't You See at 1080 is 477 KB) and no fallback at all were the alternatives.
 3. **Cover quality. Decided: AVIF at 50 by default, with a `--cover-quality` override per release.** At 60, Can't You See's 1080 is 200 KB, almost two-thirds of what the first-load budget has left after JS and fonts. At 50 it's 133 KB, and the other four are well under 100 KB. Reno checks the five releases by eye at that setting before anything uploads. Whether phones fetch 768 or 1080 for the hero is `site`'s call, through `sizes`, measured against the 350 KB budget.
 4. **`/system`'s covers. Decided: it keeps its own local fixture covers.** The design-system spec says real covers come from `media-pipeline`, but a test bench that works offline, gives the same screenshots every time and runs before the bucket exists is worth more than real files there. Real covers show up on `/` through `site`.
-5. **Loudness. Decided: no normalisation.** The masters are already mastered, and changing their level changes the art. Phones set the volume anyway. `add-song` prints each snippet's peak level, so a clipping cut gets noticed.
+5. **Loudness. Decided on 14 Nov 2026: match every snippet to −14 LUFS** (see Snippet). The masters span different eras, and some have no project files left, so they can't be re-mastered to one level. One gain over the whole cut doesn't change the mix, only its level beside the others. A fan tapping between tracks shouldn't have to reach for the volume, and iPhones ignore volume set by the page, so the match has to be baked into the file, like the fades. On 4 Nov the answer was no normalisation, on the grounds that changing the level changes the art.
 6. **Encoder settings and tooling. Decided: 160 kbps constrained VBR, Apple's encoder, through `afconvert`, with no ffmpeg.** SPEC.md's tech stack now says so.
 7. **Order of work against `cloudflare-infra`. Decided: the pipeline is built and tested up to `--dry-run` first, then the plan stops for CF-1 (the zone), CF-2 (Wrangler) and CF-3 (the bucket, domain and rules) before the first real upload.** `audio-engine` can't be tested on real snippets until that's done.
