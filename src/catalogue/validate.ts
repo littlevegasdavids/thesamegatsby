@@ -7,7 +7,7 @@ import type { Catalogue, PlatformId } from "./types.ts";
 
 export const KEBAB = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const HASH = "[0-9a-f]{8}";
-const SNIPPET_LENGTH = 30;
+export const SNIPPET_LENGTH = 30;
 const SNIPPET_TOLERANCE = 0.05;
 
 // Each platform's hosts. Bandcamp is any artist's subdomain, and Amazon Music

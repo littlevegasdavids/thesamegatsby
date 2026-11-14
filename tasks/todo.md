@@ -1256,7 +1256,11 @@ Plan: [plan.md, media-pipeline](plan.md#implementation-plan-media-pipeline). Spe
   - **Files:** `scripts/media/ids.ts`, `scripts/media/keys.ts`, `scripts/media/links.ts`, `tests/media-ids-keys.test.ts`
   - **Size:** S
 
-- [ ] **MP-3: WAV read and write, the cut and the fades**
+- [x] **MP-3: WAV read and write, the cut and the fades**
+  - **Done 14 Nov 2026.** 21 tests in `tests/media-wav-fade.test.ts`, and all 523 pass. `npm run ci` passes.
+    - **Two WAV layouts:** `afconvert -d LEF32` writes WAVE_FORMAT_EXTENSIBLE with the float subformat and a `FLLR` padding chunk, not plain format 3. The reader takes both, and a test builds the Apple layout byte for byte.
+    - **Checked on a real file:** an old `ukg_333` snippet decoded by `afconvert` read back as 659,559 frames at 44.1 kHz, matching `afinfo`, and `afinfo` reads what `writeWav` writes.
+    - **Kept separate for MP-3b:** `cut()` and `applyFades()` are two steps, so the loudness gain can go between them. `SNIPPET_LENGTH` is now exported from `src/catalogue/validate.ts`, so the cut and the validation share one 30 s.
   - `scripts/media/wav.ts` reads and writes 32-bit float WAV, mono or stereo. `fade.ts` cuts `[start, start + 30)` and bakes a raised-cosine fade-in and fade-out. `--start` parses seconds or `m:ss.s`. Peak level comes out in dBFS.
   - **Acceptance:**
     - a write then read round trip is lossless
