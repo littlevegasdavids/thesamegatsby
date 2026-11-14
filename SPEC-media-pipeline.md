@@ -320,7 +320,7 @@ Workers Builds runs `npm run ci` on Linux, with no `afconvert` or `sips`. So the
   - is AAC-LC, at a bit rate between 150 and 170 kbps by `afinfo`
   - is 30 s ± 0.05 s long
   - has `moov` before `mdat`, with its first audio frame inside the first 16 KB (the infra spec's range check fetches `bytes=0-16383`)
-  - decodes back with its first and last 10 ms below −60 dBFS, and the fades at their set lengths
+  - decodes back with its first and last 1 ms below −60 dBFS, and each fade 6 ± 1 dB down at its half-way point, which shows it runs its set length. (This said the first and last 10 ms until 14 Nov. A 0.15 s raised-cosine fade is still only 39 dB down 10 ms in, so a −14 LUFS snippet reads about −52 dBFS there, and the check could never pass.)
   - decodes back at −14 ± 0.5 LUFS with its true peak at or below −0.5 dBTP, or quieter by the shortfall `add-song` printed. The AAC encode can add about half a dB of peak, which is why the after-encode limit is looser than the −1 dBTP cap
 - [ ] Two runs on the same inputs give byte-identical files and the same keys.
 - [ ] The covers come out at 192, 384, 768 and 1080 px, square, in AVIF and WebP, sRGB, with no EXIF or GPS. A non-square cover is refused without `--crop`, and a cover under 1080 px is refused.

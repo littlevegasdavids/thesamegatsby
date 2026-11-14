@@ -1316,12 +1316,22 @@ Plan: [plan.md, media-pipeline](plan.md#implementation-plan-media-pipeline). Spe
   - **Files:** `scripts/media/mp4.ts`, `tests/media-mp4.test.ts`
   - **Size:** S
 
-- [ ] **MP-5: The snippet encode, on the Mac**
+- [x] **MP-5: The snippet encode, on the Mac**
+  - **Done 14 Nov 2026.** 7 tests in `tests/media-snippet.mac.test.ts`, which ran on the Mac and passed. All 559 pass, none skipped. `npm run ci` passes. The file adds about 4 s to `npm test` on the Mac.
+    - **Measured:**
+      - AAC-LC at 165,211 bps, 30.000 s
+      - 629,177 bytes, with the first audio at byte 8,192
+      - the cut measured −10.86 LUFS, so a −3.14 dB gain was applied. Decoded back, it's −14.09 LUFS and −9.66 dBTP
+      - two runs gave byte-identical files and the same key
+    - **Edge checks:** the first and last 1 ms read under −60 dBFS. Each fade is within 1 dB of −6 dB half-way through.
+    - **Spec changed:** the acceptance criterion was the first and last 10 ms, which a 0.15 s raised-cosine fade can't meet. It's 39 dB down at 10 ms, so the trial read −52 dBFS there. Both this task and SPEC-media-pipeline.md now check 1 ms plus each fade's half-way point.
+    - **Test signal:** the generated master is two tones over a low-passed noise bed. A pure tone encoded at 120 kbps and flat white noise at 171 kbps, either side of the target, while real music (MP-4) took 164 kbps. The bed's falling spectrum is what brings it in line.
+    - **Other cases:** a 96 kHz master comes out at 48 kHz, and a master too short for the cut is refused before anything is encoded.
   - `scripts/media/encode.ts` wraps `afconvert` (any master to float WAV, then float WAV to AAC with the spec's arguments) and `afinfo`, through `execFile` with argument arrays. `snippet.ts` chains decode → cut (MP-3) → loudness match (MP-3b) → fades (MP-3) → encode → zero timestamps (MP-4) → hash, and resamples to 48 kHz only when the master isn't 44.1 or 48 kHz.
-  - **Acceptance,** on a generated 40 s tone through the real tools (Mac only):
+  - **Acceptance,** on a generated 40 s tone with noise in it through the real tools (Mac only). A pure tone encodes at about 120 kbps, too simple for the encoder to spend bits on:
     - AAC-LC at 150–170 kbps by `afinfo`, 30 s ± 0.05 s
     - `moov` before `mdat`, with the first audio frame inside the first 16 KB
-    - decoded back, the first and last 10 ms are below −60 dBFS
+    - decoded back, the first and last 1 ms are below −60 dBFS, and each fade is 6 ± 1 dB down at its half-way point (the spec's 10 ms check can't pass with a 0.15 s fade: see its acceptance criteria)
     - decoded back, the snippet measures −14 ± 0.5 LUFS with its true peak at or below −0.5 dBTP
     - two runs give byte-identical files and the same key
   - **Verify:** `npm test` on the Mac, with the Done note recording the measured bit rate, duration, first-frame offset, size, loudness and true peak
