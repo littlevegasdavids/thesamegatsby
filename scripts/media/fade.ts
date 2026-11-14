@@ -19,7 +19,8 @@ export function cut(master: Audio, start: number, seconds = SNIPPET_LENGTH): Aud
     const short = (from + frames - length) / sampleRate;
     throw new Error(
       `the master is ${(length / sampleRate).toFixed(2)} s, and a ${seconds} s cut from ${start} s needs ` +
-        `${((from + frames) / sampleRate).toFixed(2)} s: it's ${short.toFixed(2)} s short. Use an earlier --start`,
+        `${((from + frames) / sampleRate).toFixed(2)} s: it's ${short.toFixed(2)} s short. ` +
+        (frames > length ? `The whole master is shorter than ${seconds} s` : "Use an earlier --start"),
     );
   }
   return { sampleRate, channels: channels.map((channel) => channel.slice(from, from + frames)) };

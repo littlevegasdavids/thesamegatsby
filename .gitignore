@@ -33,6 +33,9 @@ yarn-error.log*
 # cloudflare
 .wrangler/
 
+# media-pipeline: snippets and covers staged by add-song before upload
+.media/
+
 # vercel
 .vercel
 

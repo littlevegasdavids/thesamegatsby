@@ -1398,7 +1398,20 @@ Plan: [plan.md, media-pipeline](plan.md#implementation-plan-media-pipeline). Spe
   - **Files:** `scripts/media/args.ts`, `scripts/media/merge.ts`, `tests/media-args-merge.test.ts`
   - **Size:** M
 
-- [ ] **MP-8: `add-song --dry-run`, end to end**
+- [x] **MP-8: `add-song --dry-run`, end to end**
+  - **Done 14 Nov 2026.** 15 tests in `tests/media-add-song.test.ts`. Of those, 14 run anywhere with fake tools, and 1 is a real dry run that ran on the Mac. All 625 pass, and `npm run ci` passes with lint clean.
+    - **Tools are passed in:** `runAddSong(argv, deps)` takes its tools as arguments, so the fakes check that every bad flag, missing file, catalogue clash and missing `--dry-run` stops it with exit code 1 before anything is built or staged. A failing build step leaves `songs.json` alone. The script's own entry is also spawned with `--bogus` and exits 1.
+    - **A real `npm run add-song -- … --dry-run` in the repo** used MP-5's 40 s test master and Vapor_City's real cover:
+      - it staged the `.m4a` and 8 covers under `.media/` in 1.8 s
+      - it printed the loudness (−9.60 LUFS, −5.40 dBTP, −4.40 dB applied) and the `songs.json` diff, with the `si` parameter stripped from the link
+      - `songs.json`'s SHA-1 was the same before and after
+      - the snippet key matched MP-5's trial of the same master, `05247a88`, so the result is the same through both code paths
+      - the test files were removed from `.media/` afterwards
+    - **Refused as expected:**
+      - the old 15 s `ukg_333/audio.m4a` as a master ("15.04 s short. The whole master is shorter than 30 s")
+      - a run without `--dry-run` ("come with MP-9")
+    - **Not played:** `afplay` wasn't run, so no audio played on Reno's Mac. Listening is Checkpoint 10.
+    - **Added:** `scripts/media/diff.ts`, a small line diff for the report.
   - `scripts/add-song.ts` wires MP-5 to MP-7 into one run that stages every file under `.media/<key>`. It prints the keys, sizes, the snippet's measured loudness, true peak and applied gain, and the `songs.json` diff, then stops. The upload step is MP-9's. Also adds the `add-song` script to `package.json` and `.media/` to `.gitignore`.
   - **Acceptance:**
     - a dry run on the generated tone and test pattern stages one `.m4a` and eight covers, and leaves `songs.json` byte-identical
