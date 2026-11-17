@@ -10,6 +10,7 @@ import type { AddSongDeps } from "../scripts/add-song.ts";
 import { parseAddSongArgs } from "../scripts/media/args.ts";
 import type { BuiltCover, CoverInput } from "../scripts/media/covers.ts";
 import { lineDiff } from "../scripts/media/diff.ts";
+import { DEFAULT_FADE_IN } from "../scripts/media/fade.ts";
 import { COVER_WIDTHS } from "../scripts/media/keys.ts";
 import { applyMerge, catalogueText } from "../scripts/media/merge.ts";
 import { encodeRgbPng } from "../scripts/media/png.ts";
@@ -44,7 +45,7 @@ describe("add-song with fake tools", () => {
       info: { codec: "aac", channels: 2, sampleRate: 44_100, duration: 30.0000004, bitRate: 160_000 },
       loudness: { loudness: -9.5, truePeak: -0.3, gain: -4.5, shortfall: 0, silent: false },
       firstMediaByte: 8192,
-      fadeIn: input.fadeIn ?? 0.15,
+      fadeIn: input.fadeIn ?? DEFAULT_FADE_IN,
       fadeOut: input.fadeOut ?? 2,
     };
   };

@@ -2,10 +2,11 @@ import { SNIPPET_LENGTH } from "../../src/catalogue/validate.ts";
 import type { Audio } from "./wav.ts";
 
 // The fades are baked into the samples (SPEC.md): iPhones ignore volume set
-// by the page, and a fade in the file needs no code at play time. 0.15 s
-// removes the click without being heard as a fade, and 2 s lets the snippet
-// end gently (SPEC-media-pipeline.md, open question 1).
-export const DEFAULT_FADE_IN = 0.15;
+// by the page, and a fade in the file needs no code at play time. Both are 2 s,
+// so a snippet eases in and out rather than starting on a cut. Reno chose the
+// fade-in at Checkpoint 10 after hearing 0.15 s (SPEC-media-pipeline.md, open
+// question 1). --fade-in and --fade-out override them per song.
+export const DEFAULT_FADE_IN = 2;
 export const DEFAULT_FADE_OUT = 2;
 
 // [start, start + 30 s) as copies, so later steps can't touch the master.

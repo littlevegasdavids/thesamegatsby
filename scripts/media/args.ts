@@ -68,7 +68,7 @@ function oneOf<T extends string>(value: string | undefined, options: readonly T[
 
 function seconds(value: string | undefined, name: string): number | undefined {
   if (value === undefined) return undefined;
-  if (!/^\d+(?:\.\d+)?$/.test(value)) fail(`--${name} must be seconds, 0 or more, like 0.15, not "${value}"`);
+  if (!/^\d+(?:\.\d+)?$/.test(value)) fail(`--${name} must be seconds, 0 or more, like 2 or 0.5, not "${value}"`);
   return Number(value);
 }
 

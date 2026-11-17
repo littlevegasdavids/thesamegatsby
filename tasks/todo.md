@@ -1423,9 +1423,19 @@ Plan: [plan.md, media-pipeline](plan.md#implementation-plan-media-pipeline). Spe
   - **Size:** M
 
 ### Checkpoint 10: Reno hears a dry run
-- [ ] Reno runs `npm run add-song -- --dry-run` on one real master and its cover (I-1), and listens with `afplay`
-- [ ] The covers look right at every width in Quick Look
-- [ ] The fade lengths and cover quality hold, or change in the spec before Phase 11
+- [x] Reno runs `npm run add-song -- --dry-run` on one real master and its cover (I-1), and listens with `afplay`
+- [x] The covers look right at every width in Quick Look
+- [x] The fade lengths and cover quality hold, or change in the spec before Phase 11
+  - **Done 17 Nov 2026.**
+    - **The dry run:**
+      - **Source:** Bring That Change's mastered WAV (`~/Music/FINISHED GATSBY SONGS/bring that change/`, 5:32, 24-bit, 48 kHz), cut from 3:56, with its original 1600² PNG cover in place of the repo's SVG.
+      - **Snippet:** 168 kbps and 30.000 s.
+      - **Loudness:** the cut measured −10.0 LUFS at +0.89 dBTP, so −4.0 dB was applied. Decoded back it's −14.1 LUFS.
+      - **Cover:** the 1080 AVIF is 45.5 KB.
+      - **Date:** `2023-09-19` is a placeholder from the file's date. The real date is I-3.
+    - **Reno's verdict:** the cut, level and covers were right. He changed the fade-in from 0.15 s to **2 s**, which is now the default in `scripts/media/fade.ts` and the spec's Snippet table and open question 1.
+    - **The 2 s version, measured in 100 ms windows:** −63 dBFS at 0.1 s, −41 at 0.5 s, −28 at 1 s and −21 at 1.5 s, against about −22.5 after the fade. It's staged as `snippets/bring-that-change.8923339a.m4a`.
+    - **Corrected:** I'd called the cut-off sign text ("HLOKOMEL…") an SVG clip. The original PNG is framed the same way, so that's the artwork as designed.
 
 ---
 

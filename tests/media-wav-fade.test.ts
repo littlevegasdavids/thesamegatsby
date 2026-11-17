@@ -137,8 +137,8 @@ describe("the cut", () => {
 });
 
 describe("the fades", () => {
-  test("default to 0.15 s in and 2 s out", () => {
-    assert.equal(DEFAULT_FADE_IN, 0.15);
+  test("default to 2 s in and 2 s out", () => {
+    assert.equal(DEFAULT_FADE_IN, 2);
     assert.equal(DEFAULT_FADE_OUT, 2);
   });
 
@@ -148,7 +148,7 @@ describe("the fades", () => {
     const left = faded.channels[0];
     assert.equal(left[0], 0);
     assert.equal(left[left.length - 1], 0);
-    assert.equal(left[0.15 * rate], 1);
+    assert.equal(left[2 * rate], 1);
     assert.equal(left[15 * rate], 1);
     assert.equal(left[left.length - 1 - 2 * rate], 1);
   });
@@ -157,10 +157,10 @@ describe("the fades", () => {
     const rate = 48_000;
     const left = applyFades(constant(30, rate)).channels[0];
     const n = left.length;
-    assert.ok(Math.abs(left[Math.round(0.075 * rate)] - 0.5) < 1e-6);
+    assert.ok(Math.abs(left[1 * rate] - 0.5) < 1e-6);
     assert.ok(Math.abs(left[n - 1 - 1 * rate] - 0.5) < 1e-6);
     // A quarter of the way into the fade-in: 0.5 − 0.5·cos(π/4).
-    assert.ok(Math.abs(left[Math.round(0.0375 * rate)] - (0.5 - 0.5 * Math.cos(Math.PI / 4))) < 1e-6);
+    assert.ok(Math.abs(left[Math.round(0.5 * rate)] - (0.5 - 0.5 * Math.cos(Math.PI / 4))) < 1e-6);
   });
 
   test("rise and fall smoothly, never overshooting", () => {
