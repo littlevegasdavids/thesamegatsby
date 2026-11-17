@@ -1599,7 +1599,18 @@ Spec: [SPEC-audio-engine.md](../SPEC-audio-engine.md). Every file under `src/aud
   - **Files:** `src/audio/tracks.ts`, `tests/audio-tracks.test.ts`
   - **Size:** S
 
-- [ ] **AE-3: The engine over one element**
+- [x] **AE-3: The engine over one element**
+  - **Done 17 Nov 2026.** 35 tests in `tests/audio-engine.test.ts`, against a fake element and fake timers, and all 714 pass. `npm run ci` passes. Three deliberate breaks each failed the tests: dropping the end-of-file pause guard, the generation check, and the pause on timeout. Nothing imports it yet, so there's nothing to see in a browser until AE-5.
+    - **How stale events are handled, which is simpler than the spec's sketch:**
+      - **Queued element events:** by the HTML spec's load algorithm, an element drops a replaced file's queued events itself when its source changes, so the engine doesn't filter them.
+      - **Settled `play()` promises:** a generation counter, bumped by every play, replay and stop, means a `play()` promise that settles after a later tap is ignored, whatever it rejects with. A current `play()` rejecting with anything but `AbortError` fails the snippet (for example `NotAllowedError`).
+      - **The engine's own pauses** land on a state where `interrupted` changes nothing (loading, ended or null), so no counter is needed.
+      - `/bench` checks the load-algorithm behaviour on real browsers in AE-5.
+    - **A real element fires `pause` just before `ended`.** The engine ignores a pause while `ended` is true. Without that, every snippet would end as a stop at about 29.9 s rather than at 30. The fake runs out the way a real element does, with a last `timeupdate` just short of the end.
+    - **The load timeout pauses the element**, so a file that turns up after 10 s can't sound under an ended bar.
+    - **`warm()` only acts on a fresh element** (no tap yet and no source), so it never undoes an `intent()`.
+    - **`replay()` after a failure calls `load()`**, so the file is fetched again rather than replaying a broken one.
+    - **The browser environment is resolved on first use**, so importing the module never touches `window`. AE-4's test checks it in Node.
   - `src/audio/engine.ts`: `createAudioEngine(tracks, env)` makes one element on first use and turns its events (`playing`, `waiting`, `timeupdate`, `ended`, `pause`, `error`) into AE-1's events. Also `play`, `stop`, `replay`, `close`, `intent`, `warm`, `subscribe` and `getSnapshot`. No Media Session yet.
   - **Acceptance**, against a fake element:
     - `play()` sets `src` and calls the element's `play()` before it returns, with nothing awaited
