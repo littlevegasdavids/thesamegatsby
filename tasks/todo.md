@@ -1583,7 +1583,12 @@ Spec: [SPEC-audio-engine.md](../SPEC-audio-engine.md). Every file under `src/aud
   - **Files:** `src/audio/state.ts`, `tests/audio-state.test.ts`
   - **Size:** S
 
-- [ ] **AE-2: Engine tracks from the catalogue**
+- [x] **AE-2: Engine tracks from the catalogue**
+  - **Done 17 Nov 2026.** 7 tests in `tests/audio-tracks.test.ts`, and all 679 pass. `npm run ci` passes. Nothing imports it yet, so there's nothing to see in a browser until AE-5.
+    - **`EngineTrack` lives in `tracks.ts`, not `engine.ts`** as the spec's sketch has it, since this is where it's built. AE-3 re-exports it.
+    - **Artwork is a plain `Artwork` type with `MediaImage`'s shape**, not the DOM type itself, so the tracks are plain data a server component can pass as props. A test round-trips them through JSON.
+    - **The EP's album title is "Can't You See"**, the release's own title in `songs.json`, which has no "EP" in it.
+    - **The artwork URLs are live:** they're three of the eight cover files per release that `check-media` passed at Checkpoint 11.
   - `src/audio/tracks.ts`: `tracksFrom(catalogue)` gives an `EngineTrack` per track: its id, `snippetUrl()`, title, the release title as the album, the cover's WebP at 192, 384 and 768 as Media Session artwork, and the catalogue's duration.
   - **Acceptance:**
     - the committed catalogue gives six tracks with unique ids, every URL on `https://media.thesamegatsby.com/`
