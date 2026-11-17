@@ -29,9 +29,16 @@ test("nothing in src/ or scripts/ points at them", async () => {
 });
 
 // SITE-5: the homepage replaced /bench (SPEC-audio-engine.md, open question
-// 5), and nothing on the new site uses the old site's two images.
+// 5), and nothing on the new site uses the old site's two images. SITE-4:
+// src/app/icon.svg replaced the old favicon.
 test("/bench and the old site's images are gone", () => {
-  for (const path of [["src", "app", "bench"], ["public", "background.webp"], ["public", "profile_pic.jpg"]]) {
+  const retired = [
+    ["src", "app", "bench"],
+    ["public", "background.webp"],
+    ["public", "profile_pic.jpg"],
+    ["public", "favicon.ico"],
+  ];
+  for (const path of retired) {
     assert.equal(existsSync(join(root, ...path)), false, `${path.join("/")} still exists`);
   }
 });

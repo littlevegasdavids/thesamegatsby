@@ -4,6 +4,15 @@
 /_next/static/*
   Cache-Control: public, max-age=31536000, immutable
 
+# next/og writes the share image and the apple-touch icon with no file
+# extension, so nothing would name their type, and nosniff would leave a
+# crawler or iOS to refuse them.
+/opengraph-image
+  Content-Type: image/png
+
+/apple-icon
+  Content-Type: image/png
+
 /*
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin

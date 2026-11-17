@@ -1766,7 +1766,14 @@ Spec: [SPEC-site.md](../SPEC-site.md). Built in its own session at Reno's reques
   - **Verify:** `npm run ci`, the browser pane, muted
   - **Size:** M
 
-- [ ] **SITE-4: Metadata, the share image and the icons**
+- [x] **SITE-4: Metadata, the share image and the icons**
+  - **Done 17 Nov 2026.** 3 tests added (`tests/site-marks.test.ts`, `tests/site-headers.test.ts`, and `icon.svg` in `tests/sparkle-star.test.ts`), plus `favicon.ico` in `tests/old-site-retired.test.ts`. Each failed first, and all 780 pass. `npm run ci` passes, and the build lists `/apple-icon`, `/icon.svg` and `/opengraph-image` as static.
+    - **`out/index.html`'s head** has the title, the description, `theme-color` `#07080D` (read from `--dg-bg`), the canonical `https://www.thesamegatsby.com`, Open Graph `website` with the image at 1200 × 630 and its alt, a `summary_large_image` card, `<link rel="icon">` to `/icon.svg` and `<link rel="apple-touch-icon">` at 180 × 180.
+    - **Opened from `out/`:** `opengraph-image` is a 1200 × 630 PNG (66 KB), the wordmark 880 px wide with the sparkle at its top right, on a radial from `--dg-surface` (the night sky) to `--dg-bg`. `apple-icon` is a 180 × 180 PNG, a 112 px star on `--dg-bg`. `icon.svg` is `sparkle-star.svg`, byte for byte, which a test holds.
+    - **Found and fixed: the two PNGs had no Content-Type.** `next/og` writes them as `out/opengraph-image` and `out/apple-icon`, with no extension, and `wrangler dev` served them with no type under `_headers`' `nosniff`, which crawlers and iOS can refuse. `public/_headers` now names both `image/png`, `wrangler dev` sends it, and `tests/site-headers.test.ts` holds it. SPEC-site.md and SPEC-cloudflare-infra.md's `_headers` table say so.
+    - **The image routes say `dynamic = "force-static"`:** `output: export` refuses to build them otherwise.
+    - **The marks go into `next/og` as SVG data URIs** (`src/app/marks.ts`), so no font is loaded; colours come from `token()`, so no hex is in TSX.
+    - **`/` still loads no `/system` code:** its 3 CSS and 8 JS files hold none of `stackHero`, `framePage`, `FIXTURE`, `system-fixtures` or `/bench`; `/system`'s own CSS file is loaded only by `/system`.
   - `layout.tsx`'s metadata and viewport, `opengraph-image.tsx`, `icon.svg`, `apple-icon.tsx`. Delete `public/favicon.ico`.
   - **Acceptance:** `out/` has the share image (1200 × 630), the icons and the tags; no hex in TSX
   - **Verify:** `npm run ci`, opening the files from `out/`

@@ -76,6 +76,7 @@ AVIF isn't used. WebP is within about 10% of it at these sizes (media-pipeline's
   - `src/app/icon.svg` is the sparkle star.
   - **(new)** `src/app/apple-icon.tsx` renders the star on the ground at 180 px.
   - The old site's `favicon.ico` goes.
+- **Serving them:** `next/og` writes the share image and the apple icon into `out/` with no file extension, so `public/_headers` gives both `Content-Type: image/png` (found in SITE-4: without it, Static Assets sent no type under `nosniff`).
 
 ### Clean-up
 

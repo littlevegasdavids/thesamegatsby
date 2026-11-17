@@ -59,6 +59,13 @@ describe("sparkle-star.svg", () => {
     const [r, g, b] = [0, 2, 4].map((at) => parseInt(fill[1].slice(at, at + 2), 16));
     assert.deepEqual({ r, g, b, a: 1 }, resolveColor(parseTokens(read("tokens.css"), 360), "--dg-star"));
   });
+
+  // SITE-4: the site's icon is this file, copied, since Next reads icon.svg
+  // from src/app itself.
+  test("is the site's icon, byte for byte", () => {
+    const icon = readFileSync(new URL("../src/app/icon.svg", import.meta.url), "utf8");
+    assert.equal(icon, readFileSync(url("assets/sparkle-star.svg"), "utf8"));
+  });
 });
 
 describe("SparkleStar.module.css", () => {

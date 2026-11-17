@@ -56,6 +56,7 @@ visitor ──► www.thesamegatsby.com ──► Worker "thesamegatsby" (static
 | Path | Header |
 |---|---|
 | `/_next/static/*` | `Cache-Control: public, max-age=31536000, immutable`. This covers fonts too, since `next/font` emits them under `/_next/static/media/` |
+| `/opengraph-image`, `/apple-icon` | `Content-Type: image/png`. `next/og` writes them with no extension, so Static Assets sends no type, and `nosniff` would leave crawlers and iOS to refuse them (SITE-4) |
 | `/*` | `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin` |
 
 HTML keeps the static-assets default (`public, max-age=0, must-revalidate`), so a deploy shows up immediately.
