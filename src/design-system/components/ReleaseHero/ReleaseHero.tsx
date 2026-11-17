@@ -18,6 +18,9 @@ type ReleaseHeroProps = {
   elapsed?: number;
   /** Plays or stops a track: the lead from the main button, or a listed one. */
   onPlay?: (trackId: string) => void;
+  /** Raised on pointerdown and focus of a play control, before a click, with
+   * the track it would play. */
+  onIntent?: (trackId: string) => void;
   /** Opens an album's "Show all" on first render, so /system can show it open. */
   defaultShowAll?: boolean;
 };
@@ -27,7 +30,7 @@ type ReleaseHeroProps = {
 // gets "Play lead track", its tracklist with LEAD on the lead, and an album's
 // tracks past five behind "Show all". Nothing is drawn over the cover. While
 // the lead track runs, the main button reads "Stop snippet", pressed (G7).
-export function ReleaseHero({ release, playingTrackId, playState, elapsed, onPlay, defaultShowAll }: ReleaseHeroProps) {
+export function ReleaseHero({ release, playingTrackId, playState, elapsed, onPlay, onIntent, defaultShowAll }: ReleaseHeroProps) {
   const labelId = `${useId()}-label`;
   const view = releaseHeroView(release, { playingTrackId, playState, elapsed });
   const className = `${styles.hero} ${view.kind === "single" ? styles.single : styles.group}`;
@@ -50,11 +53,12 @@ export function ReleaseHero({ release, playingTrackId, playState, elapsed, onPla
             label={view.play.label}
             pressed={view.play.pressed}
             onClick={onPlay && (() => onPlay(view.leadTrackId))}
+            onIntent={onIntent && (() => onIntent(view.leadTrackId))}
           />
           {view.leadNote && <span className={styles.leadNote}>{view.leadNote}</span>}
         </div>
         {view.listLabel && (
-          <HeroTracklist label={view.listLabel} tracks={view.tracks} shown={view.shown} defaultShowAll={defaultShowAll} onPlay={onPlay} />
+          <HeroTracklist label={view.listLabel} tracks={view.tracks} shown={view.shown} defaultShowAll={defaultShowAll} onPlay={onPlay} onIntent={onIntent} />
         )}
         <div className={styles.streams}>
           <StreamLinks variant="chips" heading={view.streamHeading} links={release.links} />

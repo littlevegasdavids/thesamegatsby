@@ -17,20 +17,31 @@ type TrackRowProps = {
   lead?: boolean;
   variant: TrackRowVariant;
   onToggle?: () => void;
+  /** Raised on pointerdown and focus, before a click, so site can start
+   * loading this track's snippet. */
+  onIntent?: () => void;
 };
 
 // One track: the whole row is the button that plays or stops its snippet.
 // The aria-label carries the name, so the number, time and LEAD tag are for
 // the eye. The number, time and ring columns have fixed widths, so a state
 // change never moves the title.
-export function TrackRow({ index, title, duration, elapsed, state, lead = false, variant, onToggle }: TrackRowProps) {
+export function TrackRow({ index, title, duration, elapsed, state, lead = false, variant, onToggle, onIntent }: TrackRowProps) {
   const { lit, running } = trackRowLook(state);
   const time = trackRowTime(state, elapsed, duration);
   const ring = GLYPHS[running ? "stop" : "play"];
   const className = [styles.row, styles[variant], lit && styles.lit, running && styles.running].filter(Boolean).join(" ");
 
   return (
-    <button type="button" className={className} aria-pressed={running} aria-label={trackRowLabel(title, state)} onClick={onToggle}>
+    <button
+      type="button"
+      className={className}
+      aria-pressed={running}
+      aria-label={trackRowLabel(title, state)}
+      onClick={onToggle}
+      onPointerDown={onIntent}
+      onFocus={onIntent}
+    >
       <span className={styles.index}>{lit ? <SparkleStar size={14} /> : trackNumber(index)}</span>
       <span className={styles.title}>
         <span className={styles.titleText}>{title}</span>

@@ -1739,7 +1739,11 @@ Spec: [SPEC-site.md](../SPEC-site.md). Built in its own session at Reno's reques
   - **Verify:** `npm test`, `npm run ci`, `/system` still loads its fixture covers
   - **Size:** S
 
-- [ ] **SITE-2: `onIntent` on the play controls**
+- [x] **SITE-2: `onIntent` on the play controls**
+  - **Done 17 Nov 2026.** `npm run ci` passes, all 767 tests. No new tests: the change is in `.tsx`, which the runner can't import, and it holds no logic beyond passing the id. SITE-3 checks in the browser that each control raises its own track's id.
+    - **Differs from the spec: `Button` gains `onIntent` too**, since the hero's main button is a `Button`. `TrackRow` and `Button` take `onIntent()` with no argument, like their `onToggle` and `onClick`, because neither knows a track id; `ReleaseRow`, `ReleaseHero` and `HeroTracklist` pass the id. SPEC-site.md is updated to say so.
+    - **The EP or album row raises nothing:** it opens the tracks, it doesn't play.
+    - **`/system` is unchanged:** it passes no `onIntent`, so React attaches no handler. In the browser pane it rendered its 212 buttons, a focus and a `pointerdown` on a play control did nothing, and there were no console errors.
   - `TrackRow`, `ReleaseRow` and `ReleaseHero` raise an optional `onIntent(trackId)` on `pointerdown` and focus of each play control.
   - **Acceptance:** optional, so `/system` is unchanged; each play control raises it with its own track id
   - **Verify:** `npm run ci`, `/system` in the browser pane

@@ -19,6 +19,9 @@ type ReleaseRowProps = {
   onToggle?: () => void;
   /** Plays or stops a track: the single's own, or a nested one. */
   onPlay?: (trackId: string) => void;
+  /** Raised on pointerdown and focus of a play control, before a click, with
+   * the track it would play. The EP or album row itself plays nothing. */
+  onIntent?: (trackId: string) => void;
 };
 
 // One release in the discography. A single's row is the button that plays
@@ -26,7 +29,16 @@ type ReleaseRowProps = {
 // sticks under the filter inside its own group, so it stays put while its
 // tracks scroll under it and leaves with the last of them. Stream links are
 // never inside a row.
-export function ReleaseRow({ release, expanded = false, playingTrackId, playState, elapsed = 0, onToggle, onPlay }: ReleaseRowProps) {
+export function ReleaseRow({
+  release,
+  expanded = false,
+  playingTrackId,
+  playState,
+  elapsed = 0,
+  onToggle,
+  onPlay,
+  onIntent,
+}: ReleaseRowProps) {
   const tracksId = `${useId()}-tracks`;
   const view = releaseRowView(release, { expanded, playingTrackId, playState, elapsed });
   const cover = <Image className={styles.cover} src={release.cover} alt="" width={60} height={60} />;
@@ -45,6 +57,8 @@ export function ReleaseRow({ release, expanded = false, playingTrackId, playStat
           aria-pressed={view.running}
           aria-label={view.label}
           onClick={onPlay && (() => onPlay(release.leadTrackId))}
+          onPointerDown={onIntent && (() => onIntent(release.leadTrackId))}
+          onFocus={onIntent && (() => onIntent(release.leadTrackId))}
         >
           {cover}
           <span className={styles.text}>
@@ -99,6 +113,7 @@ export function ReleaseRow({ release, expanded = false, playingTrackId, playStat
             elapsed={view.trackStates[i] === "idle" ? 0 : elapsed}
             state={view.trackStates[i]}
             onToggle={onPlay && (() => onPlay(track.id))}
+            onIntent={onIntent && (() => onIntent(track.id))}
           />
         ))}
       </div>

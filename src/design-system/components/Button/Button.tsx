@@ -10,11 +10,14 @@ export type ButtonProps = {
   pressed?: boolean;
   disabled?: boolean;
   onClick?: () => void;
+  /** Raised on pointerdown and focus, before a click: site starts loading
+   * the snippet a play button will ask for. */
+  onIntent?: () => void;
 } & ({ variant: "primary" | "ghost"; icon?: ButtonIcon } | { variant: "hardware"; icon: ButtonIcon });
 
 // No "use client": it holds no state, and a client parent that passes
 // onClick brings it into the client bundle.
-export function Button({ variant, icon, label, pressed, disabled = false, onClick }: ButtonProps) {
+export function Button({ variant, icon, label, pressed, disabled = false, onClick, onIntent }: ButtonProps) {
   const iconOnly = variant === "hardware";
 
   return (
@@ -24,6 +27,8 @@ export function Button({ variant, icon, label, pressed, disabled = false, onClic
       disabled={disabled}
       aria-pressed={pressed}
       onClick={onClick}
+      onPointerDown={onIntent}
+      onFocus={onIntent}
       aria-label={iconOnly ? label : undefined}
     >
       {icon && <Glyph icon={icon} />}

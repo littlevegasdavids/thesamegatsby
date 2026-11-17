@@ -58,7 +58,7 @@ AVIF isn't used. WebP is within about 10% of it at these sizes (media-pipeline's
 
 - **One engine for the page**, made in the client component with `tracksFrom()`'s tracks and the browser defaults (Media Session included).
 - **Every play control calls the engine:** the hero's main button and tracklist, a single's row, an open EP's tracks, and the bar's Stop, Replay and Close. `rowState()` and `barState()` give the props.
-- **Intent on touch (new):** `TrackRow`, `ReleaseRow` and `ReleaseHero` gain an optional `onIntent(trackId)`, raised on `pointerdown` and on focus of a play control. The engine spec listed changing a component's props as ask-first. This change only adds an optional callback, so the components stay presentational and `/system` is unchanged.
+- **Intent on touch (new):** `ReleaseRow` and `ReleaseHero` gain an optional `onIntent(trackId)`, raised on `pointerdown` and on focus of a play control. `TrackRow` and `Button` gain an optional `onIntent()` with no argument, like their `onToggle` and `onClick`, since they don't know a track id; the hero's main button is a `Button`. The engine spec listed changing a component's props as ask-first. This change only adds an optional callback, so the components stay presentational and `/system` is unchanged.
 - **The preconnect** goes in the page's head with no `crossorigin`, as on `/bench`.
 - **The warm-up** fetches the hero's lead track's first range once the page has loaded and gone idle.
 - **Following an external link stops the snippet** (the engine's open question 6). A capture-phase click listener on the page calls `stop()` for any link that opens in a new tab: the stream links, the "More" platforms and the socials. No component changes for it.
@@ -133,7 +133,7 @@ SPEC.md's rules apply. On top of them:
 Reno asked for the spec and the build without a review stop, so these were decided as part of it. Each can change after he tests:
 
 1. **Covers through a custom image loader**, WebP at the smallest built width that fills each box.
-2. **`onIntent` added to `TrackRow`, `ReleaseRow` and `ReleaseHero`:** an optional callback, so no visual or behaviour change on `/system`.
+2. **`onIntent` added to `TrackRow`, `ReleaseRow`, `ReleaseHero` and `Button`:** an optional callback, so no visual or behaviour change on `/system`. `Button` was added while building, for the hero's main button.
 3. **The description line** for search and share cards.
 4. **The share image:** the wordmark and the sparkle on the ground, with no other text.
 5. **The apple-touch icon:** the sparkle on the ground.

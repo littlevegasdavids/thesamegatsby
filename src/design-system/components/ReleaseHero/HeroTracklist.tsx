@@ -13,6 +13,7 @@ type HeroTracklistProps = {
   /** Opens "Show all" on first render, so /system can show it open. */
   defaultShowAll?: boolean;
   onPlay?: (trackId: string) => void;
+  onIntent?: (trackId: string) => void;
 };
 
 // The hero's tracklist: list TrackRows under a hairline, LEAD on the lead
@@ -20,7 +21,7 @@ type HeroTracklistProps = {
 // closed, so aria-controls always points at them. The toggle comes after
 // them, so the tracks it opens sit between it and the rows above, and focus
 // stays on it either way.
-export function HeroTracklist({ label, tracks, shown, defaultShowAll = false, onPlay }: HeroTracklistProps) {
+export function HeroTracklist({ label, tracks, shown, defaultShowAll = false, onPlay, onIntent }: HeroTracklistProps) {
   const [open, setOpen] = useState(defaultShowAll);
   const restId = `${useId()}-rest`;
 
@@ -35,6 +36,7 @@ export function HeroTracklist({ label, tracks, shown, defaultShowAll = false, on
       state={t.state}
       lead={t.lead}
       onToggle={onPlay && (() => onPlay(t.id))}
+      onIntent={onIntent && (() => onIntent(t.id))}
     />
   );
 
