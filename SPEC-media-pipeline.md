@@ -242,7 +242,7 @@ Re-cut from their masters with `add-song`, once Reno has given me the inputs bel
 | Release | Type | Tracks | Cover | To sort out |
 |---|---|---|---|---|
 | Welcome to Vapor_City | single | 1 | 1080² PNG | Exactly at the 1080 px minimum |
-| Give me that KaiZen | single? | 1? | 1469 × 1457 PNG | **Not square:** a square export, or `--crop`, which loses 12 px. **Its Spotify link is an album, its SoundCloud link is a set and its YouTube link is track 2 of a playlist, so it may hold more than one track** |
+| Give me that KaiZen | single | 1: the original mix | 1469 × 1457 PNG (`Kaizen final.png`) | **Not square:** `--crop`, which loses 12 px. **Decided 17 Nov 2026:** it came out with an extended mix, but only the original mix goes on the site. Its links still point at the release on each platform, which holds both mixes |
 | You who could be Forever | single | 1 | 2500² PNG | — |
 | Can't You See | EP | Can't You See, UKG 333 | 2048² PNG | Its Apple Music link points at the song, not the EP |
 | Bring That Change | single | 1 | SVG around a raster | `sips` renders it at 1600², but the original artwork file would be better |

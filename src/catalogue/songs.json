@@ -1,6 +1,255 @@
 {
   "releases": [
     {
+      "id": "welcome-to-vapor-city",
+      "type": "single",
+      "title": "Welcome to Vapor_City",
+      "date": "2025-10-11",
+      "cover": {
+        "key": "covers/welcome-to-vapor-city.be5bb22c",
+        "widths": [
+          192,
+          384,
+          768,
+          1080
+        ],
+        "formats": [
+          "avif",
+          "webp"
+        ]
+      },
+      "tracks": [
+        {
+          "id": "welcome-to-vapor-city",
+          "title": "Welcome to Vapor_City",
+          "kind": "original",
+          "snippet": {
+            "key": "snippets/welcome-to-vapor-city.a8e7310c.m4a",
+            "duration": 30,
+            "bytes": 632451,
+            "start": 142,
+            "fadeIn": 2,
+            "fadeOut": 2
+          }
+        }
+      ],
+      "leadTrackId": "welcome-to-vapor-city",
+      "links": [
+        {
+          "platform": "spotify",
+          "url": "https://open.spotify.com/album/1VV9RgqDE1zMkT89yyqku4"
+        },
+        {
+          "platform": "apple-music",
+          "url": "https://music.apple.com/us/album/welcome-to-vapor-city-single/1845517676"
+        },
+        {
+          "platform": "youtube-music",
+          "url": "https://music.youtube.com/playlist?list=OLAK5uy_m7yFqeJK3B8zl8nVIIzSHSchXTEHcrwyk"
+        },
+        {
+          "platform": "soundcloud",
+          "url": "https://soundcloud.com/dejagatsby/welcome-to-vapor_city"
+        },
+        {
+          "platform": "deezer",
+          "url": "https://www.deezer.com/album/835131022"
+        }
+      ]
+    },
+    {
+      "id": "give-me-that-kaizen",
+      "type": "single",
+      "title": "Give me that KaiZen",
+      "date": "2025-03-20",
+      "cover": {
+        "key": "covers/give-me-that-kaizen.237b6251",
+        "widths": [
+          192,
+          384,
+          768,
+          1080
+        ],
+        "formats": [
+          "avif",
+          "webp"
+        ]
+      },
+      "tracks": [
+        {
+          "id": "give-me-that-kaizen",
+          "title": "Give me that KaiZen",
+          "kind": "original",
+          "snippet": {
+            "key": "snippets/give-me-that-kaizen.301a67c6.m4a",
+            "duration": 30,
+            "bytes": 602928,
+            "start": 120,
+            "fadeIn": 2,
+            "fadeOut": 2
+          }
+        }
+      ],
+      "leadTrackId": "give-me-that-kaizen",
+      "links": [
+        {
+          "platform": "spotify",
+          "url": "https://open.spotify.com/album/0ATTxFkDlXZgVnoXe5zQiB"
+        },
+        {
+          "platform": "apple-music",
+          "url": "https://music.apple.com/us/album/give-me-that-kaizen-single/1803499620"
+        },
+        {
+          "platform": "youtube-music",
+          "url": "https://music.youtube.com/playlist?list=OLAK5uy_nxHhcOcMrBW07x7hwYzQkMBlJcqLLirHM"
+        },
+        {
+          "platform": "soundcloud",
+          "url": "https://soundcloud.com/dejagatsby/sets/give-me-that-kaizen"
+        },
+        {
+          "platform": "bandcamp",
+          "url": "https://thesamegatsby.bandcamp.com/album/give-me-that-kaizen"
+        },
+        {
+          "platform": "deezer",
+          "url": "https://www.deezer.com/album/730632371"
+        }
+      ]
+    },
+    {
+      "id": "you-who-could-be-forever",
+      "type": "single",
+      "title": "You who could be Forever",
+      "date": "2024-06-06",
+      "cover": {
+        "key": "covers/you-who-could-be-forever.ed6a12c5",
+        "widths": [
+          192,
+          384,
+          768,
+          1080
+        ],
+        "formats": [
+          "avif",
+          "webp"
+        ]
+      },
+      "tracks": [
+        {
+          "id": "you-who-could-be-forever",
+          "title": "You who could be Forever",
+          "kind": "original",
+          "snippet": {
+            "key": "snippets/you-who-could-be-forever.532aa949.m4a",
+            "duration": 30,
+            "bytes": 623561,
+            "start": 60,
+            "fadeIn": 2,
+            "fadeOut": 2
+          }
+        }
+      ],
+      "leadTrackId": "you-who-could-be-forever",
+      "links": [
+        {
+          "platform": "spotify",
+          "url": "https://open.spotify.com/album/6KnDL1oCSeCVK7hpor4T3s"
+        },
+        {
+          "platform": "apple-music",
+          "url": "https://music.apple.com/us/album/you-who-could-be-forever-single/1750669404"
+        },
+        {
+          "platform": "youtube-music",
+          "url": "https://music.youtube.com/playlist?list=OLAK5uy_n6pEU7-EN4xWuR-jN3zkg8fB2AAEnoCgk"
+        },
+        {
+          "platform": "soundcloud",
+          "url": "https://soundcloud.com/dejagatsby/you-who-could-be-forever"
+        },
+        {
+          "platform": "bandcamp",
+          "url": "https://thesamegatsby.bandcamp.com/track/you-who-could-be-forever"
+        },
+        {
+          "platform": "deezer",
+          "url": "https://www.deezer.com/album/598739772"
+        }
+      ]
+    },
+    {
+      "id": "cant-you-see-ep",
+      "type": "ep",
+      "title": "Can't You See",
+      "date": "2024-02-21",
+      "cover": {
+        "key": "covers/cant-you-see-ep.8d65ab75",
+        "widths": [
+          192,
+          384,
+          768,
+          1080
+        ],
+        "formats": [
+          "avif",
+          "webp"
+        ]
+      },
+      "tracks": [
+        {
+          "id": "cant-you-see",
+          "title": "Can't You See",
+          "kind": "original",
+          "snippet": {
+            "key": "snippets/cant-you-see.fcc98431.m4a",
+            "duration": 30,
+            "bytes": 623358,
+            "start": 300,
+            "fadeIn": 2,
+            "fadeOut": 2
+          }
+        },
+        {
+          "id": "ukg-333",
+          "title": "UKG 333",
+          "kind": "original",
+          "snippet": {
+            "key": "snippets/ukg-333.1cec8625.m4a",
+            "duration": 30,
+            "bytes": 614109,
+            "start": 24,
+            "fadeIn": 2,
+            "fadeOut": 2
+          }
+        }
+      ],
+      "leadTrackId": "cant-you-see",
+      "links": [
+        {
+          "platform": "spotify",
+          "url": "https://open.spotify.com/album/4WiQgdIocMx6qgYSmxnTPG"
+        },
+        {
+          "platform": "apple-music",
+          "url": "https://music.apple.com/us/album/cant-you-see-ep-single/1732276175"
+        },
+        {
+          "platform": "youtube-music",
+          "url": "https://music.youtube.com/playlist?list=OLAK5uy_mdFFNJyKEaN9sPwJeztKKdCZlV_8188k8"
+        },
+        {
+          "platform": "soundcloud",
+          "url": "https://soundcloud.com/dejagatsby/sets/cant-you-see-ep"
+        },
+        {
+          "platform": "bandcamp",
+          "url": "https://thesamegatsby.bandcamp.com/album/cant-you-see-ep"
+        }
+      ]
+    },
+    {
       "id": "bring-that-change",
       "type": "single",
       "title": "Bring That Change",
@@ -37,19 +286,23 @@
       "links": [
         {
           "platform": "spotify",
-          "url": "https://open.spotify.com/track/09QlqIRHu7X9DmGK0vdDvQ"
+          "url": "https://open.spotify.com/album/111jMvmnSJyhiDnT52nDDs"
         },
         {
           "platform": "apple-music",
-          "url": "https://music.apple.com/za/album/bring-that-change/1708120323?i=1708120324"
+          "url": "https://music.apple.com/us/album/bring-that-change-single/1708120323"
         },
         {
           "platform": "youtube-music",
-          "url": "https://www.youtube.com/watch?v=aZ5cKAAMU2U"
+          "url": "https://music.youtube.com/playlist?list=OLAK5uy_nWS5BbZIGN31bMpPLChYBPVbw8z2wWWRI"
         },
         {
           "platform": "soundcloud",
           "url": "https://soundcloud.com/dejagatsby/bring-that-change"
+        },
+        {
+          "platform": "bandcamp",
+          "url": "https://thesamegatsby.bandcamp.com/track/bring-that-change"
         }
       ]
     }

@@ -1462,7 +1462,21 @@ Plan: [plan.md, media-pipeline](plan.md#implementation-plan-media-pipeline). Spe
   - **Files:** `scripts/media/upload.ts`, `scripts/add-song.ts`, `scripts/check-media.ts`, `package.json`, `tests/media-upload.test.ts`, and `src/catalogue/songs.json` from the run
   - **Size:** M
 
-- [ ] **MP-10: Re-cut the five releases** 🔒 👤
+- [x] **MP-10: Re-cut the five releases** 🔒 👤
+  - **Done 17 Nov 2026.** Reno heard all six snippets on a local review page (`.media/review.html`, served from `.claude/launch.json`'s `media-review`) and approved the batch: "Upload all four".
+    - **Uploaded, with every key the same as its dry run:**
+      - **Can't You See EP:** Can't You See, which created the EP, then UKG 333, which joined it.
+      - **Forever, KaiZen and Vapor_City:** with KaiZen cropped to 1457².
+      - **Bring That Change:** its links were replaced by hand with the release links.
+      - **In total:** 37 new files.
+    - **Checks after the upload:**
+      - `npm run check-media` showed 46 of 46 keys live
+      - `scripts/check-edge.sh media` passed on `welcome-to-vapor-city.a8e7310c` and `ukg-333.1cec8625`
+      - `songs.json` passes strict validation, with the EP at two tracks
+      - all 639 tests pass, and `npm run ci` passes
+    - **Loudness after the match:** four snippets sit at −14 LUFS. Vapor_City is 1.3 LU under, because its peaks capped the raise. Forever is 1.1 LU under, because its master peaks at +0.7 dBTP, so it was turned down further.
+    - **Report wording fixed:** a shortfall now reads "raising it further would push its peaks past −1 dBTP" or "it was turned down further to keep its peaks under −1 dBTP", whichever applies.
+    - **Still open:** the missing links below. They're hand edits to `songs.json` when Reno sends them, followed by `npm test`.
   - The five releases and six tracks from the spec's table, with Reno's inputs I-1 to I-6. Each one goes through `--dry-run` first, and Reno listens to every snippet and checks every cover. The uploads go in batches he approves.
   - **Acceptance:**
     - `songs.json` holds every release, track, date and platform link Reno has given, and passes validation
@@ -1472,6 +1486,37 @@ Plan: [plan.md, media-pipeline](plan.md#implementation-plan-media-pipeline). Spe
   - **Depends on:** MP-9, and Reno's inputs I-1 to I-6
   - **Files:** `src/catalogue/songs.json`
   - **Size:** S of code. Most of the time goes on Reno's inputs and listening
+  - **Inputs collected 17 Nov 2026:**
+    - **Masters and covers (I-1, I-6):** all in `~/Music/FINISHED GATSBY SONGS/`.
+      - **Can't You See EP:** `Can't you see.wav` and `UKG 333.wav`, with `Cant you see.png` at 2048².
+      - **KaiZen:** `give me that kaizen original mix/give me that kaizen original mix.wav` only, with `Kaizen final.png` at 1469 × 1457, so `--crop`.
+      - **Vapor_City:** `Vapor City Final.wav`, with `Vapor City Cover High Res.png` at 2560².
+      - **Forever:** `You who could be Forever.wav`, with its cover at 2500².
+    - **Start times (I-2):**
+      - Bring That Change 3:56
+      - Can't You See 5:00
+      - UKG 333 0:24
+      - KaiZen 2:00
+      - Vapor_City 2:22
+      - Forever 1:00
+    - **Dates (I-3),** where Apple, Spotify and Deezer agree:
+      - Vapor_City 2025-10-11
+      - KaiZen 2025-03-20
+      - Forever 2024-06-06
+      - Can't You See EP 2024-02-21
+      - Bring That Change 2023-09-19
+    - **KaiZen (I-5):** a single of the original mix. Its links go to each platform's two-mix release.
+    - **Links (I-4):** each points to the release on that platform. Every one returned 200 on 17 Nov. Bring That Change's entry still holds the old track and video links, and gets these by hand.
+      - Spotify and Apple Music (US store), all five
+      - YouTube Music album playlists, read from each "Provided to YouTube" video, all five
+      - SoundCloud, all five
+      - Bandcamp: KaiZen, Forever, Can't You See and Bring That Change
+      - Deezer: Vapor_City, KaiZen and Forever
+    - **Missing links, which Reno will provide later:**
+      - [ ] Amazon Music, for all five releases
+      - [ ] Tidal, for all five releases
+      - [ ] Bandcamp, for Welcome to Vapor_City (not found on thesamegatsby.bandcamp.com)
+      - [ ] Deezer, for Can't You See EP and Bring That Change (not found on Deezer's catalogue)
 
 - [ ] **MP-11: Retire `songs/index.ts` and `public/music/`**
   - The placeholder `src/app/page.tsx` lists the catalogue's releases from `src/catalogue`. Its comment, which still says production is served from `main`, is replaced. `songs/index.ts` and `public/music/` are deleted.

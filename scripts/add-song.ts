@@ -119,7 +119,8 @@ export async function runAddSong(argv: string[], deps: AddSongDeps): Promise<num
     log(`Loudness: the cut measured ${db(loudness.loudness)} LUFS with its true peak at ${db(loudness.truePeak)} dBTP, so ${loudness.gain >= 0 ? "+" : ""}${db(loudness.gain)} dB was applied`);
     if (loudness.silent) log(`  ⚠ the cut is silent: check --start`);
     if (loudness.shortfall > 0) {
-      log(`  ⚠ it lands ${db(loudness.shortfall)} LU under ${TARGET_LUFS} LUFS, because raising it further would push its peaks past ${TRUE_PEAK_CEILING} dBTP`);
+      const why = loudness.gain < 0 ? "it was turned down further to keep its peaks under" : "raising it further would push its peaks past";
+      log(`  ⚠ it lands ${db(loudness.shortfall)} LU under ${TARGET_LUFS} LUFS, because ${why} ${TRUE_PEAK_CEILING} dBTP`);
     }
     if (cover) {
       log(`Cover: ${cover.source.width} × ${cover.source.height}${cover.side !== cover.source.width || cover.side !== cover.source.height ? `, cropped to ${cover.side} × ${cover.side}` : ""}`);

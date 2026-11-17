@@ -312,7 +312,7 @@ None of these block Phase 10. MP-10 needs them all, and MP-8's checkpoint needs 
 | I-2 | A start second for each track, auditioned with `--dry-run` | MP-10 |
 | I-3 | Each release's date | MP-10 |
 | I-4 | The links for all eight platforms per release. I can read them off the public platform pages for him to check | MP-10 |
-| I-5 | Give me that KaiZen's real type and tracklist | MP-10 |
+| I-5 | Give me that KaiZen's real type and tracklist. **Answered 17 Nov:** a single of the original mix only, linking to the platforms' release with both mixes | MP-10 |
 | I-6 | Square source art for Give me that KaiZen and Bring That Change, if he has it (otherwise `--crop`, and `sips`'s SVG render) | MP-10 |
 
 ## Approvals I'll ask for

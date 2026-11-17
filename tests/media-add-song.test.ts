@@ -115,6 +115,7 @@ describe("add-song with fake tools", () => {
     assert.equal(await runAddSong(ep, deps), 0);
     const out = lines.join("\n");
     assert.match(out, /15\.00 LU under -14 LUFS/);
+    assert.match(out, /raising it further would push its peaks past -1 dBTP/);
     assert.match(out, /cropped to 1457 × 1457/);
     assert.match(out, /12 transparent pixels/);
     assert.match(out, /night-drive-ep has one track: add the next with --release night-drive-ep/);
