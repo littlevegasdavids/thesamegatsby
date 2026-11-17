@@ -46,3 +46,19 @@ describe("the /system stack", () => {
     assert.match(stack, /<div ref=\{page\} className=\{styles\.framePage\}>\s*<SiteHeader\b/);
   });
 });
+
+// SITE-6: on / the page's root scrolls, and NowPlayingBar sets --dg-bar-h on
+// it, so the root pads both ends, as SystemFrame's scroller does. Without it,
+// Tab with the bar up left focus on the footer's links, wholly under the bar.
+describe("the homepage's root", () => {
+  const home = read("app/home/home.module.css");
+  const rule = /:global\(html\):has\(\.page\)\s*\{([^}]*)\}/.exec(home)?.[1] ?? "";
+
+  test("pads its top by the stack's reach", () => {
+    assert.match(rule, /scroll-padding-top:\s*var\(--dg-sticky-clear\);/);
+  });
+
+  test("pads its bottom by the bar and the ring's reach", () => {
+    assert.match(rule, /scroll-padding-bottom:\s*calc\(var\(--dg-bar-h\) \+ var\(--dg-space-1\)\);/);
+  });
+});

@@ -191,6 +191,14 @@ describe("ReleaseHero's markup", () => {
     assert.match(frame, /alt=\{`\$\{release\.title\} cover art`\}/);
   });
 
+  // SITE-6: with only width, next/image wrote "768 1x, 1080 2x", so every
+  // phone at 1.5x or more loaded the 1080 for a box the 768 fills, and the
+  // homepage's first load went over 350 KB at Lighthouse's 1.75x.
+  test("tells the browser the cover's box: the column on a phone, 480 px from 768", () => {
+    const frame = /<div className=\{styles\.cover\}>([\s\S]*?)<\/div>/.exec(hero)?.[1] ?? "";
+    assert.match(frame, /sizes="\(min-width: 768px\) 480px, calc\(100vw - 40px\)"/);
+  });
+
   test("plays through a primary Button that carries aria-pressed", () => {
     assert.match(hero, /<Button\s+variant="primary"\s+icon=\{view\.play\.icon\}\s+label=\{view\.play\.label\}\s+pressed=\{view\.play\.pressed\}/);
     assert.match(hero, /onPlay\(view\.leadTrackId\)/);

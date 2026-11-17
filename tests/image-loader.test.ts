@@ -61,3 +61,15 @@ describe("imageLoader, for anything else", () => {
     assert.equal(imageLoader({ src: lookalike, width: 64 }), `${lookalike}?w=64`);
   });
 });
+
+// SITE-6: next/image writes its srcset from these lists, so they are the
+// built widths and nothing else, and each w descriptor names the file's real
+// width.
+describe("next.config.ts", async () => {
+  const { default: config } = await import("../next.config.ts");
+
+  test("gives next/image the built widths, so its srcset says what loads", () => {
+    const sizes = [...(config.images?.imageSizes ?? []), ...(config.images?.deviceSizes ?? [])].sort((a, b) => a - b);
+    assert.deepEqual(sizes, [...COVER_WIDTHS]);
+  });
+});

@@ -41,8 +41,11 @@ export function ReleaseHero({ release, playingTrackId, playState, elapsed, onPla
         <SparkleStar size={12} />
         {view.label}
       </p>
+      {/* sizes is the cover's box (the column, 20 px in, on a phone), so the
+          browser picks the built width that fills it at the screen's density
+          rather than the 2x file on every phone. */}
       <div className={styles.cover}>
-        <Image className={styles.coverImage} src={release.cover} alt={`${release.title} cover art`} width={480} height={480} loading="eager" />
+        <Image className={styles.coverImage} src={release.cover} alt={`${release.title} cover art`} width={480} height={480} sizes="(min-width: 768px) 480px, calc(100vw - 40px)" loading="eager" />
       </div>
       <div className={styles.body}>
         <h1 className={`${styles.title} dg-tape`}>{release.title}</h1>

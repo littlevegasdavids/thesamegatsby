@@ -11,6 +11,16 @@
   box-sizing: border-box;
 }
 
+/* The root is this page's scroll container, and NowPlayingBar sets
+   --dg-bar-h on it. Padding both ends keeps keyboard focus clear of the
+   sticky stack above and the bar below, with room for the ring
+   (SPEC-design-system.md, ReleaseFilter and NowPlayingBar). Scoped by :has
+   so /system's page keeps its own. */
+:global(html):has(.page) {
+  scroll-padding-top: var(--dg-sticky-clear);
+  scroll-padding-bottom: calc(var(--dg-bar-h) + var(--dg-space-1));
+}
+
 .hero {
   padding: var(--dg-space-3) calc(var(--dg-space-4) + var(--dg-space-1)) 0;
 }
@@ -47,6 +57,12 @@
 .email {
   color: var(--dg-link);
   font-size: var(--dg-text-small);
+}
+
+/* The ring every component draws, not the browser's own. */
+.email:focus-visible {
+  outline: 2px solid var(--dg-focus);
+  outline-offset: 2px;
 }
 
 .rec {
