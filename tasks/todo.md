@@ -1566,7 +1566,11 @@ Plan: [plan.md, media-pipeline](plan.md#implementation-plan-media-pipeline). Spe
 
 Spec: [SPEC-audio-engine.md](../SPEC-audio-engine.md). Every file under `src/audio/` is `.ts`, so the test runner can import it.
 
-- [ ] **AE-1: The state**
+- [x] **AE-1: The state**
+  - **Done 17 Nov 2026.** 31 tests in `tests/audio-state.test.ts`, and all 672 pass. `npm run ci` passes. Nothing imports it yet, so there's nothing to see in a browser until AE-5.
+    - **Two event names the spec's table describes but doesn't name:** `interrupted`, for a pause the engine didn't ask for, and `timeout`, for 10 s in loading. AE-3 raises both.
+    - **Every event that doesn't apply is tested against every state it skips**, and returns the same object, so AE-3's `getSnapshot` can hand React an unchanged value.
+    - **To watch in AE-3:** as the spec writes it, `ended` counts only while playing. If the element ever ends while buffering (loading), the state waits for the 10 s timeout and shows a failed end. The fake element can't show whether real browsers do that, so `/bench` checks it in AE-5.
   - `src/audio/state.ts`: the `Playback` and `EngineEvent` types, and `next(state, event)`, as the spec's state table writes it.
   - **Acceptance:**
     - every row of the state table has a test, from each state it applies in
