@@ -4,9 +4,9 @@ const nextConfig: NextConfig = {
   // Pure static export: Workers Static Assets serves ./out, and media comes
   // from R2. There is no server, so no API routes, middleware or ISR.
   output: "export",
-  // Required by `output: 'export'`: the default image loader needs a server.
-  // Covers are sized by media-pipeline before they're served.
-  images: { unoptimized: true },
+  // The default image loader needs a server. This one maps each cover onto
+  // the width media-pipeline already built that fills its box.
+  images: { loader: "custom", loaderFile: "./src/app/image-loader.ts" },
 };
 
 export default nextConfig;

@@ -1726,7 +1726,14 @@ Spec: [SPEC-audio-engine.md](../SPEC-audio-engine.md). Every file under `src/aud
 
 Spec: [SPEC-site.md](../SPEC-site.md). Built in its own session at Reno's request, without a spec review stop, so its **(new)** decisions wait for his review after he tests.
 
-- [ ] **SITE-1: The catalogue as view props, and the image loader**
+- [x] **SITE-1: The catalogue as view props, and the image loader**
+  - **Done 17 Nov 2026.** 27 tests in `tests/site-releases.test.ts`, `tests/image-loader.test.ts` and `tests/site-tokens.test.ts`, and all 767 pass. `npm run ci` passes.
+    - **The mapping passes only the view fields** (a test checks the keys), so no snippet key, date or byte count reaches the client's props.
+    - **The hero pick reads the dates**, not the list order, so a reordered `songs.json` can't move it. A featured release wins. An empty catalogue throws.
+    - **A cover with no 768 px WebP fails the build**, naming the release, rather than showing a broken image.
+    - **The loader only rewrites `https://media.thesamegatsby.com/covers/<stem>.<width>.<webp|avif>`.** A lookalike host or any other media file passes through with `?w=`, like `/system`'s fixtures. Above 1080 it gives the 1080.
+    - **`tokenValue()` takes each token's first value**, the phone one, ignores comments, and throws naming the token on an unknown name, a broken link or a loop.
+    - **`/system` still loads every image:** in the browser pane, all 102 `<img>`s there (fixture covers, the wordmark and stars) loaded with none broken, and no console errors. Their `srcset`s now carry `?w=`.
   - `src/app/home/releases.ts`: catalogue releases as `design-system` `Release`s (cover at 768 WebP, snippet durations, links), the hero pick, and the socials. `src/app/image-loader.ts`, wired in `next.config.ts`, and `src/app/tokens.ts`, which reads a token's value from `tokens.css` at build.
   - **Acceptance:** the five releases map with real cover URLs and 30 s tracks; the hero is the featured release or else the newest; the loader picks 192/384/768/1080 and passes other URLs through with `?w=`; a token reads through `var()` chains to its value
   - **Verify:** `npm test`, `npm run ci`, `/system` still loads its fixture covers
