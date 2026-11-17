@@ -1,0 +1,94 @@
+/* A plain test page: tokens for colour and type, no design-system parts. */
+
+.page {
+  color-scheme: dark;
+  max-width: 40rem;
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding: var(--dg-space-6) var(--dg-space-4) var(--dg-space-9);
+  font-family: var(--dg-font-ui);
+  font-size: var(--dg-text-body);
+  line-height: 1.5;
+  color: var(--dg-fg);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--dg-text-title);
+}
+
+.lede {
+  margin: var(--dg-space-2) 0 var(--dg-space-5);
+  color: var(--dg-fg-muted);
+}
+
+.mute {
+  display: inline-flex;
+  gap: var(--dg-space-2);
+  align-items: center;
+  min-height: 44px;
+}
+
+.tracks,
+.runs {
+  margin: var(--dg-space-4) 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tracks {
+  display: grid;
+  gap: var(--dg-space-2);
+}
+
+.track,
+.control {
+  min-height: 44px;
+  padding: var(--dg-space-2) var(--dg-space-4);
+  font: inherit;
+  color: var(--dg-fg);
+  background: var(--dg-surface);
+  border: 1px solid var(--dg-outline);
+  border-radius: var(--dg-radius-m);
+  cursor: pointer;
+}
+
+.track {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  text-align: start;
+}
+
+.track[aria-pressed="true"] {
+  border-color: var(--dg-accent);
+}
+
+.control {
+  margin-inline-end: var(--dg-space-2);
+}
+
+.track:focus-visible,
+.control:focus-visible {
+  outline: 2px solid var(--dg-focus);
+  outline-offset: 2px;
+}
+
+.bar {
+  margin: var(--dg-space-5) 0;
+  padding: var(--dg-space-4);
+  border: 1px solid var(--dg-line);
+  border-radius: var(--dg-radius-m);
+}
+
+.state {
+  margin: 0 0 var(--dg-space-2);
+  font-family: var(--dg-font-readout);
+  font-size: var(--dg-text-readout);
+  color: var(--dg-fg-muted);
+}
+
+.runs li {
+  font-family: var(--dg-font-readout);
+  font-size: var(--dg-text-readout-s);
+}
