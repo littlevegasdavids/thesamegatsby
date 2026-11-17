@@ -1,6 +1,5 @@
 import assert from "node:assert/strict";
 import { describe, test } from "node:test";
-import { summarise } from "../src/app/bench/stats.ts";
 import type { Playback } from "../src/audio/state.ts";
 import { barState, rowState } from "../src/audio/view.ts";
 
@@ -34,16 +33,5 @@ describe("the engine's state as the components' props", () => {
     const failed: Playback = { ...at("ended")!, failed: true };
     assert.equal(barState(failed), "ended");
     assert.equal(rowState(failed, "ukg-333"), "played");
-  });
-});
-
-describe("the bench's timing summary", () => {
-  test("gives the median and the worst, in ms", () => {
-    assert.deepEqual(summarise([180, 120, 240, 150, 90]), { runs: 5, median: 150, worst: 240 });
-    assert.deepEqual(summarise([100, 200]), { runs: 2, median: 150, worst: 200 });
-  });
-
-  test("is empty with no runs", () => {
-    assert.deepEqual(summarise([]), { runs: 0, median: undefined, worst: undefined });
   });
 });

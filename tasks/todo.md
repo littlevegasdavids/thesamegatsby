@@ -1772,7 +1772,12 @@ Spec: [SPEC-site.md](../SPEC-site.md). Built in its own session at Reno's reques
   - **Verify:** `npm run ci`, opening the files from `out/`
   - **Size:** S
 
-- [ ] **SITE-5: Retire `/bench` and the old site's images**
+- [x] **SITE-5: Retire `/bench` and the old site's images**
+  - **Done 17 Nov 2026.** 1 test added to `tests/old-site-retired.test.ts`, which failed before the deletion, and all 777 pass. `npm run ci` passes.
+    - **`out/` went from 6,988 KB to 2,576 KB** (`du -sk`), and has no `bench` route, `background.webp` or `profile_pic.jpg`. The build lists `/`, `/_not-found` and `/system`.
+    - **`/bench`'s `summarise()` test went with it**, from `tests/audio-view.test.ts`, which keeps its `rowState()` and `barState()` tests. `src/audio/view.ts` stays.
+    - **`/` still loads three CSS files with no `/system` rule** after the deletion.
+    - **`favicon.ico` goes in SITE-4,** with the icons that replace it, so the test checks it there.
   - Delete `src/app/bench/`, `public/background.webp` and `public/profile_pic.jpg`. `src/audio/view.ts` stays, since the homepage uses it.
   - **Acceptance:** `out/` has none of them; `npm run ci` passes
   - **Size:** XS
