@@ -1,8 +1,9 @@
 import assert from "node:assert/strict";
 import { beforeEach, describe, test } from "node:test";
 import { LOAD_TIMEOUT, createAudioEngine } from "../src/audio/engine.ts";
-import type { AudioEngine, EngineEnv, MediaElementLike } from "../src/audio/engine.ts";
+import type { AudioEngine, EngineEnv } from "../src/audio/engine.ts";
 import type { EngineTrack } from "../src/audio/tracks.ts";
+import { FakeAudio } from "./support/fake-audio.ts";
 
 const track = (id: string): EngineTrack => ({
   id,
@@ -14,48 +15,6 @@ const track = (id: string): EngineTrack => ({
 });
 const TRACKS = ["vapor", "kaizen", "forever", "cys", "ukg", "btc"].map(track);
 const src = (id: string) => track(id).src;
-
-// The parts of HTMLAudioElement the engine uses. pause() fires "pause" at
-// once when it was playing; a real element queues it, which the engine
-// mustn't depend on either way.
-class FakeAudio extends EventTarget implements MediaElementLike {
-  src = "";
-  preload = "";
-  currentTime = 0;
-  paused = true;
-  ended = false;
-  calls: string[] = [];
-  playResult: Promise<void> = Promise.resolve();
-
-  play() {
-    this.calls.push(`play ${this.src}`);
-    this.paused = false;
-    this.ended = false;
-    return this.playResult;
-  }
-  pause() {
-    this.calls.push("pause");
-    if (this.paused) return;
-    this.paused = true;
-    this.emit("pause");
-  }
-  load() {
-    this.calls.push(`load ${this.src}`);
-  }
-  emit(type: string) {
-    this.dispatchEvent(new Event(type));
-  }
-  // What a real element does at the end: a last timeupdate just short of the
-  // end, then pause, then ended.
-  runOut() {
-    this.currentTime = 29.95;
-    this.emit("timeupdate");
-    this.paused = true;
-    this.ended = true;
-    this.emit("pause");
-    this.emit("ended");
-  }
-}
 
 let elements: FakeAudio[];
 let timers: Map<number, () => void>;

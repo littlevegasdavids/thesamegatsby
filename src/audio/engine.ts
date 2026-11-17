@@ -1,3 +1,5 @@
+import { bindActions, browserSession, showPlayback } from "./media-session.ts";
+import type { SessionEnv } from "./media-session.ts";
 import { next } from "./state.ts";
 import type { EngineEvent, Playback } from "./state.ts";
 import type { EngineTrack } from "./tracks.ts";
@@ -24,6 +26,8 @@ export type EngineEnv = {
   createElement: () => MediaElementLike;
   setTimeout: (fn: () => void, ms: number) => unknown;
   clearTimeout: (handle: unknown) => void;
+  // Left out where the browser has no Media Session.
+  mediaSession?: SessionEnv;
 };
 
 export type AudioEngine = {
@@ -43,6 +47,7 @@ const browserEnv = (): EngineEnv => ({
   createElement: () => new Audio(),
   setTimeout: (fn, ms) => globalThis.setTimeout(fn, ms),
   clearTimeout: (handle) => globalThis.clearTimeout(handle as ReturnType<typeof setTimeout>),
+  mediaSession: browserSession(),
 });
 
 export function createAudioEngine(tracks: readonly EngineTrack[], env?: EngineEnv): AudioEngine {
@@ -55,6 +60,7 @@ export function createAudioEngine(tracks: readonly EngineTrack[], env?: EngineEn
   // Bumped by every play, replay and stop, so a play() promise that settles
   // after a later tap can't fail the track that replaced it.
   let generation = 0;
+  let actionsBound = false;
 
   const environment = () => (resolved ??= env ?? browserEnv());
 
@@ -74,6 +80,8 @@ export function createAudioEngine(tracks: readonly EngineTrack[], env?: EngineEn
     const before = state;
     state = next(state, event);
     if (state === before) return;
+    const session = environment().mediaSession;
+    if (session) showPlayback(session, state, before, state ? byId.get(state.trackId) : undefined);
     if (state?.phase !== "loading") clearTimer();
     else if (before?.phase !== "loading" || event.type === "play" || event.type === "replay") {
       clearTimer();
@@ -108,6 +116,13 @@ export function createAudioEngine(tracks: readonly EngineTrack[], env?: EngineEn
   // play() inside the tap.
   const start = (track: EngineTrack, reload: boolean) => {
     const media = element();
+    const session = environment().mediaSession;
+    // Bound on the first tap, so the lock screen's buttons belong to a page
+    // that has actually played something.
+    if (session && !actionsBound) {
+      bindActions(session, { replay: () => engine.replay(), stop: () => engine.stop() });
+      actionsBound = true;
+    }
     const mine = ++generation;
     if (!media.paused) media.pause();
     media.preload = "auto";
@@ -131,7 +146,7 @@ export function createAudioEngine(tracks: readonly EngineTrack[], env?: EngineEn
 
   const idle = () => state?.phase !== "loading" && state?.phase !== "playing";
 
-  return {
+  const engine: AudioEngine = {
     play(trackId) {
       const track = lookup(trackId);
       const reload = state?.trackId === trackId && state.failed;
@@ -175,4 +190,5 @@ export function createAudioEngine(tracks: readonly EngineTrack[], env?: EngineEn
     },
     getSnapshot: () => state,
   };
+  return engine;
 }

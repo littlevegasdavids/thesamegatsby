@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createAudioEngine } from "../../audio/engine";
 import type { EngineEnv } from "../../audio/engine";
+import { browserSession } from "../../audio/media-session";
 import type { EngineTrack } from "../../audio/tracks";
 import { useAudioEngine } from "../../audio/use-audio-engine";
 import { barState, rowState } from "../../audio/view";
@@ -30,6 +31,7 @@ function mutedEngine(tracks: readonly EngineTrack[]) {
     },
     setTimeout: (fn, delay) => window.setTimeout(fn, delay),
     clearTimeout: (handle) => window.clearTimeout(handle as number),
+    mediaSession: browserSession(),
   };
   const setMuted = (value: boolean) => {
     muted = value;

@@ -1674,7 +1674,13 @@ Spec: [SPEC-audio-engine.md](../SPEC-audio-engine.md). Every file under `src/aud
 
 ## Phase 13: audio-engine, the lock screen and done
 
-- [ ] **AE-6: Media Session**
+- [x] **AE-6: Media Session**
+  - **Done 17 Nov 2026.** 12 tests in `tests/audio-media-session.test.ts`, against a fake session, and all 738 pass. `npm run ci` passes. Two deliberate breaks each failed them: dropping the `null` seek and skip handlers, and dropping the guard around a refused action.
+    - **In the browser pane on `/bench`, muted:** a tap on UKG 333 set the title, "Déjà Gatsby", the album "Can't You See" and the EP's cover at 192, 384 and 768 (WebP), with the state `playing`. Stop turned it to `paused`. The lock screen's own buttons can't be pressed from the page, so they're tested against the fake, and Reno's iPhone checks them in AE-8. Chrome's media hub wasn't looked at.
+    - **Beyond the spec's list, the engine sets `playbackState`:** `playing` while loading or playing, `paused` once ended (so the lock screen's play replays), and `none` with the metadata cleared when a load is cancelled.
+    - **The actions are bound on the first tap,** not when the page loads, so the lock screen's buttons only appear for a page that has played something.
+    - **The engine's client code is now 1,708 B** minified and gzipped, up from 1,266, against the 3 KB limit. `/` still loads none of it.
+    - **The fake element moved to `tests/support/fake-audio.ts`**, shared by the engine and session tests. The test glob only picks up `*.test.ts`, so it doesn't run on its own.
   - `src/audio/media-session.ts`, called from the engine where `navigator.mediaSession` exists. On each `play()` it sets the metadata (title, "Déjà Gatsby", album, artwork), the `play`, `pause` and `stop` handlers, `null` for the seek and skip actions, and the position state.
   - **Acceptance**, against a fake `mediaSession`:
     - each `play()` sets the track's metadata, and position state with the catalogue's duration
