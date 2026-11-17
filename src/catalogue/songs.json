@@ -1,3 +1,57 @@
 {
-  "releases": []
+  "releases": [
+    {
+      "id": "bring-that-change",
+      "type": "single",
+      "title": "Bring That Change",
+      "date": "2023-09-19",
+      "cover": {
+        "key": "covers/bring-that-change.4e00da2f",
+        "widths": [
+          192,
+          384,
+          768,
+          1080
+        ],
+        "formats": [
+          "avif",
+          "webp"
+        ]
+      },
+      "tracks": [
+        {
+          "id": "bring-that-change",
+          "title": "Bring That Change",
+          "kind": "original",
+          "snippet": {
+            "key": "snippets/bring-that-change.8923339a.m4a",
+            "duration": 30,
+            "bytes": 638312,
+            "start": 236,
+            "fadeIn": 2,
+            "fadeOut": 2
+          }
+        }
+      ],
+      "leadTrackId": "bring-that-change",
+      "links": [
+        {
+          "platform": "spotify",
+          "url": "https://open.spotify.com/track/09QlqIRHu7X9DmGK0vdDvQ"
+        },
+        {
+          "platform": "apple-music",
+          "url": "https://music.apple.com/za/album/bring-that-change/1708120323?i=1708120324"
+        },
+        {
+          "platform": "youtube-music",
+          "url": "https://www.youtube.com/watch?v=aZ5cKAAMU2U"
+        },
+        {
+          "platform": "soundcloud",
+          "url": "https://soundcloud.com/dejagatsby/bring-that-change"
+        }
+      ]
+    }
+  ]
 }

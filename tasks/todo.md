@@ -1441,7 +1441,18 @@ Plan: [plan.md, media-pipeline](plan.md#implementation-plan-media-pipeline). Spe
 
 ## Phase 11: media-pipeline, live
 
-- [ ] **MP-9: Upload, verify, write, and `check-media`** 🔒 *(first real upload)*
+- [x] **MP-9: Upload, verify, write, and `check-media`** 🔒 *(first real upload)*
+  - **Done 17 Nov 2026.** 14 tests in `tests/media-upload.test.ts` run against a fake in-memory bucket, and all 639 pass. `npm run ci` passes. The code is commit `b45366d`.
+    - **Failure tests:** a missing Wrangler login, an upload failing on the fifth file, a key that answers 404, a wrong size and a wrong cache-control each exit 1 and leave `songs.json` byte-identical. A login failure stops before anything is built.
+    - **Dry runs:** the MP-8 tests now pass a bucket that fails if touched, which proves a dry run never reaches R2.
+    - **The first real upload:** Bring That Change, with Reno's OK, as a single with release date 2023-09-19:
+      - cut from 3:56 of the mastered WAV, with the 2 s fade-in, at −10.0 LUFS less 4.0 dB
+      - covers from the original 1600² PNG
+      - 9 files uploaded, checked and written in 24 s, with the same keys as the dry run: `snippets/bring-that-change.8923339a.m4a` and `covers/bring-that-change.4e00da2f.*`
+    - **Checks after the upload:**
+      - `npm run check-media` showed 9 of 9 keys live
+      - `scripts/check-edge.sh media snippets/bring-that-change.8923339a.m4a` passed all 10 checks: 200, a cache HIT, immutable, `audio/mp4`, 206 on a range, CORS both ways, HSTS, an https redirect, and r2.dev off
+    - **Links:** the four from the old site, cleaned. YouTube is a `www.youtube.com` video, not a YouTube Music link, which I-4 still needs.
   - `scripts/media/upload.ts` checks `npx wrangler whoami`, runs `wrangler r2 object put` per file with its `Content-Type` and immutable `Cache-Control`, and sends a `HEAD` per key to `media.thesamegatsby.com`, expecting `200`, the type, the cache-control and the staged size. `add-song` runs build → upload → verify → write, and writes `songs.json` only when every check passes. `scripts/check-media.ts` HEADs every key in the catalogue, and `npm run check-media` runs it.
   - **Acceptance:**
     - with fake uploaders and checkers that fail at each step, `songs.json` stays byte-identical, and the exit code is 1
