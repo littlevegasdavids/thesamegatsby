@@ -5,9 +5,11 @@ import { coverUrl } from "../../catalogue/media.ts";
 import type { Catalogue, CatalogueRelease } from "../../catalogue/types.ts";
 import type { Release, SocialLink } from "../../design-system/types.ts";
 
-// The cover file the components start from. The image loader picks each
-// box's own width from it (image-loader.ts).
-const COVER_WIDTH = 768;
+// The cover file the components are given: the largest, which the image
+// loader swaps for the smallest that fills each box (image-loader.ts). Not
+// the 768: the hero asks for 768, and next/image warns in dev when a
+// loader's URL comes back unchanged, taking it for one that ignores width.
+const COVER_WIDTH = 1080;
 
 function cover(release: CatalogueRelease): string {
   const { widths, formats } = release.cover;

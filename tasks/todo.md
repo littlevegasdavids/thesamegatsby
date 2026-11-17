@@ -1734,7 +1734,7 @@ Spec: [SPEC-site.md](../SPEC-site.md). Built in its own session at Reno's reques
     - **The loader only rewrites `https://media.thesamegatsby.com/covers/<stem>.<width>.<webp|avif>`.** A lookalike host or any other media file passes through with `?w=`, like `/system`'s fixtures. Above 1080 it gives the 1080.
     - **`tokenValue()` takes each token's first value**, the phone one, ignores comments, and throws naming the token on an unknown name, a broken link or a loop.
     - **`/system` still loads every image:** in the browser pane, all 102 `<img>`s there (fixture covers, the wordmark and stars) loaded with none broken, and no console errors. Their `srcset`s now carry `?w=`.
-  - `src/app/home/releases.ts`: catalogue releases as `design-system` `Release`s (cover at 768 WebP, snippet durations, links), the hero pick, and the socials. `src/app/image-loader.ts`, wired in `next.config.ts`, and `src/app/tokens.ts`, which reads a token's value from `tokens.css` at build.
+  - `src/app/home/releases.ts`: catalogue releases as `design-system` `Release`s (cover at 1080 WebP, changed from 768 in SITE-3, snippet durations, links), the hero pick, and the socials. `src/app/image-loader.ts`, wired in `next.config.ts`, and `src/app/tokens.ts`, which reads a token's value from `tokens.css` at build.
   - **Acceptance:** the five releases map with real cover URLs and 30 s tracks; the hero is the featured release or else the newest; the loader picks 192/384/768/1080 and passes other URLs through with `?w=`; a token reads through `var()` chains to its value
   - **Verify:** `npm test`, `npm run ci`, `/system` still loads its fixture covers
   - **Size:** S
@@ -1749,7 +1749,18 @@ Spec: [SPEC-site.md](../SPEC-site.md). Built in its own session at Reno's reques
   - **Verify:** `npm run ci`, `/system` in the browser pane
   - **Size:** S
 
-- [ ] **SITE-3: The homepage**
+- [x] **SITE-3: The homepage**
+  - **Done 17 Nov 2026.** 11 tests in `tests/site-playing.test.ts`, and all 778 pass. `npm run ci` passes.
+    - **In the browser pane, muted** (every `play()` was checked to run on a muted element): the hero's main button, each single's row, both of the EP's tracks, the bar's Stop, Replay and Close, and fast tapping across all six ended on Bring That Change. A stream link in the bar, with its navigation cancelled, turned a playing snippet into the ended bar. The hero's button read "Stop snippet", pressed, while its lead played, and went back when UKG 333 started.
+    - **Intent:** a `pointerdown` on each of the six play controls in the discography set the element's source to that control's own track, and so did a `pointerdown` on the hero's main button and a `focusin` on a row. The pane's document never had focus, so `element.focus()` fired no event there; SITE-6 checks focus with the keyboard.
+    - **The warm-up** fetched Welcome to Vapor_City's snippet after load, before any tap, and the head has `<link rel="preconnect" href="https://media.thesamegatsby.com">`, with no `crossorigin`.
+    - **Layout:** at 360 px the hero and footer sit 20 px in and the discography 10 px, with no horizontal scroll. At 1280 px the header, hero, discography and footer are all 1120 px wide from x = 80, the discography is 64 px under the hero and the footer 72 px under the discography. At 768 the filter shows All 5, Singles 4 and EPs 1, and each filter lists the right rows.
+    - **Covers:** at 360 px (2x) the hero loaded the 1080 and the rows the 192. At 768 and 1280 px (1x) the hero loaded the 768 and the rows the 192.
+    - **Two changes to the spec, made in it:**
+      - **The cover handed to the components is the 1080 WebP, not the 768.** With the 768, the hero asks the loader for 768 and gets its own `src` back, and `next/image` warns in dev that the loader ignores width. Which file loads is unchanged: the loader picks it.
+      - **`experimental.cssChunking: { type: "graph", requestCost: 4000 }` in `next.config.ts`.** Once `/` used the same components as `/system`, Turbopack's default chunking merged `/system`'s own CSS (`system.module.css`, 10 KB) into the chunk `/` loads. With `graph` at a 4 KB request cost, `/` loads three CSS files and none holds a `/system` rule; at the default 20 KB it merged everything into one 33 KB file. Grepping the 11 files `out/index.html` loads finds no `/system` or `/bench` code.
+    - **Differs from the canvas:** the footer's wordmark from 768 px is 36 px, `display-l`'s value there (G1 set it for the header and footer), where `HomeDesktop.dc.html` draws 28 px. The "©" year is the build's.
+    - **The discography is 36 px under the hero on a phone**, as the spec and `Main.dc.html` give it, not the 48 px `/system`'s sticky-stack frame uses.
   - `src/app/page.tsx` (server: data, preconnect, year) and `src/app/home/Home.tsx` (client: engine, filter, open releases, the bar, warm-up, intent, stop on external links), with `home.module.css` and the footer.
   - **Acceptance:** SPEC-site.md's layout at 360, 768 and 1280 px; every play control works through the engine; a stream link stops the snippet; no console errors
   - **Verify:** `npm run ci`, the browser pane, muted

@@ -15,9 +15,9 @@ describe("homeReleases, on the committed catalogue", () => {
     );
   });
 
-  test("points each cover at its 768 px WebP on the media domain", () => {
+  test("points each cover at its 1080 px WebP on the media domain", () => {
     for (const [i, release] of releases.entries()) {
-      assert.equal(release.cover, `${MEDIA_ORIGIN}/${catalogue.releases[i].cover.key}.768.webp`);
+      assert.equal(release.cover, `${MEDIA_ORIGIN}/${catalogue.releases[i].cover.key}.1080.webp`);
     }
   });
 
@@ -74,11 +74,11 @@ describe("heroRelease", () => {
 });
 
 describe("homeReleases, on a cover it can't use", () => {
-  test("throws, naming the release, when there's no 768 px WebP", () => {
+  test("throws, naming the release, when there's no 1080 px WebP", () => {
     const noWebp = release("no-webp", "2024-01-01", { cover: { ...catalogue.releases[0].cover, formats: ["avif"] } });
     assert.throws(() => homeReleases({ releases: [noWebp] }), /no-webp/);
-    const no768 = release("no-768", "2024-01-01", { cover: { ...catalogue.releases[0].cover, widths: [192, 384, 1080] } });
-    assert.throws(() => homeReleases({ releases: [no768] }), /no-768/);
+    const no1080 = release("no-1080", "2024-01-01", { cover: { ...catalogue.releases[0].cover, widths: [192, 384, 768] } });
+    assert.throws(() => homeReleases({ releases: [no1080] }), /no-1080/);
   });
 });
 

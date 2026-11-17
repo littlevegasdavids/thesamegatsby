@@ -38,7 +38,7 @@ The homepage: a fan on a phone lands, taps a track, hears its 30 s snippet, and 
 ### Data
 
 `src/app/home/releases.ts` maps the catalogue onto `design-system`'s types in a server component:
-- each release's `cover` becomes the URL of its 768 px WebP on the media domain
+- each release's `cover` becomes the URL of its 1080 px WebP on the media domain, which the image loader swaps for each box's width. (Built as the 1080, not the 768 first written here: the hero asks for 768, and `next/image` warns in dev when a loader hands back the `src` unchanged.)
 - each track's `duration` is its snippet's, and its `kind` carries over
 - the links carry over as they are. A platform with no link isn't shown, as `StreamLinks` already does
 - **the hero is the release marked `featured`, or else the newest** (SPEC.md)

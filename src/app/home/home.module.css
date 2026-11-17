@@ -1,0 +1,115 @@
+/* The homepage's layout, as Main.dc.html (phone) and HomeDesktop.dc.html
+   (from 768 px) draw it. Nothing here clips: the header, filter and open
+   release stick to the viewport, so no ancestor may set overflow.
+
+   Phone: the floating header, the hero 20 px from the screen's edges, the
+   discography 36 px under it and the footer 40 px under that. The
+   discography sits one header inset from the edges, so the filter box and
+   rows line up with the header, as /system's sticky stack does. */
+
+.page {
+  box-sizing: border-box;
+}
+
+.hero {
+  padding: var(--dg-space-3) calc(var(--dg-space-4) + var(--dg-space-1)) 0;
+}
+
+.discography {
+  margin-top: calc(var(--dg-space-6) + var(--dg-space-1));
+  padding-inline: var(--dg-header-inset);
+}
+
+.footer {
+  margin-top: calc(var(--dg-space-6) + var(--dg-space-2));
+  padding: 0 calc(var(--dg-space-4) + var(--dg-space-1)) var(--dg-space-6);
+}
+
+.signOff {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.made {
+  display: flex;
+  align-items: center;
+  gap: var(--dg-space-2);
+  margin: var(--dg-space-5) 0 var(--dg-space-1);
+  color: var(--dg-fg-muted);
+  font-size: var(--dg-text-small);
+}
+
+.made svg {
+  color: var(--dg-star);
+}
+
+.email {
+  color: var(--dg-link);
+  font-size: var(--dg-text-small);
+}
+
+.rec {
+  margin: var(--dg-space-4) 0 0;
+  color: var(--dg-fg-subtle);
+  font-family: var(--dg-font-readout);
+  font-size: var(--dg-text-readout-s);
+  line-height: 1.2;
+}
+
+.desktopOnly {
+  display: none;
+}
+
+/* From 768 px: one 1200 px column, so the content is 1120 px wide at the
+   widest. The discography is 64 px under the hero, and the footer 72 px
+   under the discography, with a hairline over it: the wordmark and
+   sign-off on the left, the readout on the right. */
+@media (min-width: 768px) {
+  .page {
+    max-width: 1200px;
+    margin-inline: auto;
+    padding-inline: clamp(20px, 4vw, 40px);
+  }
+
+  .hero {
+    padding: var(--dg-space-6) 0 0;
+  }
+
+  .discography {
+    margin-top: var(--dg-space-8);
+    padding-inline: 0;
+  }
+
+  .footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--dg-space-5);
+    margin-top: calc(var(--dg-space-8) + var(--dg-space-2));
+    padding: var(--dg-space-5) 0 var(--dg-space-6);
+    border-top: 1px solid var(--dg-line);
+  }
+
+  .signOff {
+    gap: calc(var(--dg-space-1) + 2px);
+  }
+
+  .made {
+    margin: 0;
+  }
+
+  .rec {
+    margin: 0;
+    font-size: var(--dg-text-readout);
+  }
+
+  .phoneOnly {
+    display: none;
+  }
+
+  .desktopOnly {
+    display: block;
+  }
+}
