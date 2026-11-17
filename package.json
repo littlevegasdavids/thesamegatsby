@@ -14,13 +14,11 @@
     "check-media": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-media.ts"
   },
   "dependencies": {
-    "howler": "^2.2.4",
     "next": "16.4.6",
     "react": "19.3.0",
     "react-dom": "19.3.0"
   },
   "devDependencies": {
-    "@types/howler": "^2.2.12",
     "@types/node": "^24.19.2",
     "@types/react": "^19",
     "@types/react-dom": "^19",

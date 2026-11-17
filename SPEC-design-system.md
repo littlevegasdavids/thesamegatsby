@@ -283,7 +283,6 @@ There's no working React 19 setup in the repo, and Chakra 2 won't come along, so
 - Upgrade to Next.js 16 / React 19 / TypeScript 5 with the App Router and `output: 'export'`. Remove Chakra, Emotion, Framer Motion, react-icons and `yarn.lock`.
 - Remove `pages/`, `components/` and `styles/`. Until `site` lands, `/` shows a plain placeholder listing the songs. Nothing public depends on it, because `www` points at nothing until launch.
 - Add the `lint`, `typecheck` and `test` scripts, and the `tests/` folder.
-- Howler stays installed until `audio-engine` replaces it. Nothing imports it in the meantime.
 
 ## Acceptance criteria
 

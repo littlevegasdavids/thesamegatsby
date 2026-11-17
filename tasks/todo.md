@@ -1692,7 +1692,10 @@ Spec: [SPEC-audio-engine.md](../SPEC-audio-engine.md). Every file under `src/aud
   - **Files:** `src/audio/media-session.ts`, `src/audio/engine.ts`, `tests/audio-media-session.test.ts`
   - **Size:** S
 
-- [ ] **AE-7: Remove Howler**
+- [x] **AE-7: Remove Howler**
+  - **Done 17 Nov 2026.** 2 tests in `tests/removed-libraries.test.ts`, and all 740 pass. `npm run ci` passes. `npm uninstall howler @types/howler` took 17 lines out of `package.json` and the lockfile, and `npm ls howler @types/howler` is empty.
+    - **The test covers every library SPEC.md's assumption 3 removed** (Chakra, Emotion, Framer Motion, Howler, react-icons), in `package.json` and the lockfile's root, so none can come back unnoticed.
+    - **Flagged, not fixed:** `npm audit` reports 7 moderate vulnerabilities in `@typescript-eslint/*`, which eslint-config-next brings in. They're dev-only and unrelated to this task.
   - Remove `howler` and `@types/howler` from `package.json` and the lockfile, and SPEC-design-system.md's note that Howler stays until `audio-engine` replaces it.
   - **Acceptance:**
     - nothing in the repo imports Howler, and `npm ls howler` finds nothing
