@@ -1,6 +1,6 @@
-# Tasks: design-system, cloudflare-infra and media-pipeline
+# Tasks: design-system, cloudflare-infra, media-pipeline and audio-engine
 
-Plan: [plan.md](plan.md). Specs: [SPEC.md](../SPEC.md), [SPEC-design-system.md](../SPEC-design-system.md), [SPEC-cloudflare-infra.md](../SPEC-cloudflare-infra.md). Visual reference: the approved canvas ["Déjà Gatsby Screens"](https://claude.ai/artifact/WSB4B7NtCYipXV3GSXmmSo).
+Plan: [plan.md](plan.md). Specs: [SPEC.md](../SPEC.md), [SPEC-design-system.md](../SPEC-design-system.md), [SPEC-cloudflare-infra.md](../SPEC-cloudflare-infra.md), [SPEC-media-pipeline.md](../SPEC-media-pipeline.md), [SPEC-audio-engine.md](../SPEC-audio-engine.md). Visual reference: the approved canvas ["Déjà Gatsby Screens"](https://claude.ai/artifact/WSB4B7NtCYipXV3GSXmmSo).
 
 **Every task, before it's ticked:**
 - its acceptance criteria are met
@@ -1558,7 +1558,118 @@ Plan: [plan.md, media-pipeline](plan.md#implementation-plan-media-pipeline). Spe
     - **Old site retired:** MP-11.
     - **Linux:** Workers Builds passed on `01d4d40` on 17 Nov, running all of `npm run ci` with the macOS-only tests skipped.
     - **CI:** `npm run ci` passes, and all 641 tests pass.
-- [ ] Next step: write `SPEC-audio-engine.md` for review
+- [x] Next step: write `SPEC-audio-engine.md` for review. Written and approved on 17 Nov 2026
+
+---
+
+## Phase 12: audio-engine, playing
+
+Spec: [SPEC-audio-engine.md](../SPEC-audio-engine.md). Every file under `src/audio/` is `.ts`, so the test runner can import it.
+
+- [ ] **AE-1: The state**
+  - `src/audio/state.ts`: the `Playback` and `EngineEvent` types, and `next(state, event)`, as the spec's state table writes it.
+  - **Acceptance:**
+    - every row of the state table has a test, from each state it applies in
+    - an event that doesn't apply leaves the state unchanged (the same object), for example `timeupdate` while `ended`
+    - `elapsed` is held between 0 and the duration, and `ended` sets it to the duration
+    - `stop()` while loading gives `null`, while playing gives `ended` with the bar open
+    - an error, or the load timeout, gives `ended` with `failed: true`
+  - **Verify:** `npm test`, `npm run typecheck`
+  - **Depends on:** none
+  - **Files:** `src/audio/state.ts`, `tests/audio-state.test.ts`
+  - **Size:** S
+
+- [ ] **AE-2: Engine tracks from the catalogue**
+  - `src/audio/tracks.ts`: `tracksFrom(catalogue)` gives an `EngineTrack` per track: its id, `snippetUrl()`, title, the release title as the album, the cover's WebP at 192, 384 and 768 as Media Session artwork, and the catalogue's duration.
+  - **Acceptance:**
+    - the committed catalogue gives six tracks with unique ids, every URL on `https://media.thesamegatsby.com/`
+    - UKG 333 takes the Can't You See EP's cover and title as its album
+    - artwork lists three sizes, each with `sizes` and `type: "image/webp"`
+  - **Verify:** `npm test`
+  - **Depends on:** none
+  - **Files:** `src/audio/tracks.ts`, `tests/audio-tracks.test.ts`
+  - **Size:** S
+
+- [ ] **AE-3: The engine over one element**
+  - `src/audio/engine.ts`: `createAudioEngine(tracks, env)` makes one element on first use and turns its events (`playing`, `waiting`, `timeupdate`, `ended`, `pause`, `error`) into AE-1's events. Also `play`, `stop`, `replay`, `close`, `intent`, `warm`, `subscribe` and `getSnapshot`. No Media Session yet.
+  - **Acceptance**, against a fake element:
+    - `play()` sets `src` and calls the element's `play()` before it returns, with nothing awaited
+    - events from an earlier `play()` are dropped, so fast taps across six tracks end on the last one, and a superseded `play()` rejecting with `AbortError` is ignored
+    - a `pause` the engine didn't ask for ends the snippet. Its own `stop()` doesn't count twice
+    - 10 s in `loading` gives `failed`, on a fake clock
+    - `intent()` sets `preload="auto"` and the source only while nothing is loading or playing. `warm()` sets `preload="metadata"` under the same rule
+    - `play()` on an unknown id throws, naming it
+    - `subscribe` listeners run once per change, and `getSnapshot` returns the same object until something changes
+  - **Verify:** `npm test`
+  - **Depends on:** AE-1, AE-2
+  - **Files:** `src/audio/engine.ts`, `tests/audio-engine.test.ts`
+  - **Size:** M
+
+- [ ] **AE-4: The hook and the public index**
+  - `src/audio/use-audio-engine.ts`: `useAudioEngine(engine)` through `useSyncExternalStore`, with `null` as the server snapshot. `src/audio/index.ts` exports the engine, the hook, `tracksFrom` and the types.
+  - **Acceptance:**
+    - importing `src/audio/index.ts` in Node, with no `window` or `document`, doesn't throw and makes no element
+    - the server snapshot is `null`
+    - `npm run build` passes
+  - **Verify:** `npm test`, `npm run ci`
+  - **Depends on:** AE-3
+  - **Files:** `src/audio/use-audio-engine.ts`, `src/audio/index.ts`, `tests/audio-index.test.ts`
+  - **Size:** S
+
+- [ ] **AE-5: `/bench`, and the first numbers on the preview** 🔒 *(push)*
+  - `src/app/bench/page.tsx`, a server component with `robots: noindex`, builds the tracks with `tracksFrom(catalogue)` and passes them to a client component. That component lists the six tracks as plain buttons, wired to the engine as the spec's mapping table says, with the hero's lead track warmed after load, and `intent()` on `pointerdown` and focus. It shows the engine's state and the time from each tap to `playing`. It mutes by default, with an unmute checkbox. The head carries the media preconnect, with no `crossorigin`.
+  - **Acceptance:**
+    - in the browser pane, locally, muted: tap, stop, replay, close and fast tapping move through the states as the spec writes them, with no console errors
+    - `/` doesn't load `/bench`'s or the engine's code
+    - on the preview, after a push with Reno's OK, under "Fast 4G" and 4× CPU with each snippet a cache `HIT`: five taps for each of the spec's three cases, median and worst recorded here
+    - the JS `/bench` loads for `src/audio/` is measured, minified and gzipped
+  - **Verify:** `npm run ci`, the browser pane, the Chrome DevTools MCP against the preview
+  - **Depends on:** AE-4
+  - **Files:** `src/app/bench/page.tsx`, `src/app/bench/Bench.tsx`, `src/app/bench/bench.module.css`
+  - **Size:** M
+
+### Checkpoint 12: the first numbers
+- [ ] The three tap-to-`playing` cases are recorded under AE-5
+- [ ] Any case over 300 ms has a fix Reno has agreed to, written into the spec before Phase 13
+
+## Phase 13: audio-engine, the lock screen and done
+
+- [ ] **AE-6: Media Session**
+  - `src/audio/media-session.ts`, called from the engine where `navigator.mediaSession` exists. On each `play()` it sets the metadata (title, "Déjà Gatsby", album, artwork), the `play`, `pause` and `stop` handlers, `null` for the seek and skip actions, and the position state.
+  - **Acceptance**, against a fake `mediaSession`:
+    - each `play()` sets the track's metadata, and position state with the catalogue's duration
+    - `pause` and `stop` stop, and `play` replays
+    - `seekto`, `seekbackward`, `seekforward`, `previoustrack` and `nexttrack` are set to `null`
+    - with no `mediaSession`, nothing throws. A handler the browser refuses (it throws on an unknown action) is skipped, not fatal
+  - **Verify:** `npm test`, then `/bench` in Chrome's media controls
+  - **Depends on:** AE-5
+  - **Files:** `src/audio/media-session.ts`, `src/audio/engine.ts`, `tests/audio-media-session.test.ts`
+  - **Size:** S
+
+- [ ] **AE-7: Remove Howler**
+  - Remove `howler` and `@types/howler` from `package.json` and the lockfile, and SPEC-design-system.md's note that Howler stays until `audio-engine` replaces it.
+  - **Acceptance:**
+    - nothing in the repo imports Howler, and `npm ls howler` finds nothing
+    - `npm run ci` passes
+  - **Verify:** `npm run ci`, `grep -ri howler src scripts tests`
+  - **Depends on:** none
+  - **Files:** `package.json`, `package-lock.json`, `SPEC-design-system.md`
+  - **Size:** XS
+
+- [ ] **AE-8: Final numbers, and Reno's iPhone** 🔒 👤
+  - Push with Reno's OK. Re-measure the three cases on the preview as in AE-5, and the JS size. Reno opens `/bench` on the preview on his iPhone, unmutes, and checks the spec's phone list.
+  - **Acceptance:**
+    - every case's median is under 300 ms, or Checkpoint 12's agreed fix is in and its numbers are recorded
+    - `src/audio/` adds under 3 KB, minified and gzipped
+    - on Reno's iPhone: sound on the first tap with the silent switch on; the lock screen shows the title, Déjà Gatsby and the cover, with no skip or seek; its pause stops the snippet; a call ends it
+  - **Verify:** the Chrome DevTools MCP against the preview, Reno's iPhone
+  - **Depends on:** AE-6, AE-7
+  - **Files:** this file, for the numbers
+  - **Size:** S
+
+### Checkpoint 13: audio-engine complete
+- [ ] Every success criterion in SPEC-audio-engine.md is ticked, with its evidence
+- [ ] Next step: write `SPEC-site.md` for review
 
 ---
 

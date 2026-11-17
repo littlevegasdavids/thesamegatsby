@@ -341,3 +341,78 @@ None of these block Phase 10. MP-10 needs them all, and MP-8's checkpoint needs 
 ## Size and cost
 
 There are 12 tasks: seven small or medium pure-code tasks, two Mac integration tasks, the CLI, the upload step and the re-cut. At the pace of Phases 5–8, that's two or three sessions plus the re-cut, which mostly waits on Reno's inputs and listening. Each task runs the test-first loop and ends in its own commit on `redesign`.
+
+# Implementation Plan: audio-engine
+
+Planned on 17 Nov 2026 from [SPEC-audio-engine.md](../SPEC-audio-engine.md), which Reno approved that day with all six open questions answered as recommended. It's the next step in SPEC.md's build order. The tasks are AE-1 to AE-8 in [todo.md](todo.md), Phases 12 and 13.
+
+## Overview
+
+By the end of this plan:
+- `src/audio/` plays one snippet at a time through one shared `<audio>` element, from a tap, and reports a small state that `site` maps onto the components
+- a snippet starts fetching on `pointerdown`, and the hero's lead track's first range is fetched after load
+- the lock screen shows the track, Déjà Gatsby and the cover, and offers no skip or seek
+- an unlinked `/bench` page measures tap to `playing` on the deployed preview, and Reno checks it on his iPhone
+- Howler is gone
+
+## Architecture decisions
+
+- **The state is a pure function.** `next(state, event)` in `state.ts` covers every row of the spec's table and is tested without a browser. `engine.ts` only turns element events and calls into events, and state into element calls.
+- **The engine takes its environment as an argument.** The element factory, `mediaSession`, the clock and timers come in through `env`, so the tests drive a fake element (an `EventTarget` with `src`, `preload`, `currentTime`, `paused` and a promise-returning `play()`). The browser defaults are filled in only when `env` is left out.
+- **Measure early.** `/bench` and the first measurement on the preview come in AE-5, before Media Session and the clean-up. If the 300 ms target misses, the fix changes the engine, so Checkpoint 12 decides it before more is built on top.
+- **The bench mutes by default.** Measuring needs the `playing` event, not sound, and nothing plays aloud on Reno's Mac. `/bench` passes an element factory that sets `muted`, with an unmute checkbox for his iPhone. The engine itself has no volume or mute.
+- **The client never imports the catalogue.** `/bench` (and later `site`) imports `src/catalogue` and `tracksFrom()` in a server component, and passes plain `EngineTrack`s to the client.
+
+## Dependency graph
+
+```
+AE-1 state ──┐
+AE-2 tracks ─┴─ AE-3 engine over one element ─ AE-4 hook and index ─ AE-5 /bench, first numbers 🔒
+                                                                           │
+                                                                   Checkpoint 12
+                                                                           │
+                              AE-6 Media Session ─ AE-7 remove Howler ─ AE-8 final numbers 🔒 👤
+```
+
+AE-1 and AE-2 don't depend on each other. AE-7 doesn't depend on anything, and sits late only so it lands with the module's clean-up.
+
+## Task list
+
+### Phase 12: Playing
+- AE-1: The state
+- AE-2: Engine tracks from the catalogue
+- AE-3: The engine over one element
+- AE-4: The hook and the public index
+- AE-5: `/bench`, and the first numbers on the preview 🔒
+
+**Checkpoint 12:** the three tap-to-`playing` cases measured on the preview. If one misses 300 ms, Reno and I decide the fix before Phase 13.
+
+### Phase 13: The lock screen, and done
+- AE-6: Media Session
+- AE-7: Remove Howler
+- AE-8: Final numbers, and Reno's iPhone 🔒 👤
+
+**Checkpoint 13:** every success criterion in SPEC-audio-engine.md is ticked, with its evidence.
+
+## Approvals I'll ask for
+
+| When | What |
+|---|---|
+| AE-5 | A push, so `/bench` is on the preview to measure |
+| AE-8 | A push for the final build, then Reno's checks on his iPhone |
+
+Removing Howler is in SPEC.md's confirmed assumptions, so it needs no ask. Nothing is added or installed.
+
+## Risks and mitigations
+
+| Risk | Impact | Mitigation |
+|---|---|---|
+| The 30 s case misses 300 ms because the browser closed an idle connection | Medium: a fan who scrolls before tapping waits longer | Measured in AE-5, before anything else is built on the engine. Checkpoint 12 decides the fix |
+| Safari's small probing range request adds a round trip on iPhones | Medium: iOS is most fans | The warm-up and `intent()` make that request before the tap. Reno's iPhone check in AE-8 |
+| A fake element passes tests the real one fails, for example in event order | Medium | `/bench` exercises the real element in AE-5, on desktop and on Reno's iPhone, before Media Session is added |
+| Media Session differs between iOS Safari and Chrome | Low: only the lock screen | Feature-checked per handler. AE-8 checks the iPhone, and Chrome's media hub on desktop |
+| The Chrome DevTools MCP runs in Brave, whose throttling might not match Chrome's | Low | Same Chromium DevTools presets. The numbers record which browser took them |
+
+## Size and cost
+
+Eight tasks: four small pure-code or wrapper tasks, the engine (medium), the bench, and two measuring tasks that mostly wait on a push and Reno's phone. That's about one session plus the iPhone check. Each task runs the test-first loop and ends in its own commit on `redesign`.
