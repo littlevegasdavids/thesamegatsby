@@ -1625,7 +1625,11 @@ Spec: [SPEC-audio-engine.md](../SPEC-audio-engine.md). Every file under `src/aud
   - **Files:** `src/audio/engine.ts`, `tests/audio-engine.test.ts`
   - **Size:** M
 
-- [ ] **AE-4: The hook and the public index**
+- [x] **AE-4: The hook and the public index**
+  - **Done 17 Nov 2026.** 4 tests in `tests/audio-index.test.ts`, and all 718 pass. `npm run ci` passes.
+    - **The hook is checked through React's own server renderer** (`react-dom/server`, already installed with Next), which renders `null` and needs the server snapshot to exist at all.
+    - **Node has no `window` or `Audio`, and the first test asserts that**, so the import and default-engine checks would catch any browser access at import.
+    - **`next build` doesn't compile `src/audio/` yet,** because nothing in the app imports it. `npm run typecheck` does cover it. The build first compiles it in AE-5.
   - `src/audio/use-audio-engine.ts`: `useAudioEngine(engine)` through `useSyncExternalStore`, with `null` as the server snapshot. `src/audio/index.ts` exports the engine, the hook, `tracksFrom` and the types.
   - **Acceptance:**
     - importing `src/audio/index.ts` in Node, with no `window` or `document`, doesn't throw and makes no element
