@@ -416,3 +416,12 @@ Removing Howler is in SPEC.md's confirmed assumptions, so it needs no ask. Nothi
 ## Size and cost
 
 Eight tasks: four small pure-code or wrapper tasks, the engine (medium), the bench, and two measuring tasks that mostly wait on a push and Reno's phone. That's about one session plus the iPhone check. Each task runs the test-first loop and ends in its own commit on `redesign`.
+
+# Implementation Plan: site
+
+Planned and built on 17 Nov 2026 from [SPEC-site.md](../SPEC-site.md), at Reno's request to finish everything left so he can test the whole site in dev. The tasks are SITE-1 to SITE-6 in [todo.md](todo.md), Phase 14. The spec's **(new)** decisions are made without review and listed in it for Reno to accept or change after testing.
+
+- **Order:** the data mapping and image loader first (pure, tested), then the one design-system change (`onIntent`), then the page, then metadata and clean-up, and the full check last.
+- **Layout reference:** `/system`'s `StickyStack` already puts the page together with fixtures, so the homepage follows it on a phone, and `HomeDesktop.dc.html` from 768 px.
+- **No push.** Reno tests in dev. AE-8 and the preview checks wait for a push he asks for.
+- **Size and cost:** six tasks, mostly assembly of parts that are already built and checked. The browser checks are the long part.

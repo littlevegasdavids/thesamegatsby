@@ -1,4 +1,4 @@
-# Tasks: design-system, cloudflare-infra, media-pipeline and audio-engine
+# Tasks: design-system, cloudflare-infra, media-pipeline, audio-engine and site
 
 Plan: [plan.md](plan.md). Specs: [SPEC.md](../SPEC.md), [SPEC-design-system.md](../SPEC-design-system.md), [SPEC-cloudflare-infra.md](../SPEC-cloudflare-infra.md), [SPEC-media-pipeline.md](../SPEC-media-pipeline.md), [SPEC-audio-engine.md](../SPEC-audio-engine.md). Visual reference: the approved canvas ["Déjà Gatsby Screens"](https://claude.ai/artifact/WSB4B7NtCYipXV3GSXmmSo).
 
@@ -1706,7 +1706,7 @@ Spec: [SPEC-audio-engine.md](../SPEC-audio-engine.md). Every file under `src/aud
   - **Size:** XS
 
 - [ ] **AE-8: Final numbers, and Reno's iPhone** 🔒 👤
-  - Push with Reno's OK. Re-measure the three cases on the preview as in AE-5, and the JS size. Reno opens `/bench` on the preview on his iPhone, unmutes, and checks the spec's phone list.
+  - Push with Reno's OK. Re-measure the three cases on the preview, on the homepage now that SITE-5 has deleted `/bench`, with a timing script the DevTools MCP injects, and the JS size. Reno opens the homepage on the preview on his iPhone, unmutes, and checks the spec's phone list.
   - **Acceptance:**
     - every case's median is under 300 ms, or Checkpoint 12's agreed fix is in and its numbers are recorded
     - `src/audio/` adds under 3 KB, minified and gzipped
@@ -1718,7 +1718,51 @@ Spec: [SPEC-audio-engine.md](../SPEC-audio-engine.md). Every file under `src/aud
 
 ### Checkpoint 13: audio-engine complete
 - [ ] Every success criterion in SPEC-audio-engine.md is ticked, with its evidence
-- [ ] Next step: write `SPEC-site.md` for review
+- [x] Next step: write `SPEC-site.md` for review. Written 17 Nov 2026 and built straight away at Reno's request (Phase 14)
+
+---
+
+## Phase 14: site
+
+Spec: [SPEC-site.md](../SPEC-site.md). Built straight after it was written, at Reno's request, so its **(new)** decisions wait for his review after he tests.
+
+- [ ] **SITE-1: The catalogue as view props, and the image loader**
+  - `src/app/home/releases.ts`: catalogue releases as `design-system` `Release`s (cover at 768 WebP, snippet durations, links), the hero pick, and the socials. `src/app/image-loader.ts`, wired in `next.config.ts`, and `src/app/tokens.ts`, which reads a token's value from `tokens.css` at build.
+  - **Acceptance:** the five releases map with real cover URLs and 30 s tracks; the hero is the featured release or else the newest; the loader picks 192/384/768/1080 and passes other URLs through with `?w=`; a token reads through `var()` chains to its value
+  - **Verify:** `npm test`, `npm run ci`, `/system` still loads its fixture covers
+  - **Size:** S
+
+- [ ] **SITE-2: `onIntent` on the play controls**
+  - `TrackRow`, `ReleaseRow` and `ReleaseHero` raise an optional `onIntent(trackId)` on `pointerdown` and focus of each play control.
+  - **Acceptance:** optional, so `/system` is unchanged; each play control raises it with its own track id
+  - **Verify:** `npm run ci`, `/system` in the browser pane
+  - **Size:** S
+
+- [ ] **SITE-3: The homepage**
+  - `src/app/page.tsx` (server: data, preconnect, year) and `src/app/home/Home.tsx` (client: engine, filter, open releases, the bar, warm-up, intent, stop on external links), with `home.module.css` and the footer.
+  - **Acceptance:** SPEC-site.md's layout at 360, 768 and 1280 px; every play control works through the engine; a stream link stops the snippet; no console errors
+  - **Verify:** `npm run ci`, the browser pane, muted
+  - **Size:** M
+
+- [ ] **SITE-4: Metadata, the share image and the icons**
+  - `layout.tsx`'s metadata and viewport, `opengraph-image.tsx`, `icon.svg`, `apple-icon.tsx`. Delete `public/favicon.ico`.
+  - **Acceptance:** `out/` has the share image (1200 × 630), the icons and the tags; no hex in TSX
+  - **Verify:** `npm run ci`, opening the files from `out/`
+  - **Size:** S
+
+- [ ] **SITE-5: Retire `/bench` and the old site's images**
+  - Delete `src/app/bench/`, `public/background.webp` and `public/profile_pic.jpg`. `src/audio/view.ts` stays, since the homepage uses it.
+  - **Acceptance:** `out/` has none of them; `npm run ci` passes
+  - **Size:** XS
+
+- [ ] **SITE-6: The whole site, tested in dev**
+  - The browser checks, first-load size and Lighthouse from SPEC-site.md's testing strategy.
+  - **Acceptance:** every success criterion in SPEC-site.md is ticked with its evidence
+  - **Size:** M
+
+### Checkpoint 14: Reno tests the site in dev
+- [ ] Reno runs `npm run dev` and tries the whole page, then accepts or changes SPEC-site.md's **(new)** decisions
+- [ ] AE-8, on the homepage, after a push he asks for
 
 ---
 
