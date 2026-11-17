@@ -1518,7 +1518,13 @@ Plan: [plan.md, media-pipeline](plan.md#implementation-plan-media-pipeline). Spe
       - [ ] Bandcamp, for Welcome to Vapor_City (not found on thesamegatsby.bandcamp.com)
       - [ ] Deezer, for Can't You See EP and Bring That Change (not found on Deezer's catalogue)
 
-- [ ] **MP-11: Retire `songs/index.ts` and `public/music/`**
+- [x] **MP-11: Retire `songs/index.ts` and `public/music/`**
+  - **Done 17 Nov 2026.** 2 tests in `tests/old-site-retired.test.ts`, and all 641 pass. `npm run ci` passes.
+    - **`out/` went from 30,420 KB to 6,804 KB** (`du -sk`), 23.6 MB smaller and 11 fewer files. It's more than `public/music/`'s 21 MB on disk because `du` rounds each file to a block.
+    - **The catalogue now goes through `next build`:** the `with { type: "json" }` import compiles, and `out/index.html` lists the five releases newest first, Welcome to Vapor_City to Bring That Change.
+    - **The link-cleaning test keeps the old links inline** (`OLD_SITE_LINKS` in `tests/media-ids-keys.test.ts`), so MP-2's check still runs against the links as the old site stored them.
+    - **Two `/music/` strings stay in `tests/catalogue.test.ts`:** one is a bad snippet key the validator must refuse, the other an Amazon URL path. Neither points at the folder. The new test checks `src/` and `scripts/`.
+    - **Not yet checked on the preview:** that waits for the push.
   - The placeholder `src/app/page.tsx` lists the catalogue's releases from `src/catalogue`. Its comment, which still says production is served from `main`, is replaced. `songs/index.ts` and `public/music/` are deleted.
   - **Acceptance:**
     - nothing in `src/`, `scripts/` or `tests/` references `songs/` or `/music/`

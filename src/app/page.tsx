@@ -1,14 +1,14 @@
-import { songs } from "../../songs";
+import { catalogue } from "../catalogue";
 
-// A bare placeholder until `site` builds the homepage. Production is served
-// from `main`, so nothing public changes while `redesign` looks like this.
+// A bare placeholder until `site` builds the homepage. Nothing public serves
+// it yet: the `redesign` preview does, and `www` is routed here at launch (CF-5).
 export default function Home() {
   return (
     <main>
       <h1>Déjà Gatsby</h1>
       <ul>
-        {songs.map((song) => (
-          <li key={song.id}>{song.title}</li>
+        {catalogue.releases.map((release) => (
+          <li key={release.id}>{release.title}</li>
         ))}
       </ul>
     </main>

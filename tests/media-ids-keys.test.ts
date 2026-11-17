@@ -5,7 +5,16 @@ import { parseCatalogue } from "../src/catalogue/validate.ts";
 import { releaseId, trackId } from "../scripts/media/ids.ts";
 import { COVER_WIDTHS, coverHash, coverStem, shortHash, snippetKey } from "../scripts/media/keys.ts";
 import { cleanLink, platformFromFlag } from "../scripts/media/links.ts";
-import { songs } from "../songs/index.ts";
+
+// The old site's links as it stored them (songs/index.ts, retired in MP-11),
+// tracking parameters and all: Spotify, Apple Music, YouTube, SoundCloud.
+const OLD_SITE_LINKS: Record<string, string[]> = {
+  "Welcome to Vapor_City": ["https://open.spotify.com/track/5Shwkb85VSY33QZqMDQaqo?si=488bbdd9ee434b68", "https://music.apple.com/us/album/welcome-to-vapor-city-single/1845517676", "https://www.youtube.com/watch?v=e-12woa2MTU", "https://soundcloud.com/dejagatsby/welcome-to-vapor_city"],
+  "Give me that KaiZen": ["https://open.spotify.com/album/0ATTxFkDlXZgVnoXe5zQiB?si=wFosTC3rSgOVupKkE4b_FQ", "https://music.apple.com/us/album/give-me-that-kaizen-single/1803499620", "https://www.youtube.com/watch?v=3NtCoWZeQFU&list=OLAK5uy_nxHhcOcMrBW07x7hwYzQkMBlJcqLLirHM&index=2", "https://soundcloud.com/dejagatsby/sets/give-me-that-kaizen"],
+  "You who could be Forever": ["https://open.spotify.com/album/6KnDL1oCSeCVK7hpor4T3s?si=dLRxoji6QNSPbYS5zAEWoQ", "https://music.apple.com/us/album/you-who-could-be-forever-single/1750669404", "https://www.youtube.com/watch?v=mqdVuGzM-1s", "https://soundcloud.com/dejagatsby/you-who-could-be-forever"],
+  "Can't You See": ["https://open.spotify.com/album/4WiQgdIocMx6qgYSmxnTPG?si=vomvD2eSSb-3t1jN45mGIA", "https://music.apple.com/lk/song/cant-you-see/1732276178", "https://www.youtube.com/watch?v=qAU3CmPXcRs&list=OLAK5uy_mdFFNJyKEaN9sPwJeztKKdCZlV_8188k8&index=2", "https://soundcloud.com/dejagatsby/sets/cant-you-see-ep/"],
+  "Bring That Change": ["https://open.spotify.com/track/09QlqIRHu7X9DmGK0vdDvQ?si=2ca9d27a5ef949a5", "https://music.apple.com/za/album/bring-that-change/1708120323?i=1708120324", "https://www.youtube.com/watch?v=aZ5cKAAMU2U", "https://soundcloud.com/dejagatsby/bring-that-change"],
+};
 
 const bytes = (...values: number[]) => Uint8Array.from(values);
 
@@ -142,12 +151,8 @@ describe("links", () => {
   test("clean the old site's links into the /system fixture's hand-cleaned ones", () => {
     // The fixture keeps the five releases, so UKG 333's links (it's on the EP) aren't there.
     const fixtureUrls = new Set(FIXTURE_RELEASES.flatMap((release) => release.links.map((link) => link.url)));
-    const old = songs.filter((song) => song.title !== "UKG 333");
-    assert.equal(old.length, 5);
-    for (const song of old) {
-      for (const url of [song.spotifyLink, song.appleMusicLink, song.youtubeLink, song.soundcloudLink]) {
-        assert.ok(fixtureUrls.has(cleanLink(url)), `${cleanLink(url)} (from ${url}) isn't in the fixture`);
-      }
+    for (const url of Object.values(OLD_SITE_LINKS).flat()) {
+      assert.ok(fixtureUrls.has(cleanLink(url)), `${cleanLink(url)} (from ${url}) isn't in the fixture`);
     }
   });
 
