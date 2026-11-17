@@ -10,7 +10,8 @@
     "test": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test \"tests/**/*.test.ts\"",
     "ci": "npm run lint && npm run typecheck && npm test && npm run build",
     "cf:dev": "next build && wrangler dev",
-    "add-song": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/add-song.ts"
+    "add-song": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/add-song.ts",
+    "check-media": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-media.ts"
   },
   "dependencies": {
     "howler": "^2.2.4",

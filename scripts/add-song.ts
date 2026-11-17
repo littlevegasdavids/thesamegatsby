@@ -1,9 +1,10 @@
 // npm run add-song -- --master <wav> --start <s> --title <text> … --dry-run
 //
 // Builds a snippet and, for a new release, its cover, stages them under
-// .media/<key>, and shows the songs.json change. Uploading and writing the
-// catalogue come with MP-9, so for now only --dry-run runs. The order is
-// fixed: check everything, build, stage, then (MP-9) upload, verify and write.
+// .media/<key>, uploads them to R2, checks media.thesamegatsby.com serves
+// each one, and only then writes songs.json. The order is fixed: check
+// everything, build, stage, upload, verify, write. A failure at any step
+// leaves songs.json as it was. --dry-run stops after staging.
 import { mkdir, mkdtemp, readFile, rm, stat, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
@@ -18,6 +19,8 @@ import { COVER_WIDTHS } from "./media/keys.ts";
 import { TARGET_LUFS, TRUE_PEAK_CEILING } from "./media/loudness.ts";
 import { applyMerge, catalogueText, planMerge } from "./media/merge.ts";
 import { buildSnippet } from "./media/snippet.ts";
+import { checkHead, contentTypeFor, realMedia } from "./media/upload.ts";
+import type { MediaTools } from "./media/upload.ts";
 import type { BuiltSnippet, SnippetInput } from "./media/snippet.ts";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -30,6 +33,7 @@ export type AddSongDeps = {
   buildSnippet: (input: SnippetInput) => Promise<BuiltSnippet>;
   buildCover: (input: CoverInput) => Promise<BuiltCover>;
   checkCwebp: () => Promise<void>;
+  media: MediaTools;
   log: (line: string) => void;
 };
 
@@ -39,6 +43,7 @@ export const realDeps = (): AddSongDeps => ({
   buildSnippet,
   buildCover,
   checkCwebp,
+  media: realMedia,
   log: (line) => console.log(line),
 });
 
@@ -54,17 +59,15 @@ async function exists(path: string) {
   }
 }
 
-// Returns the exit code: 0 when the dry run staged everything, 1 when it
-// stopped. Nothing is ever half-written: songs.json is only read here.
+// Returns the exit code: 0 when the run finished, 1 when it stopped.
+// songs.json is written last, once every file is confirmed live, so it's
+// never half-written.
 export async function runAddSong(argv: string[], deps: AddSongDeps): Promise<number> {
   const { log } = deps;
   let work: string | undefined;
   try {
     // 1. Check everything that can be checked before any slow work.
     const args = parseAddSongArgs(argv);
-    if (!args.dryRun) {
-      throw new Error("add-song: uploading to R2 and writing songs.json come with MP-9. For now, run with --dry-run");
-    }
     const before = await readFile(deps.catalogueFile, "utf8");
     const catalogue = parseCatalogue(JSON.parse(before), { allowShortReleases: true });
     const plan = planMerge(catalogue, args);
@@ -73,6 +76,7 @@ export async function runAddSong(argv: string[], deps: AddSongDeps): Promise<num
       if (!(await exists(args.cover!))) throw new Error(`add-song: --cover ${args.cover} doesn't exist`);
       await deps.checkCwebp();
     }
+    if (!args.dryRun) await deps.media.whoami();
 
     // 2. Build.
     work = await mkdtemp(join(tmpdir(), "add-song-"));
@@ -127,7 +131,27 @@ export async function runAddSong(argv: string[], deps: AddSongDeps): Promise<num
     log("songs.json would change:");
     log(lineDiff(before, after));
     log("");
-    log(`Dry run: nothing uploaded, and songs.json is unchanged. Listen with: afplay .media/${snippet.key}`);
+    if (args.dryRun) {
+      log(`Dry run: nothing uploaded, and songs.json is unchanged. Listen with: afplay .media/${snippet.key}`);
+      return 0;
+    }
+
+    // 6. Upload every file, then check each one is live, then write.
+    log("");
+    for (const [key] of staged) {
+      log(`Uploading ${key}…`);
+      await deps.media.put(key, join(deps.stageDir, key), contentTypeFor(key));
+    }
+    const problems: string[] = [];
+    for (const [key, bytes] of staged) {
+      const problem = checkHead(key, await deps.media.head(key), bytes.length);
+      if (problem) problems.push(problem);
+    }
+    if (problems.length > 0) {
+      throw new Error(`add-song: uploaded, but ${problems.length} file(s) aren't served right, so songs.json is unchanged:\n  ${problems.join("\n  ")}`);
+    }
+    await writeFile(deps.catalogueFile, after);
+    log(`Uploaded and checked ${staged.length} files on media.thesamegatsby.com, and wrote songs.json. Commit it, then push.`);
     return 0;
   } catch (error) {
     log((error as Error).message);

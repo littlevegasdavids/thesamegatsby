@@ -68,6 +68,11 @@ describe("add-song with fake tools", () => {
       buildSnippet: fakeSnippet,
       buildCover: fakeCover,
       checkCwebp: async () => {},
+      media: {
+        whoami: async () => assert.fail("dry runs never check Wrangler"),
+        put: async () => assert.fail("dry runs never upload"),
+        head: async () => assert.fail("dry runs never HEAD"),
+      },
       log: (line) => lines.push(line),
     };
   });
@@ -121,7 +126,6 @@ describe("add-song with fake tools", () => {
     ["a missing master", () => single("--dry-run").map((a) => (a.endsWith("master.wav") ? join(dir, "nope.wav") : a)), /--master .*nope\.wav doesn't exist/],
     ["a missing cover", () => single("--dry-run").map((a) => (a.endsWith("cover.png") ? join(dir, "nope.png") : a)), /--cover .*nope\.png doesn't exist/],
     ["a missing date", () => single("--dry-run").filter((a, i, all) => a !== "--date" && all[i - 1] !== "--date"), /--date/],
-    ["no --dry-run", () => single(), /MP-9.*--dry-run/],
   ] as const) {
     test(`stops before building on ${name}, with exit code 1`, async () => {
       assert.equal(await runAddSong(argv(), deps), 1);
