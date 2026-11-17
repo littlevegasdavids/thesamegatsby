@@ -1640,7 +1640,23 @@ Spec: [SPEC-audio-engine.md](../SPEC-audio-engine.md). Every file under `src/aud
   - **Files:** `src/audio/use-audio-engine.ts`, `src/audio/index.ts`, `tests/audio-index.test.ts`
   - **Size:** S
 
-- [ ] **AE-5: `/bench`, and the first numbers on the preview** 🔒 *(push)*
+- [x] **AE-5: `/bench`, and the first numbers on the preview** 🔒 *(push)*
+  - **Done 17 Nov 2026.** 8 tests in `tests/audio-view.test.ts`, and all 726 pass. `npm run ci` passes. The code is commit `8d1feea`, pushed with Reno's OK, and Workers Builds passed on it.
+    - **Tap to `playing` on the preview,** under "Fast 4G" with a 4× CPU slowdown, through the Chrome DevTools MCP in Brave (Chromium 156). Every snippet was a cache `HIT` at Cloudflare's Johannesburg edge first. Each run had a fresh isolated browser context, so no browser cache and no connection carried over. Each tap was a `pointerdown`, 100 ms, then the click the time is taken from:
+
+      | Case | Track | Runs, ms | Median | Worst |
+      |---|---|---|---|---|
+      | Warmed lead, tapped at 5.1–5.2 s | Welcome to Vapor_City | 182, 14, 19, 10, 16 | **16** | 182 |
+      | Another track, `intent()` on `pointerdown`, tapped at 5.1–5.2 s | Give me that KaiZen | 112, 113, 113, 114, 112 | **113** | 114 |
+      | Tapped after a long idle | You who could be Forever | 151, 144, 162, 134, 130 | **144** | 162 |
+
+    - **The long-idle taps landed 58–188 s after load, not 30 s**, because each run's script waited on the one before. That's a stricter case than the spec's, since the connection sat idle longer.
+    - **The 182 ms lead run was the first of the session.** The other four warmed runs were 10–19 ms. It's likely a cold DNS lookup on the Mac, which isolated contexts share, but that's a guess.
+    - **Two more warmed lead taps at 12 s and 28 s took 17 and 20 ms.** They're not in the table.
+    - **The engine adds 1,266 B minified and gzipped** (`src/audio/` without `tracks.ts`, which runs on the server, bundled with esbuild). `/bench`'s whole chunk, page included, is 2,730 B gzipped. `/` loads neither: its chunks don't contain the engine.
+    - **Checked locally in the browser pane, muted:** tap, Stop, Replay, Close and fast tapping across all six moved through the states as the spec writes them, with no console errors. A snippet left to run ended at 30.00 s and read played, so the real element's pause before `ended` is handled. The AE-1 worry (an `ended` while buffering) didn't show.
+    - **The preconnect has no `crossorigin` in the built HTML**, and the warm-up's request shows in the resource timing.
+    - **`rowState()` and `barState()` in `src/audio/view.ts` are the spec's mapping table,** so `site` can reuse them.
   - `src/app/bench/page.tsx`, a server component with `robots: noindex`, builds the tracks with `tracksFrom(catalogue)` and passes them to a client component. That component lists the six tracks as plain buttons, wired to the engine as the spec's mapping table says, with the hero's lead track warmed after load, and `intent()` on `pointerdown` and focus. It shows the engine's state and the time from each tap to `playing`. It mutes by default, with an unmute checkbox. The head carries the media preconnect, with no `crossorigin`.
   - **Acceptance:**
     - in the browser pane, locally, muted: tap, stop, replay, close and fast tapping move through the states as the spec writes them, with no console errors
@@ -1653,8 +1669,8 @@ Spec: [SPEC-audio-engine.md](../SPEC-audio-engine.md). Every file under `src/aud
   - **Size:** M
 
 ### Checkpoint 12: the first numbers
-- [ ] The three tap-to-`playing` cases are recorded under AE-5
-- [ ] Any case over 300 ms has a fix Reno has agreed to, written into the spec before Phase 13
+- [x] The three tap-to-`playing` cases are recorded under AE-5
+- [x] Any case over 300 ms has a fix Reno has agreed to, written into the spec before Phase 13. None was over: the worst single run was 182 ms
 
 ## Phase 13: audio-engine, the lock screen and done
 
