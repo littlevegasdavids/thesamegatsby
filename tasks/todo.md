@@ -1718,13 +1718,13 @@ Spec: [SPEC-audio-engine.md](../SPEC-audio-engine.md). Every file under `src/aud
 
 ### Checkpoint 13: audio-engine complete
 - [ ] Every success criterion in SPEC-audio-engine.md is ticked, with its evidence
-- [x] Next step: write `SPEC-site.md` for review. Written 17 Nov 2026 and built straight away at Reno's request (Phase 14)
+- [x] Next step: write `SPEC-site.md` for review. Written 17 Nov 2026, and built in its own session at Reno's request (Phase 14)
 
 ---
 
 ## Phase 14: site
 
-Spec: [SPEC-site.md](../SPEC-site.md). Built straight after it was written, at Reno's request, so its **(new)** decisions wait for his review after he tests.
+Spec: [SPEC-site.md](../SPEC-site.md). Built in its own session at Reno's request, without a spec review stop, so its **(new)** decisions wait for his review after he tests.
 
 - [ ] **SITE-1: The catalogue as view props, and the image loader**
   - `src/app/home/releases.ts`: catalogue releases as `design-system` `Release`s (cover at 768 WebP, snippet durations, links), the hero pick, and the socials. `src/app/image-loader.ts`, wired in `next.config.ts`, and `src/app/tokens.ts`, which reads a token's value from `tokens.css` at build.

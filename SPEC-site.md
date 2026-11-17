@@ -2,7 +2,7 @@
 
 Module of the [Déjà Gatsby rebuild](SPEC.md). Depends on `design-system` for every component, `audio-engine` for playback, and `media-pipeline` for the catalogue and the files on `media.thesamegatsby.com`.
 
-**Written 17 Nov 2026 and built straight away.** Reno asked for "everything left remaining" to be completed so he can test the whole site in dev, so this spec skipped its own review gate. The decisions it makes beyond the approved specs and canvas are marked **(new)**, and are listed together at the end for Reno to accept or change.
+**Written 17 Nov 2026, and handed to its own session to build.** Reno asked for the spec and everything needed, then implementation in a new session, so he can test the whole site in dev. The decisions it makes beyond the approved specs and canvas are marked **(new)**, and are listed together at the end for Reno to accept or change after testing.
 
 ## Objective
 
@@ -130,7 +130,7 @@ SPEC.md's rules apply. On top of them:
 
 ## Decisions made without review (new)
 
-Reno asked for the rest to be built in one go, so these were decided as part of it. Each can change after he tests:
+Reno asked for the spec and the build without a review stop, so these were decided as part of it. Each can change after he tests:
 
 1. **Covers through a custom image loader**, WebP at the smallest built width that fills each box.
 2. **`onIntent` added to `TrackRow`, `ReleaseRow` and `ReleaseHero`:** an optional callback, so no visual or behaviour change on `/system`.
