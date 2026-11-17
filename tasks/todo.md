@@ -1536,7 +1536,28 @@ Plan: [plan.md, media-pipeline](plan.md#implementation-plan-media-pipeline). Spe
   - **Size:** S
 
 ### Checkpoint 11: media-pipeline complete
-- [ ] Every acceptance box in SPEC-media-pipeline.md is ticked, with its evidence
+- [x] Every acceptance box in SPEC-media-pipeline.md is ticked, with its evidence
+  - **Done 17 Nov 2026.** Each box, in the spec's order:
+    - **The snippet:** `tests/media-snippet.mac.test.ts` checks every limit on a generated master, including each fade 6 ± 1 dB down at its half-way point. The six live snippets, decoded from `.media/snippets/` (each file's hash matches its key):
+
+      | Snippet | kbps | First audio byte | First / last 1 ms, dBFS | LUFS | dBTP |
+      |---|---|---|---|---|---|
+      | Welcome to Vapor_City | 166.1 | 8,192 | −110.5 / −102.0 | −15.52 | −1.02 |
+      | Give me that KaiZen | 158.2 | 8,192 | −103.6 / −106.8 | −14.15 | −1.04 |
+      | You who could be Forever | 163.7 | 8,192 | −102.6 / −113.5 | −15.28 | −0.92 |
+      | Can't You See | 163.7 | 8,192 | −103.4 / −101.0 | −14.22 | −3.36 |
+      | UKG 333 | 161.2 | 8,192 | −123.0 / silent | −14.04 | −3.44 |
+      | Bring That Change | 167.7 | 8,192 | −102.9 / −108.9 | −14.14 | −2.80 |
+
+      All are AAC-LC and 30.000 s. Vapor_City and Forever sit 1.31 and 1.09 LU under by the shortfall `add-song` printed, and land within 0.5 of that. The fade's half-way point isn't measured on the music, because the level under the fade isn't steady enough to compare against.
+    - **Two runs are identical:** the snippet and cover integration tests build twice and compare bytes. Every real upload also came out with the key its dry run gave.
+    - **Covers:** all 40 staged files are square at their slot width (`sips`). The AVIFs are sRGB, and the test suite's own Exif and WebP chunk parsers find no GPS pointer and nothing beyond colour space and size in any of them. Refusals are covered in `tests/media-covers.mac.test.ts`: not square without `--crop`, under 1080 px, quality outside 0–100.
+    - **Failures leave `songs.json` alone:** `tests/media-add-song.test.ts` (bad args, clashes, build failures) and `tests/media-upload.test.ts` (not logged in, a failed put, a 404, a wrong size, a wrong cache-control).
+    - **Live:** `npm run check-media` passes 46 of 46 keys today. `scripts/check-edge.sh` passed its media checks on Bring That Change, Vapor_City and UKG 333 at MP-9 and MP-10.
+    - **`songs.json`:** five releases and six tracks, all cut from the masters, passing strict validation in `tests/catalogue.test.ts`. The links Reno hasn't sent yet are listed under MP-10.
+    - **Old site retired:** MP-11.
+    - **Linux:** Workers Builds passed on `b63c1d3` (MP-8) on 15 Nov. The six commits since haven't been built on Linux yet. Their new tests use fake tools or only the file system, so none needs macOS, but the push is what confirms it.
+    - **CI:** `npm run ci` passes, and all 641 tests pass.
 - [ ] Next step: write `SPEC-audio-engine.md` for review
 
 ---

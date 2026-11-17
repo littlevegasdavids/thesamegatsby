@@ -316,20 +316,22 @@ Workers Builds runs `npm run ci` on Linux, with no `afconvert` or `sips`. So the
 
 ## Acceptance criteria
 
-- [ ] `add-song --dry-run` on a WAV produces a snippet that:
+Ticked at Checkpoint 11, 17 Nov 2026. `tasks/todo.md` holds the evidence for each.
+
+- [x] `add-song --dry-run` on a WAV produces a snippet that:
   - is AAC-LC, at a bit rate between 150 and 170 kbps by `afinfo`
   - is 30 s ± 0.05 s long
   - has `moov` before `mdat`, with its first audio frame inside the first 16 KB (the infra spec's range check fetches `bytes=0-16383`)
   - decodes back with its first and last 1 ms below −60 dBFS, and each fade 6 ± 1 dB down at its half-way point, which shows it runs its set length. (This said the first and last 10 ms until 14 Nov. A 0.15 s raised-cosine fade is still only 39 dB down 10 ms in, so a −14 LUFS snippet reads about −52 dBFS there, and the check could never pass.)
   - decodes back at −14 ± 0.5 LUFS with its true peak at or below −0.5 dBTP, or quieter by the shortfall `add-song` printed. The AAC encode can add about half a dB of peak, which is why the after-encode limit is looser than the −1 dBTP cap
-- [ ] Two runs on the same inputs give byte-identical files and the same keys.
-- [ ] The covers come out at 192, 384, 768 and 1080 px, square, in AVIF and WebP, sRGB, with no EXIF or GPS. A non-square cover is refused without `--crop`, and a cover under 1080 px is refused.
-- [ ] A run that fails at any step leaves `songs.json` byte-identical. A bad argument or input stops it before anything uploads.
-- [ ] A real run uploads every file. Each one returns `200` from `media.thesamegatsby.com` with the right `content-type`, the immutable `cache-control` and the staged size. `npm run check-media` passes, and the media checks in `scripts/check-edge.sh` pass on a real snippet.
-- [ ] `songs.json` holds the five releases and six tracks, re-cut from the masters, with every platform link Reno has, and it passes validation.
-- [ ] `songs/index.ts` and `public/music/` are gone. Nothing references `/music/`, and `out/` is about 21 MB smaller.
-- [ ] The unit tests pass on Linux without the macOS tools, and the integration test runs on the Mac.
-- [ ] `npm run ci` passes.
+- [x] Two runs on the same inputs give byte-identical files and the same keys.
+- [x] The covers come out at 192, 384, 768 and 1080 px, square, in AVIF and WebP, sRGB, with no EXIF or GPS. A non-square cover is refused without `--crop`, and a cover under 1080 px is refused.
+- [x] A run that fails at any step leaves `songs.json` byte-identical. A bad argument or input stops it before anything uploads.
+- [x] A real run uploads every file. Each one returns `200` from `media.thesamegatsby.com` with the right `content-type`, the immutable `cache-control` and the staged size. `npm run check-media` passes, and the media checks in `scripts/check-edge.sh` pass on a real snippet.
+- [x] `songs.json` holds the five releases and six tracks, re-cut from the masters, with every platform link Reno has, and it passes validation.
+- [x] `songs/index.ts` and `public/music/` are gone. Nothing references `/music/`, and `out/` is about 21 MB smaller.
+- [x] The unit tests pass on Linux without the macOS tools, and the integration test runs on the Mac.
+- [x] `npm run ci` passes.
 
 ## Out of scope for this module
 
