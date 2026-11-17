@@ -1524,7 +1524,7 @@ Plan: [plan.md, media-pipeline](plan.md#implementation-plan-media-pipeline). Spe
     - **The catalogue now goes through `next build`:** the `with { type: "json" }` import compiles, and `out/index.html` lists the five releases newest first, Welcome to Vapor_City to Bring That Change.
     - **The link-cleaning test keeps the old links inline** (`OLD_SITE_LINKS` in `tests/media-ids-keys.test.ts`), so MP-2's check still runs against the links as the old site stored them.
     - **Two `/music/` strings stay in `tests/catalogue.test.ts`:** one is a bad snippet key the validator must refuse, the other an Amazon URL path. Neither points at the folder. The new test checks `src/` and `scripts/`.
-    - **Not yet checked on the preview:** that waits for the push.
+    - **The preview lists the releases:** after the push of `01d4d40`, the `redesign` preview's homepage lists all five, and `/music/vapor_city/audio.m4a` there returns 404.
   - The placeholder `src/app/page.tsx` lists the catalogue's releases from `src/catalogue`. Its comment, which still says production is served from `main`, is replaced. `songs/index.ts` and `public/music/` are deleted.
   - **Acceptance:**
     - nothing in `src/`, `scripts/` or `tests/` references `songs/` or `/music/`
@@ -1556,7 +1556,7 @@ Plan: [plan.md, media-pipeline](plan.md#implementation-plan-media-pipeline). Spe
     - **Live:** `npm run check-media` passes 46 of 46 keys today. `scripts/check-edge.sh` passed its media checks on Bring That Change, Vapor_City and UKG 333 at MP-9 and MP-10.
     - **`songs.json`:** five releases and six tracks, all cut from the masters, passing strict validation in `tests/catalogue.test.ts`. The links Reno hasn't sent yet are listed under MP-10.
     - **Old site retired:** MP-11.
-    - **Linux:** Workers Builds passed on `b63c1d3` (MP-8) on 15 Nov. The six commits since haven't been built on Linux yet. Their new tests use fake tools or only the file system, so none needs macOS, but the push is what confirms it.
+    - **Linux:** Workers Builds passed on `01d4d40` on 17 Nov, running all of `npm run ci` with the macOS-only tests skipped.
     - **CI:** `npm run ci` passes, and all 641 tests pass.
 - [ ] Next step: write `SPEC-audio-engine.md` for review
 
