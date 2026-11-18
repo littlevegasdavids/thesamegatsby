@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, test } from "node:test";
-import { barTrack, opensElsewhere, pageState, shouldStop } from "../src/app/home/playing.ts";
+import { barTrack, focusAfterClose, opensElsewhere, pageState, shouldStop } from "../src/app/home/playing.ts";
 import { homeReleases } from "../src/app/home/releases.ts";
 import type { Playback } from "../src/audio/state.ts";
 import { catalogue } from "../src/catalogue/index.ts";
@@ -81,5 +81,31 @@ describe("opensElsewhere", () => {
     assert.equal(opensElsewhere(link({ href: "mailto:a@b.c" })), false);
     assert.equal(opensElsewhere({ closest: () => null }), false);
     assert.equal(opensElsewhere(null), false);
+  });
+});
+
+// Close unmounts the bar with focus on its own button, which would drop a
+// keyboard user back to the start of the page.
+describe("focusAfterClose", () => {
+  const control = (isConnected = true, visible = true) => ({ isConnected, checkVisibility: () => visible, focus() {} });
+
+  test("returns a keyboard user to the control that played", () => {
+    const played = control();
+    assert.equal(focusAfterClose(true, played, control()), played);
+  });
+
+  test("falls back when that control has gone or is hidden", () => {
+    const fallback = control();
+    assert.equal(focusAfterClose(true, control(false), fallback), fallback);
+    assert.equal(focusAfterClose(true, control(true, false), fallback), fallback);
+    assert.equal(focusAfterClose(true, null, fallback), fallback);
+  });
+
+  test("leaves a tap alone, so the page doesn't jump", () => {
+    assert.equal(focusAfterClose(false, control(), control()), null);
+  });
+
+  test("has nothing to do when the page has no control", () => {
+    assert.equal(focusAfterClose(true, null, null), null);
   });
 });

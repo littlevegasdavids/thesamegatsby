@@ -23,6 +23,8 @@ type ReleaseHeroProps = {
   onIntent?: (trackId: string) => void;
   /** Opens an album's "Show all" on first render, so /system can show it open. */
   defaultShowAll?: boolean;
+  /** Fetches the cover first. For the page's main hero, which is its largest paint. */
+  priority?: boolean;
 };
 
 // The top of the page: the release it adapts to, with its cover, its Aero
@@ -30,7 +32,7 @@ type ReleaseHeroProps = {
 // gets "Play lead track", its tracklist with LEAD on the lead, and an album's
 // tracks past five behind "Show all". Nothing is drawn over the cover. While
 // the lead track runs, the main button reads "Stop snippet", pressed (G7).
-export function ReleaseHero({ release, playingTrackId, playState, elapsed, onPlay, onIntent, defaultShowAll }: ReleaseHeroProps) {
+export function ReleaseHero({ release, playingTrackId, playState, elapsed, onPlay, onIntent, defaultShowAll, priority }: ReleaseHeroProps) {
   const labelId = `${useId()}-label`;
   const view = releaseHeroView(release, { playingTrackId, playState, elapsed });
   const className = `${styles.hero} ${view.kind === "single" ? styles.single : styles.group}`;
@@ -43,6 +45,7 @@ export function ReleaseHero({ release, playingTrackId, playState, elapsed, onPla
     // The cover's box: the column, 20 px in, on a phone.
     sizes: "(min-width: 768px) 480px, calc(100vw - 40px)",
     loading: "eager",
+    fetchPriority: priority ? "high" : undefined,
   });
   const phone = phoneCover(cover.srcSet, cover.src);
 
@@ -52,11 +55,12 @@ export function ReleaseHero({ release, playingTrackId, playState, elapsed, onPla
         <SparkleStar size={12} />
         {view.label}
       </p>
-      {/* From 768 px the browser picks by the 480 px box and the screen's
-          density. Below it the img offers nothing past the phone cap. */}
+      {/* From 768 px the cover is about 44% of the screen, up to 480 px, and the
+          browser picks by that and the density. Below it the img offers nothing
+          past the phone cap. */}
       <div className={styles.cover}>
         <picture className={styles.coverPicture}>
-          <source media="(min-width: 768px)" srcSet={cover.srcSet} sizes="480px" />
+          <source media="(min-width: 768px)" srcSet={cover.srcSet} sizes="min(44vw, 480px)" />
           <img {...cover} alt={cover.alt} src={phone.src} srcSet={phone.srcSet} />
         </picture>
       </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type MouseEvent, type ReactNode } from "react";
+import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from "react";
 import { createAudioEngine } from "../../audio/engine";
 import type { EngineTrack } from "../../audio/tracks";
 import { useAudioEngine } from "../../audio/use-audio-engine";
@@ -14,7 +14,7 @@ import { SiteHeader } from "../../design-system/components/SiteHeader/SiteHeader
 import { releaseCategory, releaseFilterOptions, type FilterKey } from "../../design-system/release-filter";
 import type { Release, SocialLink } from "../../design-system/types";
 import styles from "./home.module.css";
-import { barTrack, opensElsewhere, pageState, shouldStop } from "./playing";
+import { barTrack, focusAfterClose, opensElsewhere, pageState, shouldStop } from "./playing";
 
 type HomeProps = {
   releases: readonly Release[];
@@ -54,6 +54,7 @@ export function Home({ releases, heroId, tracks, socials, footer }: HomeProps) {
   const playback = useAudioEngine(engine);
   const [filter, setFilter] = useState<FilterKey>("all");
   const [open, setOpen] = useState<Record<string, boolean>>({});
+  const lastControl = useRef<HTMLElement | null>(null);
 
   const hero = releases.find(({ id }) => id === heroId) ?? releases[0];
   useEffect(() => whenIdle(() => engine.warm(hero.leadTrackId)), [engine, hero.leadTrackId]);
@@ -61,8 +62,16 @@ export function Home({ releases, heroId, tracks, socials, footer }: HomeProps) {
   const play = (trackId: string) => (shouldStop(engine.getSnapshot(), trackId) ? engine.stop() : engine.play(trackId));
   const intent = (trackId: string) => engine.intent(trackId);
   // Capture, so it runs whatever the link's own handler does.
-  const leaving = (event: MouseEvent<HTMLDivElement>) => {
-    if (opensElsewhere(event.target instanceof Element ? event.target : null)) engine.stop();
+  const clicked = (event: MouseEvent<HTMLDivElement>) => {
+    const target = event.target instanceof Element ? event.target : null;
+    if (opensElsewhere(target)) engine.stop();
+    lastControl.current = target?.closest<HTMLElement>("main button[aria-pressed]") ?? lastControl.current;
+  };
+  const close = () => {
+    const byKeyboard = document.activeElement?.matches(":focus-visible") ?? false;
+    const first = document.querySelector<HTMLElement>("main button[aria-pressed]");
+    engine.close();
+    focusAfterClose(byKeyboard, lastControl.current, first)?.focus();
   };
 
   const now = pageState(playback);
@@ -70,11 +79,11 @@ export function Home({ releases, heroId, tracks, socials, footer }: HomeProps) {
   const shown = releases.filter((release) => filter === "all" || releaseCategory(release) === filter);
 
   return (
-    <div className={styles.page} onClickCapture={leaving}>
+    <div className={styles.page} onClickCapture={clicked}>
       <SiteHeader socials={socials} variant="floating" />
       <main>
         <div className={styles.hero}>
-          <ReleaseHero release={hero} {...now} onPlay={play} onIntent={intent} />
+          <ReleaseHero release={hero} {...now} onPlay={play} onIntent={intent} priority />
         </div>
         <section className={styles.discography} aria-label="Discography">
           <ReleaseFilter options={releaseFilterOptions(releases)} selected={filter} onSelect={setFilter} />
@@ -101,7 +110,7 @@ export function Home({ releases, heroId, tracks, socials, footer }: HomeProps) {
           streamLinks={bar.links}
           onStop={() => engine.stop()}
           onReplay={() => engine.replay()}
-          onClose={() => engine.close()}
+          onClose={close}
         />
       )}
     </div>

@@ -198,7 +198,14 @@ describe("ReleaseHero's markup", () => {
   // homepage's first load went over 350 KB at Lighthouse's 1.75x.
   test("tells the browser the cover's box: the column on a phone, 480 px from 768", () => {
     assert.match(hero, /sizes: "\(min-width: 768px\) 480px, calc\(100vw - 40px\)"/);
-    assert.match(coverFrame(), /<source media="\(min-width: 768px\)" srcSet=\{cover\.srcSet\} sizes="480px" \/>/);
+    assert.match(coverFrame(), /<source media="\(min-width: 768px\)" srcSet=\{cover\.srcSet\} sizes="min\(44vw, 480px\)" \/>/);
+  });
+
+  // Lighthouse on the preview: the cover is the page's largest paint, and it
+  // had no priority hint. /system shows a dozen heroes, so it's opt-in.
+  test("asks for the cover first only when the page says it's the main image", () => {
+    assert.match(hero, /priority\?: boolean/);
+    assert.match(hero, /fetchPriority: priority \? "high" : undefined/);
   });
 
   // Reno's call, 18 Nov 2026: a 3x phone took the 1080 and went to about

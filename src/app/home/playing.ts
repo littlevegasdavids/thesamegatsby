@@ -47,3 +47,13 @@ export function opensElsewhere(target: Clicked): boolean {
   const link = target?.closest("a[href]");
   return !!link && link.getAttribute("target") === "_blank";
 }
+
+type Focusable = { isConnected: boolean; checkVisibility?: () => boolean; focus: () => void };
+
+// Where focus goes when the bar closes. Only a keyboard user needs moving, to
+// the control that played, or the page's first one if a filter or a closed EP
+// has taken it away. A tap stays put, so the page doesn't jump.
+export function focusAfterClose<T extends Focusable>(byKeyboard: boolean, played: T | null, fallback: T | null): T | null {
+  if (!byKeyboard) return null;
+  return played?.isConnected && played.checkVisibility?.() !== false ? played : fallback;
+}
