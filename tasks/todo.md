@@ -1706,6 +1706,19 @@ Spec: [SPEC-audio-engine.md](../SPEC-audio-engine.md). Every file under `src/aud
   - **Size:** XS
 
 - [ ] **AE-8: Final numbers, and Reno's iPhone** 🔒 👤
+  - **Measured 18 Nov 2026; open for the deployed warm-up change and Reno's iPhone.**
+    - **Method:** headless Brave through CDP at 390 × 844, 3x, Fast 4G and 4× CPU, muted, with real pointer events, and **a fresh browser process per run**, so no DNS, connection or cache carries over. This is colder than AE-5's runs, which shared one browser. Every snippet was a cache `HIT`.
+
+      | Case | Preview at `ed32600`, ms | Median | Worst | Local build with the warm-up change, live media, ms | Median | Worst |
+      |---|---|---|---|---|---|---|
+      | Warmed lead, tapped at 5 s | 173, 161, 260, 163, 184 | **173** | 260 | 65, 63, 70, 78, 161 | **70** | 161 |
+      | KaiZen, `intent()` on `pointerdown`, at 5 s | 285, 264, 262, 264, 266 | **264** | 285 | 265, 285, 271, 287, 276 | **276** | 287 |
+      | Forever, tapped at 30 s | 290, 381, 300, 281, 287 | **290** | 381 | 393, 276, 275, 306, 281 | **281** | 393 |
+
+    - **Every median is under 300 ms, but the 30 s case is close, and single runs reached 381 and 393 ms.**
+    - **One unexplained miss:** in an earlier batch of five 30 s runs started together in one browser, one tap recorded no `playing` within 15 s. It didn't recur in 30 sequential runs.
+    - **Failure paths on the preview:** a blocked file and an offline tap reached the ended bar in 0.1 s, and a stalled connection in 10.1 s.
+    - **The engine's client code is 1,752 B** minified and gzipped, against the 3 KB limit.
   - Push with Reno's OK. Re-measure the three cases on the preview, on the homepage now that SITE-5 has deleted `/bench`, with a timing script the DevTools MCP injects, and the JS size. Reno opens the homepage on the preview on his iPhone, unmutes, and checks the spec's phone list.
   - **Acceptance:**
     - every case's median is under 300 ms, or Checkpoint 12's agreed fix is in and its numbers are recorded
@@ -1804,11 +1817,13 @@ Spec: [SPEC-site.md](../SPEC-site.md). Built in its own session at Reno's reques
     - **Lighthouse performance: estimated 95, not run.** The MCP's Lighthouse leaves out performance, as DS-25 found. From the same trace: FCP 1,435 ms, Speed Index about 1,660 ms (from the trace's screenshots), LCP 2,910 ms (the hero, slowed by the stray 1080 sharing the link), TBT 73 ms, CLS 0. Lighthouse's v12 mobile curves and weights give 95, or 85 if Speed Index scored nothing. DevTools throttling isn't Lighthouse's simulated throttling, so this is an estimate.
     - **`out/`:** `opengraph-image` (1200 × 630 PNG), `apple-icon` (180 × 180 PNG), `icon.svg`, and the tags in SITE-4's note; no `bench`, `background.webp`, `profile_pic.jpg` or `favicon.ico` anywhere. `/` loads 3 CSS and 8 JS files, none with `/system` or `/bench` code.
   - **Left for Reno:**
-    - **The performance criterion.** First load now passes on phones (below). A real Lighthouse score still needs the Lighthouse CLI (`npx lighthouse`, a download: ask-first) or the preview URL in PageSpeed Insights.
+    - **The performance criterion.** First load passes on phones and tablets. **Lighthouse 13.5 on the preview at `ed32600` gave 86, 87 and 88,** under the 90 target (LCP 3.5 to 3.7 s), with accessibility and best practices at 100. SEO's 69 is only `is-crawlable`, which is the preview's own `noindex`. It ran from the copy already in the npx cache, so nothing was downloaded. After the 18 Nov fixes the local build scores a median of 99 under real network throttling, but a local score doesn't predict the edge's: this needs a push and a re-run.
     - **Phone hero capped at the 768, Reno's call on 18 Nov.** `ReleaseHero` now uses a `<picture>`, and `phoneCover()` keeps the 1080 out of the phone `srcset` and `src`. 6 tests added, and all 790 pass. `npm run ci` passes. In headless Brave, cold, against `wrangler dev`, before any tap: **323 kB** (site 223.4, covers 99.6) at 390 and 430 px 3x, 412 px 2.625x and 1.75x, and 360 px 2x, with no 1080 fetched. A 1x desktop also loads 323 kB. **A 2x desktop and a 768 px 2x tablet load the 1080: 364 kB.** The tablet's cover is only 332 px wide there, so its `sizes="480px"` overstates the box. `/system`'s 12 heroes load and fill their frames.
     - **Not settled:** the DevTools MCP's phone emulation still fetched the 1080 alongside the 768 at 3x. The direct headless run didn't, and the cause isn't established. Neither is a real phone, and **Safari wasn't tested**: AE-8's iPhone check covers it.
-    - **Close drops focus to the page.** The bar unmounts with focus on its Close button, so the next Tab starts from the end of the document. The spec doesn't say where focus goes; the row or hero button that played is the likely home.
-    - **The warm-up fetched 99 kB, not the 8 to 16 kB SPEC-audio-engine.md estimates.** With `preload="metadata"`, Brave read 99,000 bytes of Welcome to Vapor_City before cancelling, in both cold traces. It runs after load, so the engine spec leaves it out of the budget, but it's real data on a fan's plan. That's `audio-engine`'s, not changed here.
+    - **Close and focus: fixed 18 Nov.** By keyboard, focus returns to the row that played, with its ring. By pointer, focus and scroll stay put. `focusAfterClose()` is tested, and both paths were run in headless Brave.
+    - **Tablet cover: fixed 18 Nov.** `sizes` now says `min(44vw, 480px)`, so a 768 px 2x tablet takes the 768: 323 kB, down from 364.
+    - **Hero cover priority: added 18 Nov**, as `fetchPriority="high"` through a `priority` prop only the homepage sets. **Inlined CSS was tried and rejected:** first paint went from 1.50 s to 0.84 s, but LCP went from 1.74 s to 2.72 s.
+    - **The warm-up now stops at the file's index** (18 Nov): 66 kB unthrottled, 36 kB on Fast 4G and 265 kB under Slow 4G emulation, down from 129, 99 and 318. That's still above the 8 to 16 kB the spec first estimated, so Reno should decide whether it stays. A Lighthouse reading of 634 kB was its reporting of the file's full length: that request read 33 kB.
   - The browser checks, first-load size and Lighthouse from SPEC-site.md's testing strategy.
   - **Acceptance:** every success criterion in SPEC-site.md is ticked with its evidence
   - **Size:** M

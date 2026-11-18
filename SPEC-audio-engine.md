@@ -41,7 +41,7 @@ Three things stack, cheapest first:
 
 1. **Preconnect to the media domain.** `site` puts `<link rel="preconnect" href="https://media.thesamegatsby.com">` in the head, **with no `crossorigin`**, so it opens the same kind of connection the element will use. That saves the DNS, TCP and TLS round trips on the first tap.
 2. **Preload on intent.** `intent(trackId)` runs on `pointerdown`, and on keyboard focus of a play control. If nothing is playing, it points the element at that snippet with `preload="auto"`, so the fetch starts while the finger is still down. If something is playing, it does nothing, so a touch never cuts off the current snippet. The tap that follows plays whatever is loaded.
-3. **Warm the hero's lead track** (open question 3, decided yes). Once the page has loaded and gone idle, the engine points the element at the hero's lead track with `preload="metadata"`. That fetches the first range, which holds the `moov` index and the first audio, so the most likely first tap needs no new request.
+3. **Warm the hero's lead track** (open question 3, decided yes). Once the page has loaded and gone idle, the engine points the element at the hero's lead track with `preload="metadata"`. **When `loadedmetadata` fires it drops the source, which ends the download and leaves the connection open for the tap.** A touch or tap before then claims the file and the download carries on. Changed 18 Nov 2026: `preload="metadata"` is only a hint, and on its own Brave read 99 to 318 kB.
 
 ### The state
 
@@ -108,7 +108,7 @@ export type AudioEngine = {
   replay(): void;
   close(): void;
   intent(trackId: string): void; // pointerdown or focus: start the fetch
-  warm(trackId: string): void; // after load: fetch the first range only
+  warm(trackId: string): void; // after load: fetch up to the file's index, then stop
   subscribe(listener: () => void): () => void;
   getSnapshot(): Playback;
 };
@@ -178,18 +178,22 @@ export function next(state: Playback, event: EngineEvent): Playback {
 
 ## Success criteria
 
-- [ ] **Tap to `playing` under 300 ms**, median of five, on the deployed `/bench` under "Fast 4G" and 4× CPU, with the snippet a cache `HIT`. Three cases are measured and recorded:
+`/bench` was deleted in SITE-5, so these are checked on the homepage. Evidence is under AE-8 in `tasks/todo.md`.
+
+- [ ] **Tap to `playing` under 300 ms**, median of five, on the deployed homepage under "Fast 4G" and 4× CPU, with the snippet a cache `HIT`. Three cases are measured and recorded:
   - the warmed hero lead track, tapped 5 s after load
   - another track, with `intent()` firing on `pointerdown`
   - a track tapped 30 s after load, after the preconnect may have gone idle. This case is recorded either way; if it misses, the fix is an open question rather than a quiet pass
-- [ ] Tapping one track while another plays stops the first within the same tap. Fast tapping across all six rows ends on the last one tapped, and the state names it.
-- [ ] A snippet ends at 30 s on `ended`, and nothing else starts.
-- [ ] Stop, Replay and Close move through the state table as written, checked in unit tests and on `/bench`.
-- [ ] A missing file or a dropped connection reaches `failed` within 10 s, never stuck loading.
+
+  *Passed on the preview at `ed32600` (medians 173, 264 and 290 ms) and locally with the 18 Nov warm-up change (70, 276 and 281 ms). Left open until the change is deployed and measured there.*
+- [x] Tapping one track while another plays stops the first within the same tap. Fast tapping across all six rows ends on the last one tapped, and the state names it. *Unit tests, and SITE-3 in the browser.*
+- [x] A snippet ends at 30 s on `ended`, and nothing else starts. *AE-5 ended at 30.00 s, and SITE-6 read END 00:30 / 00:30 on the homepage.*
+- [x] Stop, Replay and Close move through the state table as written, checked in unit tests and on the homepage. *SITE-3 by pointer, and SITE-6 by keyboard.*
+- [x] A missing file or a dropped connection reaches `failed` within 10 s, never stuck loading. *On the preview, 18 Nov: a blocked file and an offline tap reached the ended bar in 0.1 s, and a stalled connection in 10.1 s, each with Replay and the stream links showing.*
 - [ ] On Reno's iPhone: the first tap makes sound with the silent switch on, the lock screen shows the title, Déjà Gatsby and the cover, has no skip or seek buttons, and its pause stops the snippet.
-- [ ] Howler is gone from `package.json`, and nothing imports it.
-- [ ] `src/audio/` adds under 3 KB (minified and gzipped) to the JS that `/bench` loads.
-- [ ] `npm run ci` passes.
+- [x] Howler is gone from `package.json`, and nothing imports it. *AE-7, held by `tests/removed-libraries.test.ts`.*
+- [x] `src/audio/`'s client code is under 3 KB, minified and gzipped. *1,752 B on 18 Nov. `/bench` is gone, so it's bundled on its own with esbuild.*
+- [x] `npm run ci` passes.
 
 ## Risks
 
@@ -213,7 +217,7 @@ All six were answered on 17 Nov 2026: Reno accepted every recommendation. They s
 
 1. **Stop mid-snippet. Decided: the bar goes to its ended look** (Replay, Close, the stream buttons lit) and the row reads played, the same as a snippet that ran to the end. A fan who stops is still at the moment to convert. The alternative is for Stop to close the bar, leaving Close with nothing to do.
 2. **Lock-screen pause. Decided: it stops, as Stop does**, and the lock screen's play replays from the start. The page has no paused state to show, and a snippet is too short to resume.
-3. **Warm the hero's lead track after load. Decided: yes, metadata only.** It's one range request, about 8–16 KB, made on every visit whether or not anyone taps. It doesn't count against the 350 KB first-load budget because it runs after load, but it's real data on a fan's plan.
+3. **Warm the hero's lead track after load. Decided: yes, metadata only.** The estimate Reno approved was one range request of about 8–16 KB, made on every visit whether or not anyone taps. **Measured on 18 Nov it wasn't:** left alone, Brave read 129 kB unthrottled, 99 kB on Fast 4G and 318 kB on Slow 4G. The engine now stops at the index, which reads 66, 36 and 265 kB. That's lower but **still above the estimate**, and whether the Slow 4G figure reflects a real slow connection or how the emulator meters data isn't established. It doesn't count against the 350 KB first-load budget because it runs after load, but it's real data on a fan's plan.
 4. **A snippet that fails. Decided: show the ended bar**, so the stream buttons are still there and the fan can hear the full track anyway, with no new design. The alternative is a new error look on `TrackRow` and `NowPlayingBar`, which would mean a design-system change and a canvas check.
 5. **The `/bench` route. Decided: add it in this module, unlinked and `noindex` like `/system`**, and delete it in `site` once the homepage carries the same measurements. Without it, nothing can measure the 300 ms target until `site` is built.
 6. **Stop the snippet when a stream link is followed. Decided: yes.** On desktop the new tab would otherwise play the full track over the snippet. On a phone the streaming app usually interrupts it anyway. It's one `stop()` call in `site`'s wiring, so this answer goes into SPEC-site.md.
