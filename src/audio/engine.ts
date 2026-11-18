@@ -20,6 +20,7 @@ export type MediaElementLike = EventTarget & {
   play(): Promise<void>;
   pause(): void;
   load(): void;
+  removeAttribute(name: string): void;
 };
 
 export type EngineEnv = {
@@ -61,6 +62,9 @@ export function createAudioEngine(tracks: readonly EngineTrack[], env?: EngineEn
   // after a later tap can't fail the track that replaced it.
   let generation = 0;
   let actionsBound = false;
+  // True from warm() until the index arrives, or until a touch or tap claims
+  // the file.
+  let warming = false;
 
   const environment = () => (resolved ??= env ?? browserEnv());
 
@@ -108,6 +112,15 @@ export function createAudioEngine(tracks: readonly EngineTrack[], env?: EngineEn
     // The engine's own pauses land on a state where "interrupted" changes nothing.
     made.addEventListener("pause", () => made.ended || dispatch({ type: "interrupted" }));
     made.addEventListener("error", () => dispatch({ type: "error" }));
+    // preload="metadata" is only a hint: browsers read 100 kB or more, up to the
+    // whole snippet. Dropping the source ends the fetch at the index, and the
+    // connection stays open for the tap.
+    made.addEventListener("loadedmetadata", () => {
+      if (!warming) return;
+      warming = false;
+      made.removeAttribute("src");
+      made.load();
+    });
     audio = made;
     return made;
   };
@@ -116,6 +129,7 @@ export function createAudioEngine(tracks: readonly EngineTrack[], env?: EngineEn
   // play() inside the tap.
   const start = (track: EngineTrack, reload: boolean) => {
     const media = element();
+    warming = false;
     const session = environment().mediaSession;
     // Bound on the first tap, so the lock screen's buttons belong to a page
     // that has actually played something.
@@ -173,6 +187,7 @@ export function createAudioEngine(tracks: readonly EngineTrack[], env?: EngineEn
       const track = lookup(trackId);
       const media = element();
       if (!idle()) return;
+      warming = false;
       media.preload = "auto";
       if (media.src !== track.src) media.src = track.src;
     },
@@ -181,6 +196,7 @@ export function createAudioEngine(tracks: readonly EngineTrack[], env?: EngineEn
       const media = element();
       // Only a fresh element: never undo an intent() or a tap.
       if (state || media.src) return;
+      warming = true;
       media.preload = "metadata";
       media.src = track.src;
     },

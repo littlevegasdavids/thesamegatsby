@@ -24,6 +24,10 @@ export class FakeAudio extends EventTarget implements MediaElementLike {
     this.paused = true;
     this.emit("pause");
   }
+  removeAttribute(name: string) {
+    this.calls.push(`remove ${name}`);
+    if (name === "src") this.src = "";
+  }
   load() {
     this.calls.push(`load ${this.src}`);
   }

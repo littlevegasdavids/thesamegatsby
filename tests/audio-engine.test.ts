@@ -332,6 +332,47 @@ describe("intent and warm", () => {
     assert.equal(engine.getSnapshot(), null);
   });
 
+  // Reno approved a warm-up of about 8 to 16 KB. preload="metadata" alone let
+  // Brave read 99 to 318 kB, and a whole 634 kB snippet in one throttled run.
+  test("warm() stops the download once the file's index has arrived", () => {
+    engine.warm("vapor");
+    el().emit("loadedmetadata");
+    assert.equal(el().src, "");
+    assert.deepEqual(el().calls, ["remove src", "load "]);
+    assert.equal(engine.getSnapshot(), null);
+  });
+
+  test("a tap after the warm-up has stopped loads the file again", () => {
+    engine.warm("vapor");
+    el().emit("loadedmetadata");
+    engine.play("vapor");
+    assert.equal(el().src, src("vapor"));
+    assert.equal(el().preload, "auto");
+    assert.equal(el().calls.at(-1), `play ${src("vapor")}`);
+  });
+
+  test("a touch during the warm-up keeps the download going", () => {
+    engine.warm("vapor");
+    engine.intent("vapor");
+    el().emit("loadedmetadata");
+    assert.equal(el().src, src("vapor"));
+    assert.ok(!el().calls.includes("remove src"));
+  });
+
+  test("a tap during the warm-up keeps the download going", () => {
+    engine.warm("vapor");
+    engine.play("vapor");
+    el().emit("loadedmetadata");
+    assert.equal(el().src, src("vapor"));
+    assert.ok(!el().calls.includes("remove src"));
+  });
+
+  test("a later file's metadata never stops anything", () => {
+    engine.intent("kaizen");
+    el().emit("loadedmetadata");
+    assert.equal(el().src, src("kaizen"));
+  });
+
   test("warm() never moves an element intent() or a tap already pointed", () => {
     engine.intent("kaizen");
     engine.warm("vapor");
