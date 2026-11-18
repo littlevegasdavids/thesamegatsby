@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { describe, test } from "node:test";
 import { parseTokens, tokenContrast } from "../src/design-system/contrast.ts";
-import { HERO_TRACK_LIMIT, releaseHeroView, showAllLabel } from "../src/design-system/components/ReleaseHero/view.ts";
+import { HERO_PHONE_COVER_WIDTH, HERO_TRACK_LIMIT, phoneCover, releaseHeroView, showAllLabel } from "../src/design-system/components/ReleaseHero/view.ts";
 import type { Release, Track } from "../src/design-system/types.ts";
 
 const read = (path: string) =>
@@ -182,21 +182,34 @@ describe("ReleaseHero's markup", () => {
     assert.match(hero, /<SparkleStar size=\{12\} \/>/);
   });
 
+  const coverFrame = () => /<div className=\{styles\.cover\}>([\s\S]*?)<\/div>/.exec(hero)?.[1] ?? "";
+
   test("gives the cover fixed dimensions, eager loading and alt text, with nothing else in its frame", () => {
-    const frame = /<div className=\{styles\.cover\}>([\s\S]*?)<\/div>/.exec(hero)?.[1] ?? "";
-    assert.match(frame, /^\s*<Image[^>]*\/>\s*$/, "the cover frame holds the image alone");
-    assert.match(frame, /width=\{480\}/);
-    assert.match(frame, /height=\{480\}/);
-    assert.match(frame, /loading="eager"/);
-    assert.match(frame, /alt=\{`\$\{release\.title\} cover art`\}/);
+    assert.match(coverFrame(), /^\s*<picture[^>]*>[\s\S]*<\/picture>\s*$/, "the cover frame holds the picture alone");
+    assert.equal(coverFrame().match(/<img\b/g)?.length, 1);
+    assert.match(hero, /width: 480/);
+    assert.match(hero, /height: 480/);
+    assert.match(hero, /loading: "eager"/);
+    assert.match(hero, /`\$\{release\.title\} cover art`/);
   });
 
   // SITE-6: with only width, next/image wrote "768 1x, 1080 2x", so every
   // phone at 1.5x or more loaded the 1080 for a box the 768 fills, and the
   // homepage's first load went over 350 KB at Lighthouse's 1.75x.
   test("tells the browser the cover's box: the column on a phone, 480 px from 768", () => {
-    const frame = /<div className=\{styles\.cover\}>([\s\S]*?)<\/div>/.exec(hero)?.[1] ?? "";
-    assert.match(frame, /sizes="\(min-width: 768px\) 480px, calc\(100vw - 40px\)"/);
+    assert.match(hero, /sizes: "\(min-width: 768px\) 480px, calc\(100vw - 40px\)"/);
+    assert.match(coverFrame(), /<source media="\(min-width: 768px\)" srcSet=\{cover\.srcSet\} sizes="480px" \/>/);
+  });
+
+  // Reno's call, 18 Nov 2026: a 3x phone took the 1080 and went to about
+  // 364 kB, over the 350 kB budget. Below 768 px the img offers nothing wider.
+  test("keeps phones to the capped file, in its srcset and its src", () => {
+    assert.match(coverFrame(), /<img[^>]*src=\{phone\.src\}[^>]*srcSet=\{phone\.srcSet\}/);
+    assert.match(hero, /phoneCover\(cover\.srcSet, cover\.src\)/);
+  });
+
+  test("lets the picture take no box of its own, so the image still fills the frame", () => {
+    assert.match(block(NARROW, ".coverPicture"), /display:\s*contents/);
   });
 
   test("plays through a primary Button that carries aria-pressed", () => {
@@ -304,5 +317,36 @@ describe("ReleaseHero's Show all toggle", () => {
   test("its muted words and its hover reach 4.5:1 on the page", () => {
     assert.ok(tokenContrast(tokens, "--dg-fg-muted", "--dg-bg") >= 4.5);
     assert.ok(tokenContrast(tokens, "--dg-accent", "--dg-bg") >= 4.5);
+  });
+});
+
+describe("phoneCover", () => {
+  const url = (width: number) => `https://media.thesamegatsby.com/covers/x.12345678.${width}.webp`;
+  const all = [768, 1080].map((width) => `${url(width)} ${width}w`).join(", ");
+
+  test("caps a phone at the 768 px file", () => {
+    assert.equal(HERO_PHONE_COVER_WIDTH, 768);
+    assert.deepEqual(phoneCover(all, url(1080)), { srcSet: `${url(768)} 768w`, src: url(768) });
+  });
+
+  test("keeps every width up to the cap, and takes the widest as src", () => {
+    const wider = [192, 384, 768, 1080].map((width) => `${url(width)} ${width}w`).join(", ");
+    assert.deepEqual(phoneCover(wider, url(1080)), {
+      srcSet: [192, 384, 768].map((width) => `${url(width)} ${width}w`).join(", "),
+      src: url(768),
+    });
+  });
+
+  test("works on /system's local fixtures, which carry ?w=", () => {
+    const local = "/system-fixtures/x.jpg?w=768 768w, /system-fixtures/x.jpg?w=1080 1080w";
+    assert.deepEqual(phoneCover(local, "/system-fixtures/x.jpg?w=1080"), {
+      srcSet: "/system-fixtures/x.jpg?w=768 768w",
+      src: "/system-fixtures/x.jpg?w=768",
+    });
+  });
+
+  test("leaves the image alone when no file fits under the cap", () => {
+    assert.deepEqual(phoneCover(`${url(1080)} 1080w`, url(1080)), { srcSet: `${url(1080)} 1080w`, src: url(1080) });
+    assert.deepEqual(phoneCover(undefined, url(1080)), { srcSet: undefined, src: url(1080) });
   });
 });

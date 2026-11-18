@@ -38,6 +38,11 @@
   box-shadow: var(--dg-glow-cover);
 }
 
+/* No box of its own, so the image's 100% still means the frame. */
+.coverPicture {
+  display: contents;
+}
+
 .coverImage {
   display: block;
   width: 100%;

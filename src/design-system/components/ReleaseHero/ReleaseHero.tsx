@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { getImageProps } from "next/image";
 import { useId } from "react";
 import type { Release } from "../../types";
 import { Button } from "../Button/Button";
@@ -7,7 +7,7 @@ import { SparkleStar } from "../SparkleStar/SparkleStar";
 import { StreamLinks } from "../StreamLinks/StreamLinks";
 import { HeroTracklist } from "./HeroTracklist";
 import styles from "./ReleaseHero.module.css";
-import { releaseHeroView } from "./view";
+import { phoneCover, releaseHeroView } from "./view";
 
 type ReleaseHeroProps = {
   /** The latest or featured release. Its leadTrackId and links are the hero's. */
@@ -34,6 +34,17 @@ export function ReleaseHero({ release, playingTrackId, playState, elapsed, onPla
   const labelId = `${useId()}-label`;
   const view = releaseHeroView(release, { playingTrackId, playState, elapsed });
   const className = `${styles.hero} ${view.kind === "single" ? styles.single : styles.group}`;
+  const { props: cover } = getImageProps({
+    className: styles.coverImage,
+    src: release.cover,
+    alt: `${release.title} cover art`,
+    width: 480,
+    height: 480,
+    // The cover's box: the column, 20 px in, on a phone.
+    sizes: "(min-width: 768px) 480px, calc(100vw - 40px)",
+    loading: "eager",
+  });
+  const phone = phoneCover(cover.srcSet, cover.src);
 
   return (
     <section className={className} aria-labelledby={labelId}>
@@ -41,11 +52,13 @@ export function ReleaseHero({ release, playingTrackId, playState, elapsed, onPla
         <SparkleStar size={12} />
         {view.label}
       </p>
-      {/* sizes is the cover's box (the column, 20 px in, on a phone), so the
-          browser picks the built width that fills it at the screen's density
-          rather than the 2x file on every phone. */}
+      {/* From 768 px the browser picks by the 480 px box and the screen's
+          density. Below it the img offers nothing past the phone cap. */}
       <div className={styles.cover}>
-        <Image className={styles.coverImage} src={release.cover} alt={`${release.title} cover art`} width={480} height={480} sizes="(min-width: 768px) 480px, calc(100vw - 40px)" loading="eager" />
+        <picture className={styles.coverPicture}>
+          <source media="(min-width: 768px)" srcSet={cover.srcSet} sizes="480px" />
+          <img {...cover} alt={cover.alt} src={phone.src} srcSet={phone.srcSet} />
+        </picture>
       </div>
       <div className={styles.body}>
         <h1 className={`${styles.title} dg-tape`}>{release.title}</h1>

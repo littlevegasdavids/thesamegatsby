@@ -10,6 +10,21 @@ import { trackRowLook, type TrackRowState } from "../TrackRow/states.ts";
 /** An album shows this many tracks before "Show all". */
 export const HERO_TRACK_LIMIT = 5;
 
+/** The widest cover a phone loads. A 3x phone would otherwise take the 1080
+ * and put the first load over its 350 kB budget (Reno's call, 18 Nov 2026). */
+export const HERO_PHONE_COVER_WIDTH = 768;
+
+/** The hero cover's srcset and src below 768 px: nothing wider than the cap,
+ * in either, so no browser can reach for the bigger file. */
+export function phoneCover(srcSet: string | undefined, src: string): { srcSet: string | undefined; src: string } {
+  const fits = (srcSet ?? "")
+    .split(/,\s+/)
+    .map((entry) => entry.trim().split(/\s+/))
+    .filter(([url, width]) => url && Number.parseInt(width, 10) <= HERO_PHONE_COVER_WIDTH);
+  if (fits.length === 0) return { srcSet, src };
+  return { srcSet: fits.map((entry) => entry.join(" ")).join(", "), src: fits[fits.length - 1][0] };
+}
+
 export type ReleaseHeroPlayback = {
   /** The track playing anywhere on the page, or none. */
   playingTrackId?: string | null;

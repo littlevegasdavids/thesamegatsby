@@ -50,7 +50,7 @@ The client gets plain view data plus `EngineTrack`s from `tracksFrom()`. It neve
 
 `next.config.ts` swaps `unoptimized` for a custom image loader (`src/app/image-loader.ts`), which static export allows. For a cover on the media domain it picks the smallest built width at or above the one asked for (192, 384, 768 or 1080, WebP). Anything else (`/system`'s local fixtures) passes through with a `?w=` the server ignores. `images.imageSizes` and `deviceSizes` are those four widths, so every `srcset` descriptor names the file's real width.
 - **Rows and the bar** have a fixed `width`, so `next/image` writes a 1x/2x `srcset`: a 60 px row cover loads the 192 px file, not the 768.
-- **The hero's cover sets `sizes`**: `(min-width: 768px) 480px, calc(100vw - 40px)`. The browser then picks by the box and the screen's density: the 768 on a 2x or 1.75x phone (a 372 px box needs 744 or 651), the 1080 on a 3x one, and on desktop the 768 at 1x and the 1080 at 2x. **Changed in SITE-6:** with only `width`, `next/image` wrote "768 1x, 1080 2x", so every phone at 1.5x or more loaded the 1080, and first load at Lighthouse's 1.75x was 363 kB, over the budget.
+- **The hero's cover is a `<picture>`, built with `getImageProps`.** From 768 px its `<source>` offers every width with `sizes="480px"`: the 768 at 1x and the 1080 at 2x. Below 768 px the `<img>` offers nothing past **768 px**, in its `srcset` and its `src`, with `sizes` set to the column. **Reno's call, 18 Nov 2026:** a 3x phone took the 1080 and loaded about 364 kB, over the 350 kB budget. The 768 is about 2.2 device pixels per CSS pixel on a 350 px cover, so it's slightly softer there. SITE-6 had already given the hero `sizes`: with only `width`, `next/image` wrote "768 1x, 1080 2x", and every phone at 1.5x or more loaded the 1080.
 
 AVIF isn't used. WebP is within about 10% of it at these sizes (media-pipeline's open question 2), and `next/image` writes one format.
 
@@ -119,9 +119,9 @@ Checked in SITE-6 (17 Nov 2026). Evidence is in its Done note in `tasks/todo.md`
 
 - [x] `/` shows the five releases newest first, with Welcome to Vapor_City in the hero, and the filter offering only the types the catalogue has. *Rows read Welcome to Vapor_City, Give me that KaiZen, You who could be Forever, Can't You See, Bring That Change; the filter offers All 5, Singles 4 and EPs 1.*
 - [x] Every play control plays its snippet through the engine. Stop, Replay and Close work, the bar stays up after the end, and following a stream link stops the snippet. *SITE-3 by pointer; SITE-6 by keyboard, and a snippet left to run reads END 00:30 / 00:30 with Replay and Close.*
-- [x] Each cover loads at the smallest built width that fills its box. *After SITE-6 gave the hero `sizes`: the 768 at 1.75x, the 1080 in a real 2x window, the 192 for rows.*
+- [x] Each cover loads at the smallest built width that fills its box, except that phones stop at the 768. *Measured 18 Nov in headless Brave: the 768 at 1.75x, 2x, 2.625x and 3x phone sizes, the 768 on a 1x desktop, the 1080 on a 2x desktop, and the 192 for rows.*
 - [x] Checked at 360, 768 and 1280 px, by keyboard only, and with reduced motion, with no console errors. *SITE-6 fixed two keyboard faults (the root's scroll padding, the email's ring). Open for Reno: Close drops focus to the page.*
-- [ ] First load under 350 KB, and Lighthouse mobile performance 90 or more. *At Lighthouse's 1.75x, 322.6 kB before any tap, and an estimated 95 from a throttled trace. Left open: Lighthouse's own performance score wasn't run (the DevTools MCP leaves it out), and a 3x phone, which needs the 1080, loads about 364 kB.*
+- [ ] First load under 350 KB, and Lighthouse mobile performance 90 or more. *First load is 323 kB on every phone size measured on 18 Nov (360 to 430 px, 1.75x to 3x), in headless Brave against `wrangler dev`, before any tap. Still open: Lighthouse's own score hasn't been run (a throttled trace estimates 95). Tablets and desktops at 2x load the 1080 and 364 kB.*
 - [x] `out/` has the share image, the icons and the metadata, and no `/bench`, `background.webp` or `profile_pic.jpg`.
 - [x] `npm run ci` passes.
 
