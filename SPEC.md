@@ -70,7 +70,7 @@ Approved 3 Nov 2026. The module ids are stable and are never renamed.
 | `media-pipeline` | `npm run add-song`: cut and encode the snippet, size the covers, content-hash the names, upload to R2, write the typed catalogue entry. Re-cut the six existing songs | `cloudflare-infra` | [SPEC-media-pipeline.md](SPEC-media-pipeline.md) |
 | `audio-engine` | Player core: one shared `<audio>` element, fast start, preload on intent, one snippet at a time, stop at end, Media Session for the lock screen. No UI | `media-pipeline` | [SPEC-audio-engine.md](SPEC-audio-engine.md) |
 | `site` | The homepage built from `design-system` components and wired to `audio-engine`, plus metadata, Open Graph image and favicon | `design-system`, `audio-engine`, `media-pipeline` | [SPEC-site.md](SPEC-site.md) |
-| `release-kit` | Unlinked `/kit` route: upload a cover, pick a track, export the post and story PNGs | `design-system`, `media-pipeline` | written when reached |
+| `release-kit` | Unlinked `/kit` route: upload a cover, pick a track, export the post and story PNGs | `design-system`, `media-pipeline` | [SPEC-release-kit.md](SPEC-release-kit.md) |
 | `claude-design-system` | Publish Déjà Gatsby as a Design System artifact in Claude, built from the same tokens and assets | `design-system` | written when reached |
 
 **Build order:**

@@ -425,3 +425,7 @@ Planned on 17 Nov 2026 from [SPEC-site.md](../SPEC-site.md), at Reno's request t
 - **Layout reference:** `/system`'s `StickyStack` already puts the page together with fixtures, so the homepage follows it on a phone, and `HomeDesktop.dc.html` from 768 px.
 - **No push.** Reno tests in dev. AE-8 and the preview checks wait for a push he asks for.
 - **Size and cost:** six tasks, mostly assembly of parts that are already built and checked. The browser checks are the long part.
+
+# Implementation Plan: release-kit
+
+Planned and built on 18 Nov 2026 from [SPEC-release-kit.md](../SPEC-release-kit.md), as RK-1 in [todo.md](todo.md), Phase 15. No canvas board draws the artwork, so its composition is listed in the spec for Reno's review.

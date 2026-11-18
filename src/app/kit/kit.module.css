@@ -1,0 +1,109 @@
+/* A working page for Reno: tokens for colour and type. */
+
+.page {
+  color-scheme: dark;
+  max-width: 72rem;
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding: var(--dg-space-6) var(--dg-space-4) var(--dg-space-9);
+  font-family: var(--dg-font-ui);
+  font-size: var(--dg-text-body);
+  line-height: 1.5;
+  color: var(--dg-fg);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--dg-font-display);
+  font-size: var(--dg-text-display-l);
+  font-weight: 400;
+  line-height: 1;
+  text-shadow: var(--dg-tape);
+}
+
+.lede {
+  margin: var(--dg-space-3) 0 var(--dg-space-5);
+  color: var(--dg-fg-muted);
+}
+
+.controls {
+  display: grid;
+  gap: var(--dg-space-4);
+  max-width: 32rem;
+}
+
+.field {
+  display: grid;
+  gap: var(--dg-space-1);
+  font-size: var(--dg-text-small);
+  color: var(--dg-fg-muted);
+}
+
+.select,
+.file {
+  min-height: 44px;
+  padding: var(--dg-space-2) var(--dg-space-3);
+  font: inherit;
+  font-size: var(--dg-text-body);
+  color: var(--dg-fg);
+  background: var(--dg-surface);
+  border: 1px solid var(--dg-outline);
+  border-radius: var(--dg-radius-s);
+}
+
+.using {
+  margin: 0;
+  font-size: var(--dg-text-small);
+  color: var(--dg-fg-muted);
+}
+
+.reset {
+  min-height: 44px;
+  padding: 0 var(--dg-space-1);
+  font: inherit;
+  color: var(--dg-link);
+  text-decoration: underline;
+  cursor: pointer;
+  background: none;
+  border: 0;
+}
+
+.select:focus-visible,
+.file:focus-visible,
+.reset:focus-visible {
+  outline: 2px solid var(--dg-focus);
+  outline-offset: 2px;
+}
+
+.status {
+  min-height: 1.5em;
+  margin: var(--dg-space-4) 0;
+  font-size: var(--dg-text-small);
+  color: var(--dg-accent);
+}
+
+.outputs {
+  display: grid;
+  gap: var(--dg-space-6);
+  align-items: start;
+}
+
+.output {
+  display: grid;
+  gap: var(--dg-space-3);
+  justify-items: start;
+}
+
+.canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--dg-line);
+  border-radius: var(--dg-radius-m);
+}
+
+@media (min-width: 768px) {
+  .outputs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

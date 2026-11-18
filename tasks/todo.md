@@ -1,4 +1,4 @@
-# Tasks: design-system, cloudflare-infra, media-pipeline, audio-engine and site
+# Tasks: design-system, cloudflare-infra, media-pipeline, audio-engine, site and release-kit
 
 Plan: [plan.md](plan.md). Specs: [SPEC.md](../SPEC.md), [SPEC-design-system.md](../SPEC-design-system.md), [SPEC-cloudflare-infra.md](../SPEC-cloudflare-infra.md), [SPEC-media-pipeline.md](../SPEC-media-pipeline.md), [SPEC-audio-engine.md](../SPEC-audio-engine.md). Visual reference: the approved canvas ["Déjà Gatsby Screens"](https://claude.ai/artifact/WSB4B7NtCYipXV3GSXmmSo).
 
@@ -1831,6 +1831,23 @@ Spec: [SPEC-site.md](../SPEC-site.md). Built in its own session at Reno's reques
 ### Checkpoint 14: Reno tests the site in dev
 - [ ] Reno runs `npm run dev` and tries the whole page, then accepts or changes SPEC-site.md's **(new)** decisions
 - [ ] AE-8, on the homepage, after a push he asks for
+
+---
+
+## Phase 15: release-kit
+
+Spec: [SPEC-release-kit.md](../SPEC-release-kit.md). Built on 18 Nov 2026 at Reno's request to finish everything possible, so its artwork composition, marked **(new)**, waits for his review.
+
+- [x] **RK-1: The kit's data, layout and page**
+  - **Done 18 Nov 2026.** 22 tests in `tests/release-kit.test.ts`, and all 822 pass. `npm run ci` passes.
+    - **In headless Brave against the built site:** all six tracks exported a post at 1080 × 1350 and a story at 1080 × 1920. The Download button saved `deja-gatsby-welcome-to-vapor-city-story.png`. No console errors.
+    - **A picked file:** a 320 × 200 JPEG replaced the cover, centre-cropped, with the under-1080 note. "Use the release cover" restored the exact earlier image. A text file was refused. The page sent no non-GET request.
+    - **`/` loads none of it:** no file `/` loads contains the kit's code.
+    - **The module is `artwork.ts`, not `layout.ts`:** Next treats any `layout.ts` in a route folder as that route's layout.
+    - **Not tested:** Safari, or posting the PNGs to Instagram or TikTok.
+
+### Checkpoint 15: Reno reviews the kit
+- [ ] Reno tries `/kit` and accepts or changes the artwork's composition
 
 ---
 
