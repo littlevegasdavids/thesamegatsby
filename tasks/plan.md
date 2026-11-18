@@ -429,3 +429,7 @@ Planned on 17 Nov 2026 from [SPEC-site.md](../SPEC-site.md), at Reno's request t
 # Implementation Plan: release-kit
 
 Planned and built on 18 Nov 2026 from [SPEC-release-kit.md](../SPEC-release-kit.md), as RK-1 in [todo.md](todo.md), Phase 15. No canvas board draws the artwork, so its composition is listed in the spec for Reno's review.
+
+# Implementation Plan: claude-design-system
+
+Planned on 18 Nov 2026 from [SPEC-claude-design-system.md](../SPEC-claude-design-system.md). CDS-1 builds the files locally, and CDS-2, publishing, waits for Reno's OK.

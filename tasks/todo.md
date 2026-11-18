@@ -1,4 +1,4 @@
-# Tasks: design-system, cloudflare-infra, media-pipeline, audio-engine, site and release-kit
+# Tasks: design-system, cloudflare-infra, media-pipeline, audio-engine, site, release-kit and claude-design-system
 
 Plan: [plan.md](plan.md). Specs: [SPEC.md](../SPEC.md), [SPEC-design-system.md](../SPEC-design-system.md), [SPEC-cloudflare-infra.md](../SPEC-cloudflare-infra.md), [SPEC-media-pipeline.md](../SPEC-media-pipeline.md), [SPEC-audio-engine.md](../SPEC-audio-engine.md). Visual reference: the approved canvas ["Déjà Gatsby Screens"](https://claude.ai/artifact/WSB4B7NtCYipXV3GSXmmSo).
 
@@ -1848,6 +1848,18 @@ Spec: [SPEC-release-kit.md](../SPEC-release-kit.md). Built on 18 Nov 2026 at Ren
 
 ### Checkpoint 15: Reno reviews the kit
 - [ ] Reno tries `/kit` and accepts or changes the artwork's composition
+
+---
+
+## Phase 16: claude-design-system
+
+Spec: [SPEC-claude-design-system.md](../SPEC-claude-design-system.md).
+
+- [x] **CDS-1: The Design System's files**
+  - **Done 18 Nov 2026.** `npm run export-design-system` writes `.design-system/project/`, which git ignores. 10 tests in `tests/design-system-export.test.ts`, and all 832 pass. `npm run ci` passes. The cover was rendered and looks right.
+    - **Left out:** Aero's font file, until its licence is confirmed, and six `color-mix()` colours the artifact's format refuses.
+- [ ] **CDS-2: Publish it** 🔒 👤
+  - Needs Reno's OK. Making a post in Aero also needs the licence and the font file.
 
 ---
 

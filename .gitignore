@@ -35,6 +35,7 @@ yarn-error.log*
 
 # media-pipeline: snippets and covers staged by add-song before upload
 .media/
+.design-system/
 
 # vercel
 .vercel

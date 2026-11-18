@@ -11,7 +11,8 @@
     "ci": "npm run lint && npm run typecheck && npm test && npm run build",
     "cf:dev": "next build && wrangler dev",
     "add-song": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/add-song.ts",
-    "check-media": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-media.ts"
+    "check-media": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-media.ts",
+    "export-design-system": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/design-system-export.ts"
   },
   "dependencies": {
     "next": "16.4.6",
